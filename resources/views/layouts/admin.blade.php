@@ -98,134 +98,142 @@
             <div class="nav flex-column">
 
                 @if($isAdmin || ($subAdmin && $subAdmin->hasPermission('dashboard_view')))
-                <a href="{{ route('admin.dashboard') }}"
-                    class="nav-link-admin {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
-                    <i class="bi bi-speedometer2"></i> <span>Dashboard</span>
-                </a>
+                    <a href="{{ route('admin.dashboard') }}"
+                        class="nav-link-admin {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
+                        <i class="bi bi-speedometer2"></i> <span>Dashboard</span>
+                    </a>
                 @endif
 
                 @if($isAdmin || ($subAdmin && ($subAdmin->hasPermission('categories_view') || $subAdmin->hasPermission('sub_categories_view') || $subAdmin->hasPermission('products_view'))))
-                <div class="sidebar-section-title">Catalog & Inventory</div>
+                    <div class="sidebar-section-title">Catalog & Inventory</div>
                 @endif
 
                 @if($isAdmin || ($subAdmin && $subAdmin->hasPermission('categories_view')))
-                <a href="{{ route('admin.categories.index') }}"
-                    class="nav-link-admin {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}">
-                    <i class="bi bi-grid-3x3-gap"></i> <span>Categories</span>
-                </a>
+                    <a href="{{ route('admin.categories.index') }}"
+                        class="nav-link-admin {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}">
+                        <i class="bi bi-grid-3x3-gap"></i> <span>Categories</span>
+                    </a>
                 @endif
 
                 @if($isAdmin || ($subAdmin && $subAdmin->hasPermission('sub_categories_view')))
-                <a href="{{ route('admin.sub-categories.index') }}"
-                    class="nav-link-admin {{ request()->routeIs('admin.sub-categories.*') ? 'active' : '' }}">
-                    <i class="bi bi-grid"></i> <span>Sub Categories</span>
-                </a>
+                    <a href="{{ route('admin.sub-categories.index') }}"
+                        class="nav-link-admin {{ request()->routeIs('admin.sub-categories.*') ? 'active' : '' }}">
+                        <i class="bi bi-grid"></i> <span>Sub Categories</span>
+                    </a>
                 @endif
 
                 @if($isAdmin || ($subAdmin && $subAdmin->hasPermission('products_view')))
-                <a href="{{ route('admin.products.index') }}"
-                    class="nav-link-admin {{ request()->routeIs('admin.products.*') ? 'active' : '' }}">
-                    <i class="bi bi-box-seam"></i> <span>Products</span>
-                </a>
+                    <a href="{{ route('admin.products.index') }}"
+                        class="nav-link-admin {{ request()->routeIs('admin.products.*') ? 'active' : '' }}">
+                        <i class="bi bi-box-seam"></i> <span>Products</span>
+                    </a>
                 @endif
 
                 @if($isAdmin || ($subAdmin && $subAdmin->hasPermission('coupons_view')))
-                <a href="{{ route('admin.coupons.index') }}"
-                    class="nav-link-admin {{ request()->routeIs('admin.coupons.*') ? 'active' : '' }}">
-                    <i class="bi bi-ticket-perforated"></i> <span>Offers & Coupons</span>
-                </a>
+                    <a href="{{ route('admin.coupons.index') }}"
+                        class="nav-link-admin {{ request()->routeIs('admin.coupons.*') ? 'active' : '' }}">
+                        <i class="bi bi-ticket-perforated"></i> <span>Offers & Coupons</span>
+                    </a>
                 @endif
 
                 @if($isAdmin || ($subAdmin && $subAdmin->hasPermission('orders_view')))
-                <div class="sidebar-section-title">Orders & Logistics</div>
-                <a href="{{ route('admin.orders.index') }}"
-                    class="nav-link-admin {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}">
-                    <i class="bi bi-cart-check"></i> <span>Orders</span>
-                </a>
-                @if($isAdmin)
-                <a href="{{ route('admin.settings') }}#orderingConfiguration" class="nav-link-admin">
-                    <i class="bi bi-funnel"></i> <span>Set Minimum Global Order Value</span>
-                </a>
-                @endif
+                    <div class="sidebar-section-title">Orders & Logistics</div>
+                    <a href="{{ route('admin.orders.index') }}"
+                        class="nav-link-admin {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}">
+                        <i class="bi bi-cart-check"></i> <span>Orders</span>
+                    </a>
+                    @if($isAdmin)
+                        <a href="{{ route('admin.settings') }}"
+                            class="nav-link-admin {{ request()->routeIs('admin.settings*') ? 'active' : '' }}">
+                            <i class="bi bi-funnel"></i> <span>Set Minimum Global Order Value</span>
+                        </a>
+                    @endif
                 @endif
 
                 @if($isAdmin || ($subAdmin && ($subAdmin->hasPermission('transactions_view') || $subAdmin->hasPermission('wallet_deals_view') || $subAdmin->hasPermission('users_view'))))
-                <div class="sidebar-section-title">Finance & Users</div>
+                    <div class="sidebar-section-title">Finance & Users</div>
                 @endif
 
                 @if($isAdmin || ($subAdmin && $subAdmin->hasPermission('transactions_view')))
-                <a href="{{ route('admin.transactions.index') }}"
-                    class="nav-link-admin {{ request()->routeIs('admin.transactions.index') ? 'active' : '' }}">
-                    <i class="bi bi-journal-text"></i> <span>Payments & Transactions</span>
-                </a>
+                    <a href="{{ route('admin.transactions.index') }}"
+                        class="nav-link-admin {{ request()->routeIs('admin.transactions.index') ? 'active' : '' }}">
+                        <i class="bi bi-journal-text"></i> <span>Payments & Transactions</span>
+                    </a>
                 @endif
 
                 @if($isAdmin || ($subAdmin && $subAdmin->hasPermission('wallet_deals_view')))
-                <a href="{{ route('admin.wallet-offers.index') }}"
-                    class="nav-link-admin {{ request()->routeIs('admin.wallet-offers.*') ? 'active' : '' }}">
-                    <i class="bi bi-gift"></i> <span>Wallet Bonus Deals</span>
-                </a>
+                    <a href="{{ route('admin.wallet-offers.index') }}"
+                        class="nav-link-admin {{ request()->routeIs('admin.wallet-offers.*') ? 'active' : '' }}">
+                        <i class="bi bi-gift"></i> <span>Wallet Bonus Deals</span>
+                    </a>
                 @endif
 
                 @if($isAdmin || ($subAdmin && $subAdmin->hasPermission('users_view')))
-                <a href="{{ route('admin.users.index') }}"
-                    class="nav-link-admin {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
-                    <i class="bi bi-people"></i> <span>Users/Customers</span>
-                </a>
+                    <a href="{{ route('admin.users.index') }}"
+                        class="nav-link-admin {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
+                        <i class="bi bi-people"></i> <span>Users/Customers</span>
+                    </a>
                 @endif
 
-                @if($isAdmin || ($subAdmin && ($subAdmin->hasPermission('complaints_view') || $subAdmin->hasPermission('contacts_view') || $subAdmin->hasPermission('support_view') || $subAdmin->hasPermission('reviews_view'))))
-                <div class="sidebar-section-title">Customer Support</div>
+                @if($isAdmin || ($subAdmin && ($subAdmin->hasPermission('complaints_view') || $subAdmin->hasPermission('contacts_view') || $subAdmin->hasPermission('support_view') || $subAdmin->hasPermission('reviews_view') || $subAdmin->hasPermission('seller_inquiries_view'))))
+                    <div class="sidebar-section-title">Customer Support</div>
+                @endif
+
+                @if($isAdmin || ($subAdmin && $subAdmin->hasPermission('seller_inquiries_view')))
+                    <a href="{{ route('admin.seller-inquiries.index') }}"
+                        class="nav-link-admin {{ request()->routeIs('admin.seller-inquiries.*') ? 'active' : '' }}">
+                        <i class="bi bi-shop"></i> <span>Seller Inquiries</span>
+                    </a>
                 @endif
 
                 @if($isAdmin || ($subAdmin && $subAdmin->hasPermission('complaints_view')))
-                <a href="{{ route('admin.complaints.index') }}"
-                    class="nav-link-admin {{ request()->routeIs('admin.complaints.*') ? 'active' : '' }}">
-                    <i class="bi bi-chat-left-text"></i> <span>Complaints</span>
-                </a>
+                    <a href="{{ route('admin.complaints.index') }}"
+                        class="nav-link-admin {{ request()->routeIs('admin.complaints.*') ? 'active' : '' }}">
+                        <i class="bi bi-chat-left-text"></i> <span>Complaints</span>
+                    </a>
                 @endif
 
                 @if($isAdmin || ($subAdmin && $subAdmin->hasPermission('contacts_view')))
-                <a href="{{ route('admin.contacts.index') }}"
-                    class="nav-link-admin {{ request()->routeIs('admin.contacts.*') ? 'active' : '' }}">
-                    <i class="bi bi-envelope"></i> <span>Contact Inquiries</span>
-                </a>
+                    <a href="{{ route('admin.contacts.index') }}"
+                        class="nav-link-admin {{ request()->routeIs('admin.contacts.*') ? 'active' : '' }}">
+                        <i class="bi bi-envelope"></i> <span>Contact Inquiries</span>
+                    </a>
                 @endif
 
                 @if($isAdmin || ($subAdmin && $subAdmin->hasPermission('support_view')))
-                <a href="{{ route('admin.support-tickets.index') }}"
-                    class="nav-link-admin {{ request()->routeIs('admin.support-tickets.*') ? 'active' : '' }}">
-                    <i class="bi bi-headset"></i> <span>Support & Feedback</span>
-                </a>
+                    <a href="{{ route('admin.support-tickets.index') }}"
+                        class="nav-link-admin {{ request()->routeIs('admin.support-tickets.*') ? 'active' : '' }}">
+                        <i class="bi bi-headset"></i> <span>Support & Feedback</span>
+                    </a>
                 @endif
 
                 @if($isAdmin || ($subAdmin && $subAdmin->hasPermission('reviews_view')))
-                <a href="{{ route('admin.reviews.index') }}"
-                    class="nav-link-admin {{ request()->routeIs('admin.reviews.*') ? 'active' : '' }}">
-                    <i class="bi bi-star-half"></i> <span>Product Reviews</span>
-                </a>
+                    <a href="{{ route('admin.reviews.index') }}"
+                        class="nav-link-admin {{ request()->routeIs('admin.reviews.*') ? 'active' : '' }}">
+                        <i class="bi bi-star-half"></i> <span>Product Reviews</span>
+                    </a>
                 @endif
 
                 @if($isAdmin || ($subAdmin && $subAdmin->hasPermission('refunds_view')))
-                <a href="{{ route('admin.refunds.index') }}"
-                    class="nav-link-admin {{ request()->routeIs('admin.refunds.*') ? 'active' : '' }}">
-                    <i class="bi bi-arrow-counterclockwise"></i> <span>Refund & Cancellations</span>
-                </a>
+                    <a href="{{ route('admin.refunds.index') }}"
+                        class="nav-link-admin {{ request()->routeIs('admin.refunds.*') ? 'active' : '' }}">
+                        <i class="bi bi-arrow-counterclockwise"></i> <span>Refund & Cancellations</span>
+                    </a>
                 @endif
 
                 @if($isAdmin)
-                <div class="sidebar-section-title">System Administration</div>
-                <a href="{{ route('admin.subadmins.index') }}"
-                    class="nav-link-admin {{ request()->routeIs('admin.subadmins.*') ? 'active' : '' }}">
-                    <i class="bi bi-shield-lock"></i> <span>Sub Admin System</span>
-                </a>
-                <a href="{{ route('admin.profile') }}"
-                    class="nav-link-admin {{ request()->routeIs('admin.profile') ? 'active' : '' }}">
-                    <i class="bi bi-person-circle"></i> <span>My Profile</span>
-                </a>
-                <a href="{{ route('admin.profile') }}#changePasswordSection" class="nav-link-admin">
-                    <i class="bi bi-key"></i> <span>Change Password</span>
-                </a>
+                    <div class="sidebar-section-title">System Administration</div>
+                    <a href="{{ route('admin.subadmins.index') }}"
+                        class="nav-link-admin {{ request()->routeIs('admin.subadmins.*') ? 'active' : '' }}">
+                        <i class="bi bi-shield-lock"></i> <span>Sub Admin System</span>
+                    </a>
+                    <a href="{{ route('admin.profile') }}"
+                        class="nav-link-admin {{ request()->routeIs('admin.profile') ? 'active' : '' }}">
+                        <i class="bi bi-person-circle"></i> <span>My Profile</span>
+                    </a>
+                    <a href="{{ route('admin.profile') }}#changePasswordSection" class="nav-link-admin">
+                        <i class="bi bi-key"></i> <span>Change Password</span>
+                    </a>
                 @endif
             </div>
         </div>
@@ -256,47 +264,60 @@
                             <span class="d-none d-sm-inline">System Active</span>
                         </span>
                         <span class="text-secondary opacity-50 d-none d-sm-inline mx-2">|</span>
-                        <span class="text-white opacity-75 d-none d-sm-inline font-monospace" id="liveClock">Loading time...</span>
+                        <span class="text-white opacity-75 d-none d-sm-inline font-monospace" id="liveClock">Loading
+                            time...</span>
                     </div>
                 </div>
             </div>
-            
+
             <!-- Right Side: Profile & Actions -->
             <div class="d-flex align-items-center ms-2 flex-shrink-0">
                 <div class="header-glass-pill py-2 px-3 d-flex align-items-center">
-                    <i class="bi bi-bell text-white opacity-75 me-3 d-none d-sm-block hover-white cursor-pointer transition-all"></i>
+                    <i
+                        class="bi bi-bell text-white opacity-75 me-3 d-none d-sm-block hover-white cursor-pointer transition-all"></i>
                     <div class="vr bg-white opacity-25 me-3 d-none d-sm-block" style="height: 20px;"></div>
                     <div class="dropdown">
-                        <div class="d-flex align-items-center cursor-pointer" data-bs-toggle="dropdown" aria-expanded="false">
+                        <div class="d-flex align-items-center cursor-pointer" data-bs-toggle="dropdown"
+                            aria-expanded="false">
                             @if($isAdmin)
                                 <img src="https://ui-avatars.com/api/?name=Admin&background=FFB800&color=000"
-                                    class="rounded-circle me-0 me-md-2 shadow-sm" style="width: 32px; height: 32px; border: 2px solid rgba(255,255,255,0.2);">
-                                <span class="small fw-bold d-none d-md-block text-white transition-all" style="white-space: nowrap;">Shopping Club Admin <i class="bi bi-chevron-down ms-1 xx-small opacity-50"></i></span>
+                                    class="rounded-circle me-0 me-md-2 shadow-sm"
+                                    style="width: 32px; height: 32px; border: 2px solid rgba(255,255,255,0.2);">
+                                <span class="small fw-bold d-none d-md-block text-white transition-all"
+                                    style="white-space: nowrap;">Shopping Club Admin <i
+                                        class="bi bi-chevron-down ms-1 xx-small opacity-50"></i></span>
                             @else
                                 <img src="https://ui-avatars.com/api/?name={{ urlencode($subAdmin->name) }}&background=0DCAF0&color=000"
-                                    class="rounded-circle me-0 me-md-2 shadow-sm" style="width: 32px; height: 32px; border: 2px solid rgba(255,255,255,0.2);">
-                                <span class="small fw-bold d-none d-md-block text-white transition-all" style="white-space: nowrap;">{{ $subAdmin->name }} (Sub Admin) <i class="bi bi-chevron-down ms-1 xx-small opacity-50"></i></span>
+                                    class="rounded-circle me-0 me-md-2 shadow-sm"
+                                    style="width: 32px; height: 32px; border: 2px solid rgba(255,255,255,0.2);">
+                                <span class="small fw-bold d-none d-md-block text-white transition-all"
+                                    style="white-space: nowrap;">{{ $subAdmin->name }} (Sub Admin) <i
+                                        class="bi bi-chevron-down ms-1 xx-small opacity-50"></i></span>
                             @endif
                         </div>
-                        <ul class="dropdown-menu dropdown-menu-end shadow-lg rounded-4 mt-3" 
+                        <ul class="dropdown-menu dropdown-menu-end shadow-lg rounded-4 mt-3"
                             style="background: #ffffff; min-width: 220px; padding: 10px; border: 1px solid rgba(0,0,0,0.08) !important; box-shadow: 0 10px 30px rgba(0,0,0,0.1) !important;">
                             @if($isAdmin)
-                            <li>
-                                <a class="d-flex align-items-center rounded-3 text-dark text-decoration-none py-2 px-3 fw-bold small transition-all" href="{{ url('admin/profile') }}" 
-                                   onmouseover="this.style.background='rgba(0,0,0,0.04)'" 
-                                   onmouseout="this.style.background='transparent'">
-                                   <i class="bi bi-person text-primary fs-5 me-3"></i> 
-                                   <span>My Profile</span>
-                                </a>
-                            </li>
+                                <li>
+                                    <a class="d-flex align-items-center rounded-3 text-dark text-decoration-none py-2 px-3 fw-bold small transition-all"
+                                        href="{{ url('admin/profile') }}"
+                                        onmouseover="this.style.background='rgba(0,0,0,0.04)'"
+                                        onmouseout="this.style.background='transparent'">
+                                        <i class="bi bi-person text-primary fs-5 me-3"></i>
+                                        <span>My Profile</span>
+                                    </a>
+                                </li>
                             @endif
-                            <li><hr class="dropdown-divider my-2 opacity-10"></li>
                             <li>
-                                <a class="d-flex align-items-center rounded-3 text-danger text-decoration-none fw-black py-2 px-3 small transition-all" href="#" onclick="confirmLogout(event)"
-                                   onmouseover="this.style.background='rgba(239, 68, 68, 0.08)'" 
-                                   onmouseout="this.style.background='transparent'">
-                                   <i class="bi bi-box-arrow-right fs-5 me-3"></i> 
-                                   <span>Secure Logout</span>
+                                <hr class="dropdown-divider my-2 opacity-10">
+                            </li>
+                            <li>
+                                <a class="d-flex align-items-center rounded-3 text-danger text-decoration-none fw-black py-2 px-3 small transition-all"
+                                    href="#" onclick="confirmLogout(event)"
+                                    onmouseover="this.style.background='rgba(239, 68, 68, 0.08)'"
+                                    onmouseout="this.style.background='transparent'">
+                                    <i class="bi bi-box-arrow-right fs-5 me-3"></i>
+                                    <span>Secure Logout</span>
                                 </a>
                             </li>
                         </ul>
@@ -321,9 +342,9 @@
             minutes = minutes < 10 ? '0' + minutes : minutes;
             seconds = seconds < 10 ? '0' + seconds : seconds;
             const timeString = hours + ':' + minutes + ':' + seconds + ' ' + ampm;
-            
+
             const clockEl = document.getElementById('liveClock');
-            if(clockEl) clockEl.innerHTML = dateString + ' &nbsp;&bull;&nbsp; ' + timeString;
+            if (clockEl) clockEl.innerHTML = dateString + ' &nbsp;&bull;&nbsp; ' + timeString;
         }
         setInterval(updateClock, 1000);
         updateClock(); // initial call
@@ -367,15 +388,35 @@
 
         $(document).ready(function () {
             // Re-initialize DataTable only if not already initialized
-            if (!$.fn.DataTable.isDataTable('.admin-datatable')) {
-                $('.admin-datatable').DataTable({
-                    "pageLength": 10,
-                    "language": {
-                        "search": "Search:",
-                        "searchPlaceholder": "Type to filter..."
+            // Re-initialize DataTable with support for dynamic serial numbers
+            $('.admin-datatable').each(function () {
+                if (!$.fn.DataTable.isDataTable(this)) {
+                    const table = $(this);
+                    // Find the index of the serial number column if it exists
+                    const serialColIndex = table.find('th.serial-col').index();
+
+                    const dt = table.DataTable({
+                        "pageLength": 10,
+                        "order": [],
+                        "columnDefs": serialColIndex !== -1 ? [
+                            { "orderable": false, "targets": serialColIndex }
+                        ] : [],
+                        "language": {
+                            "search": "Search:",
+                            "searchPlaceholder": "Type to filter..."
+                        }
+                    });
+
+                    // Dynamic serial numbering logic
+                    if (serialColIndex !== -1) {
+                        dt.on('order.dt search.dt', function () {
+                            dt.column(serialColIndex, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
+                                cell.innerHTML = '#' + (i + 1);
+                            });
+                        }).draw();
                     }
-                });
-            }
+                }
+            });
 
             // SweetAlert Deletion
             $(document).on('click', '.btn-delete', function (e) {
@@ -405,7 +446,7 @@
                 const form = $(this).closest('form');
                 const status = $(this).data('status');
                 const isBlock = status === 'block';
-                
+
                 Swal.fire({
                     title: isBlock ? 'Block User Account?' : 'Unblock User Account?',
                     text: isBlock ? "The user will be immediately logged out and denied access." : "The user will regain full access to their account.",
@@ -515,7 +556,7 @@
             });
         }
     </script>
-    
+
     @stack('scripts')
 </body>
 

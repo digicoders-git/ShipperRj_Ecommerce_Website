@@ -1001,7 +1001,6 @@ body {
 
 .dashboard-card:hover {
     box-shadow: var(--shadow-md);
-    transform: translateY(-5px);
 }
 
 .dashboard-header-light {
@@ -1230,8 +1229,4 @@ body {
     position: absolute;
     bottom: 0;
     left: 0;
-}
-
-.row {
-    align-items: flex-start !important;
 }

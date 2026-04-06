@@ -151,11 +151,9 @@
         <div class="container">
             <div class="row g-5">
                 <!-- Sidebar -->
-                <!-- <div class="col-lg-3 d-none d-lg-block">
-                                    <div class="sidebar-wrapper sticky-top" style="top: 150px;"> -->
                 <div class="col-lg-3 d-none d-lg-block" style="align-self: flex-start;">
                     <div class="sidebar-wrapper sticky-top"
-                        style="top: 90px; z-index: 1000; max-height: calc(100vh - 110px); overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none;">
+                        style="top: 90px; z-index: 1; max-height: calc(100vh - 110px); overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none;">
                         <!-- Filter Header -->
                         <div class="d-flex align-items-center justify-content-between mb-4 px-1">
                             <h5 class="fw-black mb-0"><i class="bi bi-funnel-fill me-2 text-primary"></i>Filters</h5>
@@ -175,7 +173,7 @@
                                     <span class="badge bg-light text-secondary">All</span>
                                 </a>
                                 @foreach($categories as $cat)
-                                    <a href="{{ url('/products?category=' . $cat->id . '&sort=' . request('sort')) }}"
+                                    <a href="{{ url('/products?category=' . $cat->id . '&sort=' . request('sort') . '&search=' . request('search')) }}"
                                         class="cat-link {{ request('category') == $cat->id ? 'active' : '' }}">
                                         <span>{{ $cat->name }}</span>
                                         <span
@@ -194,7 +192,11 @@
                             <form action="{{ url('/products') }}" method="GET" id="priceFilterForm">
                                 @if(request('category')) <input type="hidden" name="category"
                                 value="{{ request('category') }}"> @endif
+                                @if(request('sub_category')) <input type="hidden" name="sub_category"
+                                value="{{ request('sub_category') }}"> @endif
                                 @if(request('sort')) <input type="hidden" name="sort" value="{{ request('sort') }}"> @endif
+                                @if(request('search')) <input type="hidden" name="search" value="{{ request('search') }}">
+                                @endif
 
                                 <div class="px-2 mt-2">
                                     <input type="range" class="form-range" name="max_price" min="0" max="100000" step="500"
@@ -253,6 +255,7 @@
 
                 <!-- Main Shop Content -->
                 <div class="col-lg-9">
+
                     <!-- Sorting Bar -->
                     <div
                         class="shop-bar d-flex flex-wrap justify-content-between align-items-center mb-5 bg-white p-3 border">
@@ -269,8 +272,12 @@
                             <form action="{{ url('/products') }}" method="GET" id="sortForm">
                                 @if(request('category')) <input type="hidden" name="category"
                                 value="{{ request('category') }}"> @endif
+                                @if(request('sub_category')) <input type="hidden" name="sub_category"
+                                value="{{ request('sub_category') }}"> @endif
                                 @if(request('max_price')) <input type="hidden" name="max_price"
                                 value="{{ request('max_price') }}"> @endif
+                                @if(request('search')) <input type="hidden" name="search" value="{{ request('search') }}">
+                                @endif
                                 <select name="sort" class="form-select-premium"
                                     onchange="document.getElementById('sortForm').submit()">
                                     <option value="newest" {{ request('sort') == 'newest' ? 'selected' : '' }}>Newest Arrivals

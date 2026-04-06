@@ -27,24 +27,24 @@ class CheckoutController extends Controller
         $online_shipping = 0;
         $cod_shipping = 0;
 
-        // Fetch Global Settings with robust fallbacks
-        $settingsData = \App\Models\Setting::all()->pluck('value', 'key')->toArray();
-        $global_online = (isset($settingsData['global_online_shipping']) && $settingsData['global_online_shipping'] !== '') ? $settingsData['global_online_shipping'] : 0;
-        $global_cod = (isset($settingsData['global_cod_shipping']) && $settingsData['global_cod_shipping'] !== '') ? $settingsData['global_cod_shipping'] : 0;
-        $global_adv = (isset($settingsData['global_cod_advance_percent']) && $settingsData['global_cod_advance_percent'] !== '') ? $settingsData['global_cod_advance_percent'] : 10;
+        // Fetch Global Settings using Cache
+        $settingsData = \App\Models\Setting::getAllCached();
+        $global_online = ($settingsData['global_online_shipping'] ?? '') !== '' ? (float) $settingsData['global_online_shipping'] : 0;
+        $global_cod = ($settingsData['global_cod_shipping'] ?? '') !== '' ? (float) $settingsData['global_cod_shipping'] : 0;
+        $global_adv = ($settingsData['global_cod_advance_percent'] ?? '') !== '' ? (float) $settingsData['global_cod_advance_percent'] : 0;
 
         if ($buy_now) {
             $product = Product::findOrFail($buy_now);
 
-            /* MOQ check moved to frontend Place Order button as per user request */
-            // if($qty < $product->minimum_order_quantity) {
-            //     return redirect()->back()->with('error', 'Minimum order quantity for '.$product->name.' is '.$product->minimum_order_quantity);
-            // }
-
             // Calculation logic: use product value if not NULL/zero/empty, otherwise fallback to global
             $item_adv = ((float) $product->cod_advance_percent > 0) ? $product->cod_advance_percent : $global_adv;
-            $item_online_ship = ((float) $product->online_shipping_charges > 0) ? $product->online_shipping_charges : $global_online;
-            $item_cod_ship = ((float) $product->cod_shipping_charges > 0) ? $product->cod_shipping_charges : $global_cod;
+
+            // Treat these as percentages now
+            $item_online_ship_pct = ((float) $product->online_shipping_charges > 0) ? $product->online_shipping_charges : $global_online;
+            $item_cod_ship_pct = ((float) $product->cod_shipping_charges > 0) ? $product->cod_shipping_charges : $global_cod;
+
+            $item_online_ship = ($product->selling_price * $item_online_ship_pct / 100);
+            $item_cod_ship = ($product->selling_price * $item_cod_ship_pct / 100);
 
             $items[] = [
                 'id' => $product->id,
@@ -55,19 +55,25 @@ class CheckoutController extends Controller
                 'advance_percent' => $item_adv,
                 'online_shipping' => $item_online_ship,
                 'cod_shipping' => $item_cod_ship,
+                'online_shipping_pct' => $item_online_ship_pct,
+                'cod_shipping_pct' => $item_cod_ship_pct,
                 'min_qty' => $product->minimum_order_quantity ?? 1
             ];
             $total = $product->selling_price * $qty;
-            $online_shipping += $item_online_ship;
-            $cod_shipping += $item_cod_ship;
+            $online_shipping += ($item_online_ship * $qty);
+            $cod_shipping += ($item_cod_ship * $qty);
             $order_type = 'buy_now';
         } else {
             $carts = Cart::with('product')->where('user_id', $user->id)->get();
             foreach ($carts as $cart) {
                 // Calculation logic for each cart item: favor global if product is empty/0
                 $item_adv = ((float) $cart->product->cod_advance_percent > 0) ? $cart->product->cod_advance_percent : $global_adv;
-                $item_online_ship = ((float) $cart->product->online_shipping_charges > 0) ? $cart->product->online_shipping_charges : $global_online;
-                $item_cod_ship = ((float) $cart->product->cod_shipping_charges > 0) ? $cart->product->cod_shipping_charges : $global_cod;
+
+                $item_online_ship_pct = ((float) $cart->product->online_shipping_charges > 0) ? $cart->product->online_shipping_charges : $global_online;
+                $item_cod_ship_pct = ((float) $cart->product->cod_shipping_charges > 0) ? $cart->product->cod_shipping_charges : $global_cod;
+
+                $item_online_ship = ($cart->product->selling_price * $item_online_ship_pct / 100);
+                $item_cod_ship = ($cart->product->selling_price * $item_cod_ship_pct / 100);
 
                 $items[] = [
                     'id' => $cart->product->id,
@@ -78,11 +84,13 @@ class CheckoutController extends Controller
                     'advance_percent' => $item_adv,
                     'online_shipping' => $item_online_ship,
                     'cod_shipping' => $item_cod_ship,
+                    'online_shipping_pct' => $item_online_ship_pct,
+                    'cod_shipping_pct' => $item_cod_ship_pct,
                     'min_qty' => $cart->product->minimum_order_quantity ?? 1
                 ];
                 $total += ($cart->product->selling_price * $cart->quantity);
-                $online_shipping += $item_online_ship;
-                $cod_shipping += $item_cod_ship;
+                $online_shipping += ($item_online_ship * $cart->quantity);
+                $cod_shipping += ($item_cod_ship * $cart->quantity);
             }
         }
 
@@ -106,6 +114,11 @@ class CheckoutController extends Controller
             $base_advance += ($item['price'] * $item['qty'] * $item['advance_percent'] / 100);
         }
 
+        $online_shipping = (float) $online_shipping;
+        $cod_shipping = (float) $cod_shipping;
+        $shipping_savings_amount = $cod_shipping - $online_shipping;
+        $shipping_savings_pct = ($total > 0) ? ($shipping_savings_amount / $total * 100) : 0;
+
         return view('checkout', compact(
             'addresses',
             'items',
@@ -120,7 +133,9 @@ class CheckoutController extends Controller
             'global_online',
             'global_cod',
             'global_adv',
-            'min_order_val'
+            'min_order_val',
+            'shipping_savings_pct',
+            'shipping_savings_amount'
         ));
     }
 
@@ -194,11 +209,11 @@ class CheckoutController extends Controller
         $total = 0;
         $shipping = 0;
 
-        // Fetch Global Settings for backend validation
-        $settingsData = \App\Models\Setting::all()->pluck('value', 'key')->toArray();
-        $global_online = (isset($settingsData['global_online_shipping']) && $settingsData['global_online_shipping'] !== '') ? $settingsData['global_online_shipping'] : 0;
-        $global_cod = (isset($settingsData['global_cod_shipping']) && $settingsData['global_cod_shipping'] !== '') ? $settingsData['global_cod_shipping'] : 0;
-        $global_adv = (isset($settingsData['global_cod_advance_percent']) && $settingsData['global_cod_advance_percent'] !== '') ? $settingsData['global_cod_advance_percent'] : 0; // Use 0 if not set as per requirement
+        // Fetch Global Settings for backend validation (using Cache)
+        $settingsData = \App\Models\Setting::getAllCached();
+        $global_online = ($settingsData['global_online_shipping'] ?? '') !== '' ? (float) $settingsData['global_online_shipping'] : 0;
+        $global_cod = ($settingsData['global_cod_shipping'] ?? '') !== '' ? (float) $settingsData['global_cod_shipping'] : 0;
+        $global_adv = ($settingsData['global_cod_advance_percent'] ?? '') !== '' ? (float) $settingsData['global_cod_advance_percent'] : 0;
         $min_order_val = (isset($settingsData['min_order_price']) && $settingsData['min_order_price'] !== '') ? (float) $settingsData['min_order_price'] : 0;
 
         if ($request->order_type == 'buy_now') {
@@ -209,14 +224,24 @@ class CheckoutController extends Controller
                 return redirect()->back()->with('error', 'MOQ Error for ' . $product->name);
             }
 
+            $item_adv = ((float) $product->cod_advance_percent > 0) ? $product->cod_advance_percent : $global_adv;
+
+            $item_online_ship_pct = ((float) $product->online_shipping_charges > 0) ? $product->online_shipping_charges : $global_online;
+            $item_cod_ship_pct = ((float) $product->cod_shipping_charges > 0) ? $product->cod_shipping_charges : $global_cod;
+
             $items[] = [
                 'id' => $product->id,
                 'qty' => $request->qty,
                 'price' => $product->selling_price,
-                'advance_percent' => ($product->cod_advance_percent !== null && $product->cod_advance_percent !== '') ? $product->cod_advance_percent : $global_adv
+                'advance_percent' => $item_adv
             ];
             $total = $product->selling_price * $request->qty;
-            $shipping = ($request->payment_method == 'cod') ? (($product->cod_shipping_charges !== null && $product->cod_shipping_charges !== '') ? $product->cod_shipping_charges : $global_cod) : (($product->online_shipping_charges !== null && $product->online_shipping_charges !== '') ? $product->online_shipping_charges : $global_online);
+
+            $calculated_shipping = ($request->payment_method == 'cod')
+                ? ($product->selling_price * $item_cod_ship_pct / 100)
+                : ($product->selling_price * $item_online_ship_pct / 100);
+
+            $shipping = round($calculated_shipping * $request->qty, 2);
         } else {
             $carts = Cart::with('product')->where('user_id', $user->id)->get();
             foreach ($carts as $cart) {
@@ -225,15 +250,26 @@ class CheckoutController extends Controller
                     return redirect('/cart')->with('error', 'MOQ Error for ' . $cart->product->name);
                 }
 
+                $item_adv = ((float) $cart->product->cod_advance_percent > 0) ? $cart->product->cod_advance_percent : $global_adv;
+
+                $item_online_ship_pct = ((float) $cart->product->online_shipping_charges > 0) ? $cart->product->online_shipping_charges : $global_online;
+                $item_cod_ship_pct = ((float) $cart->product->cod_shipping_charges > 0) ? $cart->product->cod_shipping_charges : $global_cod;
+
                 $items[] = [
                     'id' => $cart->product->id,
                     'qty' => $cart->quantity,
                     'price' => $cart->product->selling_price,
-                    'advance_percent' => ($cart->product->cod_advance_percent !== null && $cart->product->cod_advance_percent !== '') ? $cart->product->cod_advance_percent : $global_adv
+                    'advance_percent' => $item_adv
                 ];
                 $total += ($cart->product->selling_price * $cart->quantity);
-                $shipping += ($request->payment_method == 'cod') ? (($cart->product->cod_shipping_charges !== null && $cart->product->cod_shipping_charges !== '') ? $cart->product->cod_shipping_charges : $global_cod) : (($cart->product->online_shipping_charges !== null && $cart->product->online_shipping_charges !== '') ? $cart->product->online_shipping_charges : $global_online);
+
+                $calculated_shipping = ($request->payment_method == 'cod')
+                    ? ($cart->product->selling_price * $item_cod_ship_pct / 100)
+                    : ($cart->product->selling_price * $item_online_ship_pct / 100);
+
+                $shipping += ($calculated_shipping * $cart->quantity);
             }
+            $shipping = round($shipping, 2);
         }
 
 
@@ -250,8 +286,8 @@ class CheckoutController extends Controller
             }
         }
 
-        $grand_total = ($total + $shipping) - $discount;
-        
+        $grand_total = round(($total + $shipping) - $discount, 2);
+
         // RE-VALIDATE: Min Order Total Price during processing
         if ($min_order_val > 0 && $grand_total < $min_order_val) {
             return redirect()->back()->with('error', 'Minimum order total of ₹' . number_format($min_order_val) . ' is required.');
@@ -262,11 +298,11 @@ class CheckoutController extends Controller
             $itemAdvance = 0;
             foreach ($items as $item) {
                 // Ensure we use global default if product advance is not explicitly set
-                $adv_pct = $item['advance_percent'] ?? $global_adv;
+                $adv_pct = (float) ($item['advance_percent'] ?? $global_adv);
                 $itemAdvance += ($item['price'] * $item['qty'] * $adv_pct / 100);
             }
             // Advance payment = Item Advance + Full Shipping (to secure logistical costs)
-            $prepaid_amount = $itemAdvance + $shipping;
+            $prepaid_amount = round($itemAdvance + $shipping, 2);
 
             // Ensure prepaid doesn't exceed total (edge case with huge shipping/discount)
             if ($prepaid_amount > $grand_total)
@@ -316,7 +352,7 @@ class CheckoutController extends Controller
         $api = new Api(config('services.razorpay.key'), config('services.razorpay.secret'));
         $razorOrderData = [
             'receipt' => $order->order_number,
-            'amount' => $order->prepaid_amount * 100,
+            'amount' => (int) round($order->prepaid_amount * 100),
             'currency' => 'INR'
         ];
 
@@ -360,7 +396,7 @@ class CheckoutController extends Controller
 
     public function downloadInvoice($order_id)
     {
-        $order = Order::with(['orderItems.product', 'user', 'address'])->findOrFail($order_id);
+        $order = Order::where('user_id', Auth::id())->with(['orderItems.product', 'user', 'address'])->findOrFail($order_id);
         return view('invoice', compact('order'));
     }
 

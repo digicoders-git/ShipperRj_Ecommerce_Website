@@ -27,7 +27,7 @@ class OrderController extends Controller implements HasMiddleware
      */
     public function index()
     {
-        $orders = Order::with(['user', 'orderItems.product', 'address'])->latest()->paginate(15);
+        $orders = Order::with(['user', 'orderItems.product', 'address'])->orderBy('created_at', 'desc')->paginate(15);
         return view('admin.orders', compact('orders'));
     }
 
@@ -46,6 +46,7 @@ class OrderController extends Controller implements HasMiddleware
         $request->validate([
             'order_status' => 'required',
             'payment_status' => 'required',
+            'tracking_link' => 'nullable|url',
         ]);
 
         $order = Order::findOrFail($id);
@@ -61,7 +62,12 @@ class OrderController extends Controller implements HasMiddleware
         if ($newStatus == 'delivered' && $oldStatus != 'delivered') {
             $order->delivered_at = now();
         } elseif ($newStatus == 'shipped' && $oldStatus != 'shipped') {
-            $order->shipped_at = now(); // Even if shipped_at column doesn't exist yet, it's good to have this logic if we add it later or just use tracking.
+            $order->shipped_at = now();
+        }
+
+        // Save tracking link if provided
+        if ($newStatus == 'confirmed') {
+            $order->tracking_link = $request->tracking_link;
         }
 
         // Logic for Refund on Cancellation (ADMIN TRIGGERED)

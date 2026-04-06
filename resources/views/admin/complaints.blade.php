@@ -8,54 +8,60 @@
     <p class="text-secondary small">Review and resolve user support tickets</p>
 </div>
 
-<div class="glass-card">
-    <div class="table-responsive">
-        <table class="table admin-datatable table-borderless text-secondary align-middle">
-            <thead>
-                <tr class="border-bottom border-white border-opacity-10">
+    <div class="glass-card">
+        <div class="table-responsive">
+            <table class="table admin-datatable table-borderless text-secondary align-middle">
+                <thead>
+                    <tr class="border-bottom border-white border-opacity-10">
+                        <th class="serial-col">S.No</th>
                     <th class="small fw-bold py-3">ID</th>
-                    <th class="small fw-bold py-3">Customer</th>
-                    <th class="small fw-bold py-3">Product</th>
-                    <th class="small fw-bold py-3">Subject</th>
-                    <th class="small fw-bold py-3">Status</th>
-                    <th class="small fw-bold py-3 text-end">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($complaints as $complaint)
-                <tr class="border-bottom border-white border-opacity-5">
-                    <td class="small">#{{ $loop->iteration }}</td>
-                    <td>
-                        <div class="small text-white">{{ $complaint->user->name }}</div>
-                        <div class="x-small text-secondary">{{ $complaint->user->mobile }}</div>
-                    </td>
-                    <td>
-                        @if($complaint->product)
-                            <div class="d-flex align-items-center gap-2">
-                                <img src="{{ asset($complaint->product->image) }}" class="rounded" style="width: 25px; height: 25px; object-fit: cover;">
-                                <div class="x-small text-truncate text-white" style="max-width: 100px;">{{ $complaint->product->name }}</div>
-                            </div>
-                        @else
-                            <span class="x-small text-secondary italic">N/A</span>
-                        @endif
-                    </td>
-                    <td class="small text-white fw-bold">{{ $complaint->subject }}</td>
-                    <td>
-                        <span class="badge bg-{{ $complaint->status == 'open' || $complaint->status == 'pending' ? 'danger' : ($complaint->status == 'in_progress' ? 'warning' : 'success') }} bg-opacity-10 text-{{ $complaint->status == 'open' || $complaint->status == 'pending' ? 'danger' : ($complaint->status == 'in_progress' ? 'warning' : 'success') }} px-2 py-1 x-small">
-                            {{ strtoupper(str_replace('_', ' ', $complaint->status)) }}
-                        </span>
-                    </td>
-                    <td class="text-end">
-                        <button class="btn btn-sm btn-outline-light border-0 bg-white bg-opacity-5" data-bs-toggle="modal" data-bs-target="#resolveComplaintModal{{ $complaint->id }}">
-                            <i class="bi bi-chat-left-text text-primary"></i>
-                        </button>
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
+                        <th class="small fw-bold py-3">Customer</th>
+                        <th class="small fw-bold py-3">Product</th>
+                        <th class="small fw-bold py-3">Subject</th>
+                        <th class="small fw-bold py-3">Status</th>
+                        <th class="small fw-bold py-3 text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($complaints as $complaint)
+                        <tr class="border-bottom border-white border-opacity-5">
+                            <td class="serial-cell small">#{{ $loop->iteration }}</td>
+                            <td class="small">{{ $complaint->id }}</td>
+                            <td>
+                                <div class="small text-white">{{ $complaint->user->name }}</div>
+                                <div class="x-small text-secondary">{{ $complaint->user->mobile }}</div>
+                            </td>
+                            <td>
+                                @if($complaint->product)
+                                    <div class="d-flex align-items-center gap-2">
+                                        <img src="{{ asset($complaint->product->image) }}" class="rounded"
+                                            style="width: 25px; height: 25px; object-fit: cover;">
+                                        <div class="x-small text-truncate text-white" style="max-width: 100px;">
+                                            {{ $complaint->product->name }}</div>
+                                    </div>
+                                @else
+                                    <span class="x-small text-secondary italic">N/A</span>
+                                @endif
+                            </td>
+                            <td class="small text-white fw-bold">{{ $complaint->subject }}</td>
+                            <td>
+                                <span
+                                    class="badge bg-{{ $complaint->status == 'open' || $complaint->status == 'pending' ? 'danger' : ($complaint->status == 'in_progress' ? 'warning' : 'success') }} bg-opacity-10 text-{{ $complaint->status == 'open' || $complaint->status == 'pending' ? 'danger' : ($complaint->status == 'in_progress' ? 'warning' : 'success') }} px-2 py-1 x-small">
+                                    {{ strtoupper(str_replace('_', ' ', $complaint->status)) }}
+                                </span>
+                            </td>
+                            <td class="text-end">
+                                <button class="btn btn-sm btn-outline-light border-0 bg-white bg-opacity-5"
+                                    data-bs-toggle="modal" data-bs-target="#resolveComplaintModal{{ $complaint->id }}">
+                                    <i class="bi bi-chat-left-text text-primary"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
     </div>
-</div>
 
 @push('modals')
     @foreach($complaints as $complaint)
@@ -114,10 +120,6 @@
         </div>
     @endforeach
 @endpush
-            </tbody>
-        </table>
-    </div>
-</div>
 @endsection
 
 

@@ -1,4 +1,4 @@
-<div class="dashboard-card p-0 overflow-hidden shadow-sm border-0 rounded-4 bg-white">
+<div id="sidebarCard" class="dashboard-card p-0 overflow-hidden shadow-sm border-0 rounded-4 bg-white">
     <!-- Profile Section -->
     <div class="p-4 bg-light bg-opacity-50 border-bottom">
         <div class="d-flex align-items-center gap-3">
@@ -16,8 +16,8 @@
                     style="width: 12px; height: 12px;"></div>
             </div>
             <div class="overflow-hidden">
-                <h6 class="fw-black text-dark mb-0 text-truncate ">{{ Auth::user()->name }}</h6>
-                <p class="text-muted xx-small fw-bold mb-0 text-truncate ">{{ Auth::user()->email }}</p>
+                <h6 class="fw-black text-dark mb-0 text-truncate">{{ Auth::user()->name }}</h6>
+                <p class="text-muted xx-small fw-bold mb-0 text-truncate">{{ Auth::user()->email }}</p>
             </div>
         </div>
     </div>
@@ -57,7 +57,6 @@
             <div class="px-3 my-2">
                 <hr class="my-0 opacity-5">
             </div>
-
             <form action="{{ url('/logout') }}" method="POST">
                 @csrf
                 <button type="submit" class="dash-nav-link logout-btn w-100 border-0 bg-transparent text-start">
@@ -70,24 +69,24 @@
 </div>
 
 <style>
-    .dashboard-sidebar-column {
-        position: sticky !important;
-        position: -webkit-sticky !important;
-        top: 150px !important;
-        align-self: flex-start !important;
-        z-index: 99 !important;
-        margin-bottom: 30px !important;
-        transition: all 0.3s ease !important;
-    }
+    @media (min-width: 992px) {
+        #sidebarCard {
+            position: sticky;
+            top: 100px;
+            /* Accounts for the sticky main header */
+            z-index: 90;
+        }
 
-    /* Standardized Dashboard Grid Classes */
-    .dashboard-main-row,
-    .dashboard-row-premium {
-        display: flex;
-        flex-wrap: wrap;
-        margin-right: -15px;
-        margin-left: -15px;
-        align-items: flex-start !important;
+        /* Ensure columns stretch to full height so the card has room to move inside them */
+        .dashboard-sidebar-column {
+            align-self: stretch !important;
+        }
+
+        /* Remove force alignment from the row to ensure columns can stretch */
+        .dashboard-row-premium,
+        .dashboard-main-row {
+            align-items: stretch !important;
+        }
     }
 
     .dash-nav-link {
@@ -100,22 +99,16 @@
         font-weight: 700;
         text-decoration: none;
         border-radius: 12px;
-        transition: all 0.3s ease;
+        transition: background 0.2s, color 0.2s;
     }
 
     .dash-nav-link i {
         font-size: 1.1rem;
-        transition: transform 0.3s ease;
     }
 
     .dash-nav-link:hover {
         background: #f8f9fa;
         color: var(--primary);
-        transform: translateX(5px);
-    }
-
-    .dash-nav-link:hover i {
-        transform: scale(1.1);
     }
 
     .dash-nav-link.active {
@@ -127,15 +120,5 @@
     .dash-nav-link.logout-btn:hover {
         background: #fff5f5;
         color: #dc3545;
-    }
-
-    @media (max-width: 991px) {
-        .dashboard-sidebar-column {
-            position: relative !important;
-            top: 0 !important;
-            max-height: none !important;
-            overflow-y: visible !important;
-            margin-bottom: 2rem !important;
-        }
     }
 </style>

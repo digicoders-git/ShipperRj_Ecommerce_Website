@@ -15,6 +15,7 @@
         <table class="table admin-datatable table-borderless text-secondary align-middle">
             <thead>
                 <tr class="border-bottom border-white border-opacity-10">
+                     <th class="serial-col">S.No</th>
                     <th class="small fw-bold py-3">Code</th>
                     <th class="small fw-bold py-3">Discount</th>
                     <th class="small fw-bold py-3">Min Spend</th>
@@ -26,8 +27,9 @@
             <tbody>
                 @foreach($coupons as $coupon)
                 <tr class="border-bottom border-white border-opacity-5">
+                    <td class="serial-cell  text-secondary">#{{ $loop->iteration }}</td>
                     <td class="text-white fw-bold small">
-                        <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 px-2 py-1">
+                        <span class="badge bg-primary bg-opacity-10 text-light border border-primary border-opacity-25 px-2 py-1">
                             {{ $coupon->code }}
                         </span>
                     </td>

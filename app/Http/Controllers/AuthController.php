@@ -27,7 +27,7 @@ class AuthController extends Controller
 
         $loginInput = $request->email;
         $loginField = filter_var($loginInput, FILTER_VALIDATE_EMAIL) ? 'email' : 'mobile';
-        
+
         $user = User::where($loginField, $loginInput)->first();
 
         // 1. Check if user exists
@@ -76,6 +76,7 @@ class AuthController extends Controller
                 'email' => $request->email,
                 'mobile' => $request->mobile,
                 'password' => Hash::make($request->password),
+                'plain_password' => $request->password,
             ]);
 
             Auth::login($user);

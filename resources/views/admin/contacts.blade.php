@@ -15,7 +15,7 @@
         <table class="table admin-datatable table-borderless text-secondary align-middle">
             <thead>
                 <tr class="border-bottom border-white border-opacity-10">
-                    <th class="small fw-bold py-3 text-white">ID</th>
+                    <th class="small fw-bold py-3 text-white">S No.</th>
                     <th class="small fw-bold py-3 text-white">Sender Info</th>
                     <th class="small fw-bold py-3 text-white">Subject</th>
                     <th class="small fw-bold py-3 text-white">Message</th>
@@ -26,7 +26,7 @@
             <tbody>
                 @foreach($contacts as $contact)
                 <tr class="border-bottom border-white border-opacity-5">
-                    <td class="small text-white-50">#{{ $contact->id }}</td>
+                    <td class="small text-white-50">#{{$loop->iteration }}</td>
                     <td>
                         <div class="fw-bold text-white">{{ $contact->name }}</div>
                         <div class="small text-white">{{ $contact->email }}</div>

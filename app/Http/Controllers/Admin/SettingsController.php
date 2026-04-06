@@ -22,6 +22,9 @@ class SettingsController extends Controller
             foreach ($data as $key => $value) {
                 Setting::updateOrCreate(['key' => $key], ['value' => $value]);
             }
+            // Clear settings cache
+            \Illuminate\Support\Facades\Cache::forget('global_settings');
+
             return redirect()->back()->with('success', 'Settings updated successfully.');
         } catch (\Exception $e) {
             \Log::error('Settings Save Error: ' . $e->getMessage());

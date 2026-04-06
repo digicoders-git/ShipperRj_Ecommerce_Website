@@ -10,10 +10,18 @@ use Razorpay\Api\Api;
 
 class WalletController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $user = Auth::user();
-        $transactions = $user->walletTransactions()->latest()->paginate(10);
+        $query = $user->walletTransactions()->latest();
+
+        if ($request->filter == 'credits') {
+            $query->where('type', 1);
+        } elseif ($request->filter == 'debits') {
+            $query->where('type', 2);
+        }
+
+        $transactions = $query->paginate(10)->withQueryString();
         $offers = WalletOffer::where('status', 1)->orderBy('min_amount', 'asc')->get();
         return view('wallet', compact('user', 'transactions', 'offers'));
     }
@@ -21,14 +29,14 @@ class WalletController extends Controller
     public function initiate(Request $request)
     {
         $request->validate(['amount' => 'required|numeric|min:1']);
-        
+
         $api = new Api(config('services.razorpay.key'), config('services.razorpay.secret'));
         $orderData = [
             'receipt' => 'WLT_' . time() . '_' . Auth::id(),
             'amount' => $request->amount * 100,
             'currency' => 'INR'
         ];
-        
+
         $razorOrder = $api->order->create($orderData);
 
         return response()->json([
@@ -52,18 +60,18 @@ class WalletController extends Controller
                 'razorpay_signature' => $request->razorpay_signature
             ];
             $api->utility->verifyPaymentSignature($attributes);
-            
+
             $user = Auth::user();
             $amount = $request->amount;
-            
+
             // Calculate Bonus
             $bonus = 0;
             $bestOffer = WalletOffer::where('status', 1)
                 ->where('min_amount', '<=', $amount)
                 ->orderBy('min_amount', 'desc')
                 ->first();
-                
-            if($bestOffer) {
+
+            if ($bestOffer) {
                 $bonus = $bestOffer->bonus_amount;
             }
 
@@ -76,8 +84,8 @@ class WalletController extends Controller
                 'type' => 1,
                 'description' => 'Wallet Recharge via Razorpay'
             ]);
-            
-            if($bonus > 0) {
+
+            if ($bonus > 0) {
                 WalletTransaction::create([
                     'user_id' => $user->id,
                     'amount' => $bonus,

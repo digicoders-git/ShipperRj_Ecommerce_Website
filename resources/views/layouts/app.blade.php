@@ -11,6 +11,8 @@
     <link rel="icon" type="image/x-icon" href="{{ asset('assets/images/favicon.png') }}">
 
     <!-- Google Fonts: Outfit & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
         href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
@@ -33,10 +35,12 @@
         .trust-badge-card {
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(255, 255, 255, 0.05);
-            padding: 10px 16px;
+            padding: 8px 12px;
             border-radius: 12px;
             transition: all 0.3s ease;
             cursor: default;
+            flex: 1;
+            min-width: 0;
         }
 
         .trust-badge-card:hover {
@@ -137,14 +141,12 @@
         <div class="loader-spinner"></div>
     </div>
 
-    <!-- Top Bar -->
     <div class="top-bar d-none d-lg-block">
         <div class="container d-flex justify-content-between align-items-center">
-            <div class="top-info d-flex gap-4">
-                <span class="d-flex align-items-center gap-2"><i class="bi bi-telephone text-primary"></i> <a
-                        href="tel:+918800123456">+91 8800 123 456</a></span>
-                <span class="d-flex align-items-center gap-2"><i class="bi bi-envelope text-primary"></i> <a
-                        href="mailto:info@shoppingclubindia.com">info@shoppingclubindia.com</a></span>
+            <div class="top-info d-flex gap-4 align-items-center">
+                <a href="tel:+919838048633"><i class="bi bi-telephone-fill me-1"></i> +91 98380 48633</a>
+                <div class="vr bg-secondary opacity-25" style="height: 15px;"></div>
+                <a href="mailto:shoppingserviceclub@gmail.com"><i class="bi bi-envelope-fill me-1"></i> shoppingserviceclub@gmail.com</a>
             </div>
             <div class="top-links d-flex gap-4 align-items-center">
                 <a href="{{ route('orders') }}"><i class="bi bi-bag-heart-fill me-1"></i> My Orders</a>
@@ -373,6 +375,8 @@
                     <a href="{{ route('about') }}"
                         class="list-group-item list-group-item-action border-0 px-4 py-2 small {{ request()->routeIs('about') ? 'active' : '' }}">About
                         Us</a>
+                    <a href="{{ route('seller.inquiry') }}"
+                        class="list-group-item list-group-item-action border-0 px-4 py-2 small {{ request()->routeIs('seller.inquiry') ? 'active' : '' }}">Become a Seller</a>
                     <a href="{{ route('contact') }}"
                         class="list-group-item list-group-item-action border-0 px-4 py-2 small {{ request()->routeIs('contact') ? 'active' : '' }}">Contact
                         Us</a>
@@ -503,10 +507,14 @@
                 </li>
             </ul>
 
-            <div class="promo-text-nav d-none d-xl-flex align-items-center gap-2 text-white opacity-75">
-                <i class="bi bi-lightning-charge-fill text-primary"></i>
-                <span>Exciting Offers on First Order!</span>
+            <div class="promo-text-nav d-none d-xl-flex align-items-center gap-3">
+                <a href="{{ route('seller.inquiry') }}" class="text-decoration-none d-flex align-items-center gap-2">
+                    <span class="badge bg-primary-soft text-primary px-3 py-1 rounded-pill fw-bold xx-small uppercase tracking-widest">
+                        Grow Your Business With Us 🚀
+                    </span>
+                </a>
             </div>
+            
         </div>
     </nav>
     <main>
@@ -700,26 +708,25 @@
                     </div>
 
                     <!-- Updated Premium Trust Badges -->
-                    <div class="d-flex flex-row flex-wrap gap-3 mt-3">
-                        <div class="trust-badge-card d-flex align-items-center gap-3">
-                            <div class="icon-box-sm">
+                    <div class="d-flex flex-row gap-2 mt-4">
+                        <div class="trust-badge-card d-flex align-items-center gap-2">
+                            <div class="icon-box-sm flex-shrink-0">
                                 <i class="bi bi-shield-lock-fill"></i>
                             </div>
-                            <div>
-                                <span class="d-block trust-label">100% Secure</span>
-                                <span class="d-block trust-sub">Protected Payments</span>
+                            <div class="overflow-hidden">
+                                <span class="d-block trust-label text-truncate">100% Secure</span>
+                                <span class="d-block trust-sub text-truncate">Protected Payments</span>
                             </div>
                         </div>
-                        <div class="trust-badge-card d-flex align-items-center gap-3">
-                            <div class="icon-box-sm">
+                        <div class="trust-badge-card d-flex align-items-center gap-2">
+                            <div class="icon-box-sm flex-shrink-0">
                                 <i class="bi bi-truck"></i>
                             </div>
-                            <div>
-                                <span class="d-block trust-label">Express Delivery</span>
-                                <span class="d-block trust-sub">Fast Pan-India Shipping</span>
+                            <div class="overflow-hidden">
+                                <span class="d-block trust-label text-truncate">Express Delivery</span>
+                                <span class="d-block trust-sub text-truncate">Fast Pan-India Shipping</span>
                             </div>
                         </div>
-
                     </div>
                 </div>
 
@@ -774,7 +781,7 @@
     <!-- Scroll to Top -->
     <button id="scrollToTop"
         class="btn btn-premium rounded-circle position-fixed bottom-0 end-0 m-4 shadow-lg p-0 d-flex align-items-center justify-content-center"
-        style="width: 55px; height: 55px; visibility: hidden; opacity: 0; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 1000; bottom: 20px !important;">
+        style="width: 45px; height: 45px; visibility: hidden; opacity: 0; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 1000; bottom: 20px !important;">
         <i class="bi bi-arrow-up fs-4"></i>
     </button>
 
@@ -834,6 +841,15 @@
                 setTimeout(hideLoader, 3000); // Safety timeout
             }
         })();
+
+        // Always show mega-menu categories from top on open.
+        const megaMenuTrigger = document.querySelector('.has-mega-menu');
+        const categoryList = document.querySelector('.category-main-list');
+        if (megaMenuTrigger && categoryList) {
+            megaMenuTrigger.addEventListener('mouseenter', () => {
+                categoryList.scrollTop = 0;
+            });
+        }
     </script>
 
     <!-- Quick View Modal (Global) - Soft Light Theme -->
@@ -1751,8 +1767,76 @@
             }
         });
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Floating Contact Icons -->
+    <div class="floating-contact-container">
+        <a href="https://wa.me/918800123456" class="floating-btn whatsapp-btn shadow-lg" target="_blank"
+            title="Chat on WhatsApp">
+            <i class="bi bi-whatsapp"></i>
+        </a>
+        <a href="tel:+918800123456" class="floating-btn phone-btn shadow-lg" title="Call Us">
+            <i class="bi bi-telephone-fill"></i>
+        </a>
+    </div>
+
+    <style>
+        .floating-contact-container {
+            position: fixed;
+            left: 30px;
+            bottom: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            z-index: 1050;
+        }
+
+        .floating-btn {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 1.6rem;
+            text-decoration: none !important;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .whatsapp-btn {
+            background-color: #25D366;
+            border: 2px solid #fff;
+        }
+
+        .phone-btn {
+            background-color: var(--primary);
+            border: 2px solid #fff;
+        }
+
+        .floating-btn:hover {
+            transform: scale(1.1) translateY(-5px);
+            color: #fff;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3) !important;
+        }
+
+        @media (max-width: 768px) {
+            .floating-contact-container {
+                left: 15px;
+                bottom: 15px;
+                gap: 10px;
+            }
+
+            .floating-btn {
+                width: 42px;
+                height: 42px;
+                font-size: 1.35rem;
+            }
+        }
+    </style>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
     @stack('modals')
+    @stack('scripts')
 </body>
 
 </html>

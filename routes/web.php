@@ -6,6 +6,7 @@ use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\AddressController;
+use App\Http\Controllers\SellerInquiryController;
 
 Route::get('/', function () {
     $featured_products = \App\Models\Product::with('subCategory')->where('status', 1)->latest()->take(12)->get();
@@ -27,12 +28,25 @@ Route::get('/auth/google/callback', [\App\Http\Controllers\SocialAuthController:
 Route::get('/products', function (Illuminate\Http\Request $request) {
     $query = \App\Models\Product::with('subCategory')->where('status', 1);
 
-    // Filter by Category
-    if ($request->filled('category')) {
-        $query->whereHas('subCategory', function ($q) use ($request) {
-            $q->where('category_id', $request->category);
+    // Filter by Search
+    $query->when($request->search, function ($q) use ($request) {
+        $q->where(function ($sq) use ($request) {
+            $sq->where('name', 'like', '%' . $request->search . '%')
+                ->orWhere('description', 'like', '%' . $request->search . '%')
+                ->orWhere('tags', 'like', '%' . $request->search . '%');
         });
-    }
+    });
+
+    // Filter by Category
+    $query->when($request->category, function ($q) use ($request) {
+        $subCategoryIds = \App\Models\SubCategory::where('category_id', $request->category)->pluck('id');
+        $q->whereIn('subcategory_id', $subCategoryIds);
+    });
+
+    // Filter by Sub Category
+    $query->when($request->sub_category, function ($q) use ($request) {
+        $q->where('subcategory_id', $request->sub_category);
+    });
 
     // Filter by Trending / Best Sellers
     if ($request->get('filter') === 'trending') {
@@ -40,12 +54,12 @@ Route::get('/products', function (Illuminate\Http\Request $request) {
     }
 
     // Filter by Price
-    if ($request->filled('min_price')) {
-        $query->where('selling_price', '>=', $request->min_price);
-    }
-    if ($request->filled('max_price')) {
-        $query->where('selling_price', '<=', $request->max_price);
-    }
+    $query->when($request->min_price, function ($q) use ($request) {
+        $q->where('selling_price', '>=', $request->min_price);
+    });
+    $query->when($request->max_price, function ($q) use ($request) {
+        $q->where('selling_price', '<=', $request->max_price);
+    });
 
     // Sorting
     $sort = $request->get('sort', 'newest');
@@ -121,6 +135,7 @@ Route::middleware(['auth', 'check.blocked'])->group(function () {
 
     Route::post('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
     Route::post('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
+    Route::post('/profile/delete', [ProfileController::class, 'destroy'])->name('profile.delete');
 
     Route::get('/wallet', [App\Http\Controllers\WalletController::class, 'index'])->name('wallet');
     Route::post('/wallet/add', [App\Http\Controllers\WalletController::class, 'initiate'])->name('wallet.add');
@@ -172,6 +187,9 @@ Route::get('/terms', function () {
     return view('terms');
 });
 
+Route::get('/become-a-seller', [SellerInquiryController::class, 'index'])->name('seller.inquiry');
+Route::post('/become-a-seller', [SellerInquiryController::class, 'submit'])->name('seller.inquiry.submit');
+
 Route::get('/refund-policy', function () {
     return view('refund-policy');
 });
@@ -219,6 +237,7 @@ Route::prefix('admin')->name('admin.')->middleware('admin.auth')->group(function
     Route::resource('/contacts', App\Http\Controllers\Admin\ContactController::class);
     Route::resource('/order-tracking', App\Http\Controllers\Admin\OrderTrackingController::class);
     Route::resource('/refunds', App\Http\Controllers\Admin\RefundController::class);
+    Route::resource('/seller-inquiries', App\Http\Controllers\Admin\SellerInquiryController::class);
 
     // Sub-Admin Management (Crucial)
     Route::post('/sub-admins/{subadmin}/toggle-status', [App\Http\Controllers\Admin\SubAdminController::class, 'toggleStatus'])->name('subadmins.toggle-status');

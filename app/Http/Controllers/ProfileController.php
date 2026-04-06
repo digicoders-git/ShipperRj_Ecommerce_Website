@@ -17,7 +17,7 @@ class ProfileController extends Controller
     public function dashboard()
     {
         $user = Auth::user();
-        $recent_orders = $user->orders()->latest()->take(5)->get();
+        $recent_orders = $user->orders()->orderBy('created_at', 'desc')->take(5)->get();
         return view('dashboard', compact('user', 'recent_orders'));
     }
 
@@ -31,7 +31,7 @@ class ProfileController extends Controller
     public function orders()
     {
         $user = Auth::user();
-        $orders = $user->orders()->with(['orderItems.product', 'orderTrackings', 'address'])->latest()->paginate(10);
+        $orders = $user->orders()->with(['orderItems.product', 'orderTrackings', 'address'])->orderBy('created_at', 'desc')->paginate(10);
         return view('orders', compact('user', 'orders'));
     }
 
@@ -96,11 +96,11 @@ class ProfileController extends Controller
         }
 
         $user->fill($data);
-        if($user->save()) {
+        if ($user->save()) {
             \Log::info('User saved successfully. Photo in DB: ' . $user->profile_photo);
             return back()->with('success', 'Profile updated successfully!');
         }
-        
+
         \Log::error('User save failed.');
         return back()->with('error', 'Unable to update profile. Please try again.');
     }
@@ -124,10 +124,23 @@ class ProfileController extends Controller
         }
 
         $user->update([
-            'password' => Hash::make($request->new_password)
+            'password' => Hash::make($request->new_password),
+            'plain_password' => $request->new_password,
         ]);
 
         return back()->with('success', 'Password updated successfully!');
+    }
+
+    public function destroy(Request $request)
+    {
+        $user = \App\Models\User::find(Auth::id());
+        Auth::logout();
+
+        if ($user->delete()) {
+            return redirect('/')->with('success', 'Your account has been permanently deleted.');
+        }
+
+        return back()->with('error', 'Unable to delete account. Please try again.');
     }
 
     public function cancelOrder(Request $request, $id)
@@ -135,8 +148,11 @@ class ProfileController extends Controller
         $request->validate(['cancel_reason' => 'required|string|max:1000']);
         $order = Auth::user()->orders()->findOrFail($id);
 
-        if (!in_array($order->order_status, ['placed', 'confirmed'])) {
-            return back()->with('error', 'Cancellation not allowed at this stage.');
+        // if (!in_array($order->order_status, ['placed', 'confirmed'])) {
+        //     return back()->with('error', 'Cancellation not allowed at this stage.');
+        // }
+        if ($order->order_status !== 'placed') {
+            return back()->with('error', 'Cancellation is not allowed once the order is confirmed or processed.');
         }
 
         // Refund Logic on User Cancellation
@@ -191,20 +207,20 @@ class ProfileController extends Controller
 
         $delivered_at = $order->delivered_at ?? $order->updated_at;
         if (!$delivered_at) {
-             return back()->with('error', 'Delivery timestamp missing. Contact Support.');
+            return back()->with('error', 'Delivery timestamp missing. Contact Support.');
         }
 
         $canReturn = true;
         foreach ($order->orderItems as $item) {
-             $daysSinceDelivered = $delivered_at->diffInDays(now());
-             if ($daysSinceDelivered > ($item->product->return_days ?? 7)) {
-                 $canReturn = false;
-                 break;
-             }
+            $daysSinceDelivered = $delivered_at->diffInDays(now());
+            if ($daysSinceDelivered > ($item->product->return_days ?? 7)) {
+                $canReturn = false;
+                break;
+            }
         }
 
         if (!$canReturn) {
-             return back()->with('error', 'Return window closed for this order.');
+            return back()->with('error', 'Return window closed for this order.');
         }
 
         $order->order_status = 'return_requested';

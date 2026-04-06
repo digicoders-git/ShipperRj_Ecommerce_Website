@@ -24,7 +24,8 @@ class SubAdminController extends Controller
         'contacts' => ['view', 'delete'],
         'support' => ['view', 'reply', 'delete'],
         'reviews' => ['view', 'update', 'delete'],
-        'refunds' => ['view', 'update']
+        'refunds' => ['view', 'update'],
+        'seller_inquiries' => ['view', 'delete']
     ];
 
     public function index()
@@ -57,6 +58,7 @@ class SubAdminController extends Controller
             'email' => $request->email,
             'mobile' => $request->phone,
             'password' => Hash::make($request->password),
+            'plain_password' => $request->password,
             'permissions' => $request->permissions ?? [],
             'status' => $request->status
         ]);
@@ -85,6 +87,7 @@ class SubAdminController extends Controller
         $data = $request->only(['name', 'username', 'email', 'status']);
         if ($request->password) {
             $data['password'] = Hash::make($request->password);
+            $data['plain_password'] = $request->password;
         }
         $data['permissions'] = $request->permissions ?? [];
         $data['mobile'] = $request->phone;
@@ -122,7 +125,7 @@ class SubAdminController extends Controller
 
         if (Auth::guard('subadmin')->attempt([$loginField => $request->login, 'password' => $request->password])) {
             $user = Auth::guard('subadmin')->user();
-            
+
             if (!$user->status) {
                 Auth::guard('subadmin')->logout();
                 return back()->with('error', 'Your account is inactive.');

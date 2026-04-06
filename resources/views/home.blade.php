@@ -157,7 +157,7 @@
                                 style="width: 70px; height: 70px; background: #FFF7ED;">
                                 @if($cat->image)
                                     <img src="{{ asset($cat->image) }}" class="img-fluid w-100 h-100 object-fit-contain p-2"
-                                        alt="{{ $cat->name }}"
+                                        alt="{{ $cat->name }}" loading="lazy"
                                         onerror="this.parentElement.innerHTML='<i class=\'bi bi-tag fs-1\' style=\'color: #FF7D00\'></i>'">
                                 @else
                                     <i class="bi bi-tag fs-1" style="color: #FF7D00;"></i>
@@ -174,180 +174,179 @@
     </section>
 
     <!-- Featured Products -->
-        <section class="py-5" style="background: #FAFAFB;">
-            <div class="container">
-                <div
-                    class="section-header d-flex flex-column flex-md-row justify-content-between align-items-end mb-5 text-start">
-                    <div class="text-start">
-                        <h2 class="mb-0">Featured <span class="text-gradient-primary">Products</span></h2>
-                        <p class="ms-0">Our most wanted products this week</p>
-                    </div>
-                    <div class="mt-4 mt-md-0">
-                        <ul class="nav nav-pills gap-2 bg-white p-1 rounded-pill shadow-sm">
-                            <li class="nav-item"><a class="nav-link active rounded-pill px-4" href="#">All Collections</a></li>
-                            <li class="nav-item"><a class="nav-link rounded-pill px-4" href="#">New Arrivals</a></li>
-                        </ul>
-                    </div>
+    <section class="py-5" style="background: #FAFAFB;">
+        <div class="container">
+            <div
+                class="section-header d-flex flex-column flex-md-row justify-content-between align-items-end mb-5 text-start">
+                <div class="text-start">
+                    <h2 class="mb-0">Featured <span class="text-gradient-primary">Products</span></h2>
+                    <p class="ms-0">Our most wanted products this week</p>
                 </div>
+                <div class="mt-4 mt-md-0">
+                    <a href="{{ url('/products') }}" class="btn btn-primary bg-gradient-primary rounded-pill px-4 py-2 fw-bold shadow-sm d-flex align-items-center gap-2">
+                        View All Products <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
 
-                <div class="row g-4">
+            <div class="row g-4">
 
-                    @forelse($featured_products as $prod)
-                        <div class="col-md-6 col-lg-3">
-                            <div class="product-card h-100 shadow-hover transition-all">
-                                @if($prod->mrp > $prod->selling_price)
-                                    <span class="product-card-badge bg-danger text-white">SAVE
-                                        {{ round((($prod->mrp - $prod->selling_price) / $prod->mrp) * 100) }}%</span>
-                                @elseif($prod->featured)
-                                    <span class="product-card-badge bg-primary text-white">Featured</span>
-                                @endif
+                @forelse($featured_products as $prod)
+                    <div class="col-md-6 col-lg-3">
+                        <div class="product-card h-100 shadow-hover transition-all">
+                            @if($prod->mrp > $prod->selling_price)
+                                <span class="product-card-badge bg-danger text-white">SAVE
+                                    {{ round((($prod->mrp - $prod->selling_price) / $prod->mrp) * 100) }}%</span>
+                            @elseif($prod->featured)
+                                <span class="product-card-badge bg-primary text-white">Featured</span>
+                            @endif
 
-                                <div class="product-actions-floating">
-                                    <form action="{{ route('wishlist.add', $prod->id) }}" method="POST" class="d-inline">
-                                        @csrf
-                                        <button type="submit" class="action-btn border-0 shadow-sm" title="Wishlist"><i
-                                                class="bi bi-heart"></i></button>
-                                    </form>
-                                    <button type="button" class="action-btn border-0 shadow-sm" title="Quick View"
-                                        onclick="openQuickView('{{ $prod->id }}')">
-                                        <i class="bi bi-eye"></i>
-                                    </button>
+                            <div class="product-actions-floating">
+                                <form action="{{ route('wishlist.add', $prod->id) }}" method="POST" class="d-inline">
+                                    @csrf
+                                    <button type="submit" class="action-btn border-0 shadow-sm" title="Wishlist"><i
+                                            class="bi bi-heart"></i></button>
+                                </form>
+                                <button type="button" class="action-btn border-0 shadow-sm" title="Quick View"
+                                    onclick="openQuickView('{{ $prod->id }}')">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                            <div class="product-image-wrapper p-3 overflow-hidden bg-light d-flex align-items-center justify-content-center"
+                                style="height: 220px;">
+                                <a href="{{ url('product-detail/' . $prod->slug) }}" class="h-100 d-block text-center w-100">
+                                    <img src="{{ asset($prod->image) }}"
+                                        class="img-fluid h-100 object-fit-contain transition-all hover-scale"
+                                        alt="{{ $prod->name }}" loading="lazy"
+                                        onerror="this.src='https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=400'">
+                                </a>
+                            </div>
+                            <div class="p-4">
+                                <h6 class="text-secondary xx-small fw-black mb-1 uppercase tracking-widest text-start">
+                                    {{ $prod->subCategory->name ?? 'Collection' }}
+                                </h6>
+                                <h5 class="fw-bold mb-2 text-dark text-truncate-2 text-start"
+                                    style="font-size: 0.95rem; line-height: 1.4; height: 2.8em;">{{ $prod->name }}</h5>
+                                <div class="price-wrapper d-flex align-items-baseline gap-2 mb-3">
+                                    <span
+                                        class="h5 fw-black text-primary mb-0">₹{{ number_format($prod->selling_price) }}</span>
+                                    @if($prod->mrp > $prod->selling_price)
+                                        <span
+                                            class="text-muted x-small text-decoration-line-through">₹{{ number_format($prod->mrp) }}</span>
+                                    @endif
                                 </div>
-                                <div class="product-image-wrapper p-3 overflow-hidden bg-light d-flex align-items-center justify-content-center"
-                                    style="height: 220px;">
-                                    <a href="{{ url('product-detail/' . $prod->slug) }}" class="h-100 d-block text-center w-100">
-                                        <img src="{{ asset($prod->image) }}"
-                                            class="img-fluid h-100 object-fit-contain transition-all hover-scale"
-                                            alt="{{ $prod->name }}"
-                                            onerror="this.src='https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=400'">
+                                <div class="d-flex gap-2">
+                                    <form action="{{ route('cart.add', $prod->id) }}" method="POST" class="flex-grow-1">
+                                        @csrf
+                                        <button type="submit"
+                                            class="btn btn-dark w-100 py-2 fw-black uppercase xx-small tracking-widest rounded-3 shadow-sm hover-float px-1">
+                                            <i class="bi bi-bag-plus"></i> Cart
+                                        </button>
+                                    </form>
+                                    <a href="{{ url('product-detail/' . $prod->slug) }}"
+                                        class="btn btn-primary bg-gradient-primary flex-grow-1 py-2 fw-black uppercase xx-small tracking-widest rounded-3 shadow-sm hover-float d-flex align-items-center justify-content-center text-white text-decoration-none">
+                                        Buy Now
                                     </a>
                                 </div>
-                                <div class="p-4">
-                                    <h6 class="text-secondary xx-small fw-black mb-1 uppercase tracking-widest text-start">
-                                        {{ $prod->subCategory->name ?? 'Collection' }}
-                                    </h6>
-                                    <h5 class="fw-bold mb-2 text-dark text-truncate-2 text-start"
-                                        style="font-size: 0.95rem; line-height: 1.4; height: 2.8em;">{{ $prod->name }}</h5>
-                                    <div class="price-wrapper d-flex align-items-baseline gap-2 mb-3">
-                                        <span
-                                            class="h5 fw-black text-primary mb-0">₹{{ number_format($prod->selling_price) }}</span>
-                                        @if($prod->mrp > $prod->selling_price)
-                                            <span
-                                                class="text-muted x-small text-decoration-line-through">₹{{ number_format($prod->mrp) }}</span>
-                                        @endif
-                                    </div>
-                                    <div class="d-flex gap-2">
-                                        <form action="{{ route('cart.add', $prod->id) }}" method="POST" class="flex-grow-1">
-                                            @csrf
-                                            <button type="submit"
-                                                class="btn btn-dark w-100 py-2 fw-black uppercase xx-small tracking-widest rounded-3 shadow-sm hover-float px-1">
-                                                <i class="bi bi-bag-plus"></i> Cart
-                                            </button>
-                                        </form>
-                                        <a href="{{ url('product-detail/' . $prod->slug) }}"
-                                            class="btn btn-primary bg-gradient-primary flex-grow-1 py-2 fw-black uppercase xx-small tracking-widest rounded-3 shadow-sm hover-float d-flex align-items-center justify-content-center text-white text-decoration-none">
-                                            Buy Now
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    @empty
-                        <div class="col-12 text-center py-5">
-                            <p class="text-secondary">No products found in featured collection.</p>
-                        </div>
-                    @endforelse
-                </div>
-            </div>
-        </section>
-
-        <!-- Promotional Banners -->
-        <section class="py-5">
-            <div class="container">
-                <div class="row g-4">
-                    <div class="col-md-6">
-                        <div class="rounded-4 overflow-hidden position-relative shadow-sm hover-float" style="height: 300px;">
-                            <img src="{{asset('images/photo2.jpg')}}"
-                                class="img-fluid w-100 h-100 object-fit-cover transition-all" alt="Electronics">
-                            <div class="position-absolute top-50 start-0 translate-middle-y ps-5 text-dark" style="z-index: 2;">
-                                <h6 class="text-primary fw-bold text-uppercase mb-2">SAVE UP TO 40% OFF</h6>
-                                <h3 class="fw-bold mb-2 text-white">Electronic <br>Mega Deal</h3>
-                                <a href="{{ url('/products') }}" class="btn btn-premium px-4 mt-3">Shop Now</a>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6">
-                        <div class="rounded-4 overflow-hidden position-relative shadow-sm hover-float" style="height: 300px;">
-                            <img src="{{asset('images/photo1.jpg')}}"
-                                class="img-fluid w-100 h-100 object-fit-cover transition-all" alt="Fashion Sale">
-                            <div class="position-absolute top-50 start-0 translate-middle-y ps-5 text-dark" style="z-index: 2;">
-                                <h6 class="text-primary fw-bold text-uppercase mb-2">BUY 1 GET 1 FREE</h6>
-                                <h3 class="fw-bold mb-2 text-white">Fashion <br>Summer Sale</h3>
-                                <a href="{{ url('/products') }}" class="btn btn-premium px-4 mt-3">Shop Now</a>
-                            </div>
+                @empty
+                    <div class="col-12 text-center py-5">
+                        <p class="text-secondary">No products found in featured collection.</p>
+                    </div>
+                @endforelse
+            </div>
+        </div>
+    </section>
+
+    <!-- Promotional Banners -->
+    <section class="py-5">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="rounded-4 overflow-hidden position-relative shadow-sm hover-float" style="height: 300px;">
+                        <img src="{{asset('images/photo2.jpg')}}"
+                            class="img-fluid w-100 h-100 object-fit-cover transition-all" alt="Electronics" loading="lazy">
+                        <div class="position-absolute top-50 start-0 translate-middle-y ps-5 text-dark" style="z-index: 2;">
+                            <h6 class="text-primary fw-bold text-uppercase mb-2">SAVE UP TO 40% OFF</h6>
+                            <h3 class="fw-bold mb-2 text-white">Electronic <br>Mega Deal</h3>
+                            <a href="{{ url('/products') }}" class="btn btn-premium px-4 mt-3">Shop Now</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="rounded-4 overflow-hidden position-relative shadow-sm hover-float" style="height: 300px;">
+                        <img src="{{asset('images/photo1.jpg')}}"
+                            class="img-fluid w-100 h-100 object-fit-cover transition-all" alt="Fashion Sale" loading="lazy">
+                        <div class="position-absolute top-50 start-0 translate-middle-y ps-5 text-dark" style="z-index: 2;">
+                            <h6 class="text-primary fw-bold text-uppercase mb-2">BUY 1 GET 1 FREE</h6>
+                            <h3 class="fw-bold mb-2 text-white">Fashion <br>Summer Sale</h3>
+                            <a href="{{ url('/products') }}" class="btn btn-premium px-4 mt-3">Shop Now</a>
                         </div>
                     </div>
                 </div>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <!-- Lifestyle Highlights -->
-        <section class="py-5 bg-white">
-            <div class="container py-4">
-                <div class="section-header text-center mb-5">
-                    <h2 class="display-5 fw-black mb-0">Highlights <span class="text-gradient-primary">Of The Week</span></h2>
-                    <div class="header-line mx-auto mt-2"
-                        style="width: 80px; height: 4px; background: var(--primary-gradient); border-radius: 2px;"></div>
-                    <p class="mt-3 opacity-75">Curated collections for your modern lifestyle</p>
+    <!-- Lifestyle Highlights -->
+    <section class="py-5 bg-white">
+        <div class="container py-4">
+            <div class="section-header text-center mb-5">
+                <h2 class="display-5 fw-black mb-0">Highlights <span class="text-gradient-primary">Of The Week</span></h2>
+                <div class="header-line mx-auto mt-2"
+                    style="width: 80px; height: 4px; background: var(--primary-gradient); border-radius: 2px;"></div>
+                <p class="mt-3 opacity-75">Curated collections for your modern lifestyle</p>
+            </div>
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <div class="rounded-4 overflow-hidden position-relative shadow-sm transition-all hover-scale"
+                        style="height: 400px;">
+                        <img src="{{asset('images/photo3.jpg')}}" class="img-fluid h-100 w-100 object-fit-cover"
+                            alt="Highlights" loading="lazy">
+                    </div>
                 </div>
-                <div class="row g-3">
-                    <div class="col-md-3">
-                        <div class="rounded-4 overflow-hidden position-relative shadow-sm transition-all hover-scale"
-                            style="height: 400px;">
-                            <img src="{{asset('images/photo3.jpg')}}"
-                                class="img-fluid h-100 w-100 object-fit-cover" alt="Highlights">
-                        </div>
+                <div class="col-md-5">
+                    <div class="rounded-4 overflow-hidden position-relative shadow-sm transition-all hover-scale mb-3"
+                        style="height: 190px;">
+                        <img src="{{asset('images/photo4.jpg')}}" class="img-fluid h-100 w-100 object-fit-cover"
+                            alt="Highlights" loading="lazy">
                     </div>
-                    <div class="col-md-5">
-                        <div class="rounded-4 overflow-hidden position-relative shadow-sm transition-all hover-scale mb-3"
-                            style="height: 190px;">
-                            <img src="{{asset('images/photo4.jpg')}}"
-                                class="img-fluid h-100 w-100 object-fit-cover" alt="Highlights">
-                        </div>
-                        <div class="rounded-4 overflow-hidden position-relative shadow-sm transition-all hover-scale"
-                            style="height: 194px;">
-                            <img src="{{asset('images/photo5.jpg')}}"
-                                class="img-fluid h-100 w-100 object-fit-cover" alt="Highlights">
-                        </div>
+                    <div class="rounded-4 overflow-hidden position-relative shadow-sm transition-all hover-scale"
+                        style="height: 194px;">
+                        <img src="{{asset('images/photo5.jpg')}}" class="img-fluid h-100 w-100 object-fit-cover"
+                            alt="Highlights" loading="lazy">
                     </div>
-                    <div class="col-md-4">
-                        <div class="rounded-4 overflow-hidden position-relative shadow-sm transition-all hover-scale"
-                            style="height: 400px;">
-                            <img src="{{asset('images/photo6.jpg')}}"
-                                class="img-fluid h-100 w-100 object-fit-cover" alt="Highlights">
-                        </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="rounded-4 overflow-hidden position-relative shadow-sm transition-all hover-scale"
+                        style="height: 400px;">
+                        <img src="{{asset('images/photo6.jpg')}}" class="img-fluid h-100 w-100 object-fit-cover"
+                            alt="Highlights" loading="lazy">
                     </div>
                 </div>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <!-- Final CTA Section (Soft White Theme) -->
-        <section class="py-5 text-center" style="background: #F9FAFB;  ">
-            <div class="container py-5">
-                <span class="text-primary fw-bold text-uppercase mb-3 d-block" style="letter-spacing: 2px;">JOIN THE
-                    FAMILY</span>
-                <h2 class="display-4 fw-black text-dark mb-4" style="letter-spacing: -1.5px;">Ready to Upgrade <br>Your Daily
-                    Lifestyle?</h2>
-                <p class="lead text-secondary opacity-75 mb-5 max-width-600 mx-auto">Experience the premium quality,
-                    lightning-fast delivery, and world-class service that thousands of Indian shoppers love.</p>
-                <div class="cta-actions d-flex flex-wrap justify-content-center gap-4 align-items-center">
-                    <a href="{{ url('/products') }}"
-                        class="btn btn-premium btn-lg px-5 py-3 rounded-pill shadow-lg transform-transition hover-scale fw-bold">Shop
-                        Full Collection</a>
-                    <a href="{{ url('/contact') }}" class="btn btn-outline-dark btn-lg px-5 py-3 rounded-pill fw-bold">Contact
-                        Support</a>
-                </div>
-
+    <!-- Final CTA Section (Soft White Theme) -->
+    <section class="py-5 text-center" style="background: #F9FAFB;  ">
+        <div class="container py-5">
+            <span class="text-primary fw-bold text-uppercase mb-3 d-block" style="letter-spacing: 2px;">JOIN THE
+                FAMILY</span>
+            <h2 class="display-4 fw-black text-dark mb-4" style="letter-spacing: -1.5px;">Ready to Upgrade <br>Your Daily
+                Lifestyle?</h2>
+            <p class="lead text-secondary opacity-75 mb-5 max-width-600 mx-auto">Experience the premium quality,
+                lightning-fast delivery, and world-class service that thousands of Indian shoppers love.</p>
+            <div class="cta-actions d-flex flex-wrap justify-content-center gap-4 align-items-center">
+                <a href="{{ url('/products') }}"
+                    class="btn btn-premium btn-lg px-5 py-3 rounded-pill shadow-lg transform-transition hover-scale fw-bold">Shop
+                    Full Collection</a>
+                <a href="{{ url('/contact') }}" class="btn btn-outline-dark btn-lg px-5 py-3 rounded-pill fw-bold">Contact
+                    Support</a>
             </div>
-        </section>
+
+        </div>
+    </section>
 @endsection

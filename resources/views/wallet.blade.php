@@ -67,12 +67,12 @@
                             <h4 class="fw-black mb-0">Transaction History</h4>
                             <div class="d-flex gap-2">
                                 <div class="bg-light p-1 rounded-pill d-flex">
-                                    <button
-                                        class="btn btn-white btn-sm rounded-pill px-3 fw-bold small shadow-sm">All</button>
-                                    <button
-                                        class="btn btn-transparent btn-sm rounded-pill px-3 fw-bold small text-muted">Credits</button>
-                                    <button
-                                        class="btn btn-transparent btn-sm rounded-pill px-3 fw-bold small text-muted">Debits</button>
+                                    <a href="{{ url('/wallet') }}"
+                                        class="btn {{ !request('filter') ? 'btn-white shadow-sm' : 'btn-transparent text-muted' }} btn-sm rounded-pill px-3 fw-bold small">All</a>
+                                    <a href="{{ url('/wallet?filter=credits') }}"
+                                        class="btn {{ request('filter') == 'credits' ? 'btn-white shadow-sm' : 'btn-transparent text-muted' }} btn-sm rounded-pill px-3 fw-bold small">Credits</a>
+                                    <a href="{{ url('/wallet?filter=debits') }}"
+                                        class="btn {{ request('filter') == 'debits' ? 'btn-white shadow-sm' : 'btn-transparent text-muted' }} btn-sm rounded-pill px-3 fw-bold small">Debits</a>
                                 </div>
                             </div>
                         </div>

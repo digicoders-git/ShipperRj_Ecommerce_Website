@@ -13,142 +13,95 @@
 
                 <!-- Main Content -->
                 <div class="col-lg-9">
-                    <div class="dashboard-card p-4 p-lg-5">
-                        <div class="d-flex justify-content-between align-items-center mb-5 flex-wrap gap-3">
+                    <div class="dashboard-card p-3 p-lg-4">
+                        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
                             <div>
-                                <h3 class="fw-black mb-1 letter-spacing-n1">My Shopping Odyssey</h3>
-                                <p class="text-muted small mb-0 fw-medium">Relive your purchases and trace their journey to
-                                    your doorstep.</p>
+                                <h4 class="fw-black mb-0 letter-spacing-n1">My Orders</h4>
+                                <p class="text-muted xx-small mb-0 fw-medium">Track your journey and milestones.</p>
                             </div>
-                            <div class="badge bg-primary-soft text-primary px-4 py-2 rounded-pill small fw-bold">
-                                {{ $orders->total() }} Milestones
+                            <div class="badge bg-primary-soft text-primary px-3 py-2 rounded-pill x-small fw-bold border border-primary border-opacity-10">
+                                {{ $orders->total() }} Total
                             </div>
                         </div>
 
                         @if($orders->count() > 0)
-                            <div class="table-responsive">
-                                <table class="table table-premium align-middle">
-                                    <thead class="bg-light bg-opacity-50">
+                            <div class="orders-table-wrap">
+                                <table class="orders-table">
+                                    <thead>
                                         <tr>
-                                            <th style="width: 15%"
-                                                class="ps-3 uppercase xx-small fw-black tracking-widest text-dark py-3">ID &
-                                                DATE</th>
-                                            <th style="width: 30%"
-                                                class="uppercase xx-small fw-black tracking-widest text-dark py-3">COLLECTION
-                                            </th>
-                                            <th style="width: 15%"
-                                                class="uppercase xx-small fw-black tracking-widest text-dark text-center py-3">
-                                                PAYMENT</th>
-                                            <th style="width: 15%"
-                                                class="uppercase xx-small fw-black tracking-widest text-dark text-center py-3">
-                                                STATUS</th>
-                                            <th style="width: 12%"
-                                                class="uppercase xx-small fw-black tracking-widest text-dark text-center py-3">
-                                                ACTION</th>
-                                            <th style="width: 13%"
-                                                class="pe-3 text-end uppercase xx-small fw-black tracking-widest text-dark py-3">
-                                                FEEDBACK</th>
+                                            <th class="th-order">Order</th>
+                                            <th class="th-collection">Collection</th>
+                                            <th class="th-payment">Payment</th>
+                                            <th class="th-status">Status</th>
+                                            <th class="th-action">Action</th>
+                                            <th class="th-feedback">Feedback</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @foreach($orders as $order)
-                                            <tr class="transition-all hover-translate-y">
-                                                <td class="ps-0 py-4">
-                                                    <span class="d-block fw-black text-dark mb-1">#{{ $order->order_number }}</span>
-                                                    <span
-                                                        class="x-small text-muted fw-medium">{{ $order->created_at->format('d M, Y') }}</span>
+                                            <tr>
+                                                <td class="td-order">
+                                                    <span class="order-num">#{{ $order->order_number }}</span>
+                                                    <span class="order-date">{{ $order->created_at->format('d M, Y') }}</span>
                                                 </td>
-                                                <td>
-                                                    <div class="d-flex align-items-center gap-3">
-                                                        <div class="avatar-group d-flex">
+                                                <td class="td-collection">
+                                                    <div class="collection-inner">
+                                                        <div class="avatar-stack">
                                                             @foreach($order->orderItems->take(3) as $item)
-                                                                <div class="avatar-sm rounded-circle border border-2 border-white overflow-hidden shadow-sm ms-n2 first-ms-0"
-                                                                    style="width: 32px; height: 32px; background: #f8f9fa;">
-                                                                    <img src="{{ asset($item->product->image ?? 'assets/images/placeholder.png') }}"
-                                                                        class="w-100 h-100 object-fit-cover">
+                                                                <div class="avatar-chip">
+                                                                    <img src="{{ asset($item->product->image ?? 'assets/images/placeholder.png') }}" alt="">
                                                                 </div>
                                                             @endforeach
                                                             @if($order->orderItems->count() > 3)
-                                                                <div class="avatar-sm rounded-circle border border-2 border-white bg-light text-muted x-small d-flex align-items-center justify-content-center shadow-sm ms-n2"
-                                                                    style="width: 32px; height: 32px; font-weight: 800;">
-                                                                    +{{ $order->orderItems->count() - 3 }}
-                                                                </div>
+                                                                <div class="avatar-chip avatar-more">+{{ $order->orderItems->count() - 3 }}</div>
                                                             @endif
                                                         </div>
-                                                        <div>
-                                                            <span
-                                                                class="d-block small fw-bold text-dark">{{ $order->orderItems->first()->product->name ?? 'Package' }}</span>
-                                                            <span
-                                                                class="xx-small text-muted fw-bold uppercase">{{ $order->orderItems->count() }}
-                                                                {{ Str::plural('Item', $order->orderItems->count()) }}</span>
+                                                        <div class="collection-meta">
+                                                            <span class="collection-name">{{ Str::limit($order->orderItems->first()->product->name ?? 'Package', 28) }}</span>
+                                                            <span class="collection-count">{{ $order->orderItems->count() }} {{ Str::plural('item', $order->orderItems->count()) }}</span>
                                                         </div>
                                                     </div>
                                                 </td>
-                                                <td class="text-center">
-                                                    <div class="d-inline-block text-start">
-                                                        <span
-                                                            class="d-block fw-black text-dark fs-6">₹{{ number_format($order->total_amount, 2) }}</span>
-                                                        @if($order->payment_method == 'cod')
-                                                            <div class="d-flex align-items-center gap-1 mt-1">
-                                                                <span class="xx-small text-success fw-bold">Adv:
-                                                                    ₹{{ number_format($order->prepaid_amount) }}</span>
-                                                                <span class="xx-small text-muted opacity-25">|</span>
-                                                                <span class="xx-small text-danger fw-bold">Due:
-                                                                    ₹{{ number_format($order->cod_amount) }}</span>
-                                                            </div>
-                                                        @else
-                                                            <span
-                                                                class="badge bg-success-soft text-success xx-small fw-bold uppercase px-2 mt-1">Full
-                                                                Online</span>
-                                                        @endif
-                                                    </div>
+                                                <td class="td-payment">
+                                                    <span class="payment-amount">₹{{ number_format($order->total_amount, 2) }}</span>
+                                                    @if($order->payment_method == 'cod')
+                                                        <div class="payment-split">
+                                                            <span class="split-adv">Adv ₹{{ number_format($order->prepaid_amount) }}</span>
+                                                            <span class="split-sep">·</span>
+                                                            <span class="split-due">Due ₹{{ number_format($order->cod_amount) }}</span>
+                                                        </div>
+                                                    @else
+                                                        <span class="payment-badge-online">Online</span>
+                                                    @endif
                                                 </td>
-                                                <td class="text-center">
+                                                <td class="td-status">
                                                     @php
                                                         $status = strtolower($order->order_status);
                                                         $statusMap = [
-                                                            'placed' => ['bg' => 'warning', 'text' => 'Placed'],
-                                                            'confirmed' => ['bg' => 'info', 'text' => 'Confirmed'],
-                                                            'processing' => ['bg' => 'info', 'text' => 'In Prep'],
-                                                            'dispatched' => ['bg' => 'warning', 'text' => 'Dispatched'],
-                                                            'shipped' => ['bg' => 'warning', 'text' => 'On the Way'],
-                                                            'out_for_delivery' => ['bg' => 'warning', 'text' => 'Out for Delivery'],
-                                                            'delivered' => ['bg' => 'success', 'text' => 'Delivered'],
-                                                            'cancelled' => ['bg' => 'danger', 'text' => 'Cancelled'],
-                                                            'returned' => ['bg' => 'dark', 'text' => 'Returned'],
+                                                            'placed'           => ['cls' => 'st-placed',      'text' => 'Placed'],
+                                                            'confirmed'        => ['cls' => 'st-confirmed',   'text' => 'Confirmed'],
+                                                            'processing'       => ['cls' => 'st-processing',  'text' => 'In Prep'],
+                                                            'dispatched'       => ['cls' => 'st-dispatched',  'text' => 'Dispatched'],
+                                                            'shipped'          => ['cls' => 'st-shipped',     'text' => 'On the Way'],
+                                                            'out_for_delivery' => ['cls' => 'st-ofd',         'text' => 'Out for Delivery'],
+                                                            'delivered'        => ['cls' => 'st-delivered',   'text' => 'Delivered'],
+                                                            'cancelled'        => ['cls' => 'st-cancelled',   'text' => 'Cancelled'],
+                                                            'returned'         => ['cls' => 'st-returned',    'text' => 'Returned'],
                                                         ];
-                                                        $cur = $statusMap[$status] ?? ['bg' => 'secondary', 'text' => str_replace('_', ' ', $order->order_status)];
-                                                        $rgbMap = [
-                                                            'primary' => '13, 110, 253',
-                                                            'warning' => '242, 112, 26',
-                                                            'success' => '25, 135, 84',
-                                                            'danger' => '220, 53, 69',
-                                                            'info' => '13, 202, 240',
-                                                            'dark' => '33, 37, 41'
-                                                        ];
-                                                        $rgb = $rgbMap[$cur['bg']] ?? '108, 117, 125';
+                                                        $cur = $statusMap[$status] ?? ['cls' => 'st-default', 'text' => str_replace('_', ' ', $order->order_status)];
                                                     @endphp
-                                                    <span
-                                                        class="badge-status-premium bg-{{ $cur['bg'] }}-soft text-{{ $cur['bg'] }} py-1 px-3 rounded-pill xx-small fw-black uppercase tracking-wider d-inline-flex align-items-center justify-content-center gap-1"
-                                                        style="border: 1px solid rgba({{ $rgb }}, 0.2) !important;">
-                                                        <span class="p-1 bg-current rounded-circle me-1"
-                                                            style="background-color: currentColor; width: 6px; height: 6px;"></span>
-                                                        {{ $cur['text'] }}
+                                                    <span class="status-pill {{ $cur['cls'] }}">
+                                                        <i class="status-dot"></i>{{ $cur['text'] }}
                                                     </span>
                                                 </td>
-                                                <td class="text-center">
-                                                    <div class="d-flex gap-2 justify-content-center align-items-center">
-                                                        <a href="{{ route('orders.track', $order->order_number) }}"
-                                                            class="btn btn-premium-outline btn-sm rounded-pill px-3 fw-black tracking-tighter">
-                                                            TRACK
-                                                        </a>
+                                                <td class="td-action">
+                                                    <div class="action-group">
+                                                        <a href="{{ route('orders.track', $order->order_number) }}" class="act-btn act-track">Track</a>
+                                                        <a href="{{ route('order.invoice', $order->id) }}" target="_blank" class="act-btn act-invoice">Invoice</a>
 
                                                         @if(in_array(strtolower($order->order_status), ['placed', 'confirmed']))
-                                                            <button type="button"
-                                                                class="btn btn-danger-soft text-danger btn-sm rounded-pill px-3 fw-black tracking-tighter border-0"
-                                                                data-bs-toggle="modal" data-bs-target="#cancelOrderModal{{$order->id}}">
-                                                                CANCEL
-                                                            </button>
+                                                            <button type="button" class="act-btn act-cancel"
+                                                                data-bs-toggle="modal" data-bs-target="#cancelOrderModal{{$order->id}}">Cancel</button>
                                                         @endif
 
                                                         @php
@@ -166,26 +119,21 @@
                                                         @endphp
 
                                                         @if($canReturn && !$order->return_status)
-                                                            <button type="button"
-                                                                class="btn btn-warning-soft text-warning btn-sm rounded-pill px-3 fw-black tracking-tighter border-0"
-                                                                data-bs-toggle="modal" data-bs-target="#returnOrderModal{{$order->id}}">
-                                                                RETURN
-                                                            </button>
+                                                            <button type="button" class="act-btn act-return"
+                                                                data-bs-toggle="modal" data-bs-target="#returnOrderModal{{$order->id}}">Return</button>
                                                         @elseif($order->return_status)
-                                                            <span
-                                                                class="badge bg-info-soft text-info xx-small fw-bold px-2 py-1 rounded-pill">{{ strtoupper($order->return_status) }}</span>
+                                                            <span class="return-status-badge">{{ strtoupper($order->return_status) }}</span>
                                                         @endif
                                                     </div>
                                                 </td>
-                                                <td class="pe-0 text-end">
+                                                <td class="td-feedback">
                                                     @if(strtolower($order->order_status) == 'delivered')
-                                                        <button type="button"
-                                                            class="btn btn-success btn-sm rounded-pill px-3 fw-black tracking-tighter"
-                                                            data-bs-toggle="modal" data-bs-target="#reviewModal{{$order->id}}">
-                                                            REVIEW
-                                                        </button>
+                                                        <button type="button" class="act-btn act-review"
+                                                            data-bs-toggle="modal" data-bs-target="#reviewModal{{$order->id}}">Review</button>
                                                     @else
-                                                        <span class="xx-small text-muted fw-bold opacity-50 pe-3">LOCKED</span>
+                                                        <span class="feedback-locked">
+                                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                                                        </span>
                                                     @endif
                                                 </td>
                                             </tr>
@@ -210,7 +158,7 @@
                                     class="btn btn-primary rounded-pill px-5 fw-black mt-3">START SHOPPING</a>
                             </div>
                         @endif
-                    </div> <!-- End Dashboard Card Inner -->
+                    </div>
                 </div>
             </div>
         </div>
@@ -218,7 +166,6 @@
 
     @push('modals')
         @foreach($orders as $order)
-            <!-- Review Modal (Only for delivered) -->
             @if(strtolower($order->order_status) == 'delivered')
                 <div class="modal fade" id="reviewModal{{$order->id}}" tabindex="-1" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered">
@@ -245,7 +192,6 @@
                                                 @endif
                                             </div>
                                         </div>
-
                                         @if(!$hasReviewed)
                                             <form action="{{ route('product.review.store') }}" method="POST">
                                                 @csrf
@@ -272,8 +218,7 @@
                                                         style="border-radius: 12px; font-size: 0.9rem;"></textarea>
                                                 </div>
                                                 <button type="submit"
-                                                    class="btn btn-primary w-100 fw-black rounded-pill py-2 small shadow-sm">SUBMIT
-                                                    REVIEW</button>
+                                                    class="btn btn-primary w-100 fw-black rounded-pill py-2 small shadow-sm">SUBMIT REVIEW</button>
                                             </form>
                                         @endif
                                     </div>
@@ -284,37 +229,30 @@
                 </div>
             @endif
 
-            <!-- Cancel Order Modal -->
-            @if(in_array(strtolower($order->order_status), ['placed', 'confirmed']))
+            <!-- @if(in_array(strtolower($order->order_status), ['placed', 'confirmed'])) -->
+             @if(strtolower($order->order_status) == 'placed')
                 <div class="modal fade" id="cancelOrderModal{{$order->id}}" tabindex="-1" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered">
                         <div class="modal-content border-0 shadow-lg" style="border-radius: 24px;">
                             <div class="modal-header border-0 pb-0 pt-4 px-4">
                                 <form action="{{ route('orders.cancel', $order->id) }}" method="POST" class="w-100">
                                     @csrf
-                                    <h5 class="modal-title fw-black mb-3 letter-spacing-n1">Cancel Order #{{ $order->order_number }}
-                                    </h5>
-
+                                    <h5 class="modal-title fw-black mb-3 letter-spacing-n1">Cancel Order #{{ $order->order_number }}</h5>
                                     <div class="alert alert-warning-soft text-warning x-small border-0 rounded-4 p-3 mb-4">
                                         <i class="bi bi-info-circle me-2"></i>
-                                        Once cancelled, the refund will be processed and you'll receive the amount back on your original
-                                        payment method (if online).
+                                        Once cancelled, the refund will be processed and you'll receive the amount back on your original payment method (if online).
                                     </div>
-
                                     <div class="mb-4">
-                                        <label class="form-label xx-small fw-black uppercase opacity-50 ps-1">Reason for
-                                            Cancellation</label>
+                                        <label class="form-label xx-small fw-black uppercase opacity-50 ps-1">Reason for Cancellation</label>
                                         <textarea name="cancel_reason" class="form-control border-0 bg-light bg-opacity-50" rows="3"
                                             required placeholder="Tell us why you want to cancel this order..."
                                             style="border-radius: 12px;"></textarea>
                                     </div>
-
                                     <div class="d-flex gap-2 mb-4">
                                         <button type="button" class="btn btn-light rounded-pill w-100 fw-bold py-2 border"
                                             data-bs-dismiss="modal">NOT NOW</button>
                                         <button type="submit"
-                                            class="btn btn-danger-soft text-danger w-100 rounded-pill border-0 py-2 fw-black shadow-sm">CONFIRM
-                                            CANCEL</button>
+                                            class="btn btn-danger-soft text-danger w-100 rounded-pill border-0 py-2 fw-black shadow-sm">CONFIRM CANCEL</button>
                                     </div>
                                 </form>
                             </div>
@@ -323,7 +261,6 @@
                 </div>
             @endif
 
-            <!-- Return Order Modal -->
             @php
                 $isDelivered = strtolower($order->order_status) == 'delivered';
                 $canReturn = false;
@@ -345,40 +282,32 @@
                             <div class="modal-header border-0 pb-0 pt-4 px-4">
                                 <form action="{{ route('orders.return', $order->id) }}" method="POST" class="w-100">
                                     @csrf
-                                    <h5 class="modal-title fw-black mb-3 letter-spacing-n1">Return Request #{{ $order->order_number }}
-                                    </h5>
-
+                                    <h5 class="modal-title fw-black mb-3 letter-spacing-n1">Return Request #{{ $order->order_number }}</h5>
                                     <div class="alert alert-primary-soft text-primary x-small border-0 rounded-4 p-3 mb-4">
                                         <i class="bi bi-shield-check me-2"></i>
                                         We values your trust. Please describe the issue and our team will approve the return shortly.
                                     </div>
-
                                     <div class="mb-4 text-start">
-                                        <label class="form-label xx-small fw-black uppercase opacity-50 ps-1">Items being
-                                            returned</label>
+                                        <label class="form-label xx-small fw-black uppercase opacity-50 ps-1">Items being returned</label>
                                         <ul class="list-unstyled p-0 m-0 x-small fw-medium opacity-75">
                                             @foreach($order->orderItems as $item)
                                                 <li class="mb-1 d-flex gap-2">
-                                                    <i class="bi bi-check2-circle text-success"></i> {{ $item->product->name }}
-                                                    (x{{ $item->quantity }})
+                                                    <i class="bi bi-check2-circle text-success"></i> {{ $item->product->name }} (x{{ $item->quantity }})
                                                 </li>
                                             @endforeach
                                         </ul>
                                     </div>
-
                                     <div class="mb-4">
                                         <label class="form-label xx-small fw-black uppercase opacity-50 ps-1">Reason for Return</label>
                                         <textarea name="return_reason" class="form-control border-0 bg-light bg-opacity-50" rows="3"
                                             required placeholder="Size issue, damaged product, or something else?"
                                             style="border-radius: 12px;"></textarea>
                                     </div>
-
                                     <div class="d-flex gap-2 mb-4">
                                         <button type="button" class="btn btn-light rounded-pill w-100 fw-bold py-2 border"
                                             data-bs-dismiss="modal">DISMISS</button>
                                         <button type="submit"
-                                            class="btn btn-warning-soft text-warning w-100 rounded-pill border-0 py-2 fw-black shadow-sm">SUBMIT
-                                            REQUEST</button>
+                                            class="btn btn-warning-soft text-warning w-100 rounded-pill border-0 py-2 fw-black shadow-sm">SUBMIT REQUEST</button>
                                     </div>
                                 </form>
                             </div>
@@ -390,309 +319,280 @@
     @endpush
 
     @push('styles')
-        <style>
-            .badge-status-premium {
-                min-width: 90px;
-                letter-spacing: 0.8px;
-                white-space: nowrap;
-                line-height: normal;
-                display: inline-flex;
-                transition: all 0.3s ease;
-            }
+    <style>
+        /* ── Table wrapper ── */
+        .orders-table-wrap {
+            overflow-x: auto;
+            border-radius: 16px;
+            border: 1px solid #f0f0f0;
+        }
 
-            .bg-warning-soft {
-                background-color: rgba(242, 112, 26, 0.08) !important;
-                color: #f2701aff !important;
-            }
+        /* ── Table base ── */
+        .orders-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
 
-            .bg-primary-soft {
-                background-color: rgba(13, 110, 253, 0.08) !important;
-                color: #0d6efd !important;
-            }
+        /* ── Header ── */
+        .orders-table thead tr {
+            background: #fafafa;
+            border-bottom: 1px solid #efefef;
+        }
+        .orders-table thead th {
+            padding: 11px 14px;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 0.9px;
+            text-transform: uppercase;
+            color: #aaa;
+            white-space: nowrap;
+            border: none;
+        }
+        .th-order      { width: 12%; }
+        .th-collection { width: 30%; }
+        .th-payment    { width: 16%; text-align: center; }
+        .th-status     { width: 14%; text-align: center; }
+        .th-action     { width: 18%; text-align: center; }
+        .th-feedback   { width: 10%; text-align: center; }
 
-            .bg-success-soft {
-                background-color: rgba(25, 135, 84, 0.08) !important;
-                color: #198754 !important;
-            }
+        /* ── Body rows ── */
+        .orders-table tbody tr {
+            border-bottom: 1px solid #f5f5f5;
+            transition: background 0.15s ease;
+        }
+        .orders-table tbody tr:last-child { border-bottom: none; }
+        .orders-table tbody tr:hover { background: #fafbff; }
 
-            .bg-danger-soft {
-                background-color: rgba(220, 53, 69, 0.08) !important;
-                color: #dc3545 !important;
-            }
+        .orders-table tbody td {
+            padding: 13px 14px;
+            vertical-align: middle;
+        }
 
-            .bg-info-soft {
-                background-color: rgba(13, 202, 240, 0.08) !important;
-                color: #0dcaf0 !important;
-            }
+        /* ── Order cell ── */
+        .td-order { white-space: nowrap; }
+        .order-num {
+            display: block;
+            font-weight: 800;
+            font-size: 12.5px;
+            color: #1a1a1a;
+            letter-spacing: -0.3px;
+        }
+        .order-date {
+            display: block;
+            font-size: 11px;
+            color: #aaa;
+            font-weight: 600;
+            margin-top: 2px;
+        }
 
-            .bg-dark-soft {
-                background-color: rgba(33, 37, 41, 0.08) !important;
-                color: #212529 !important;
-            }
+        /* ── Collection cell ── */
+        .collection-inner {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .avatar-stack {
+            display: flex;
+            align-items: center;
+        }
+        .avatar-chip {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: 2px solid #fff;
+            overflow: hidden;
+            margin-left: -6px;
+            background: #f3f3f3;
+            flex-shrink: 0;
+        }
+        .avatar-chip:first-child { margin-left: 0; }
+        .avatar-chip img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .avatar-more {
+            background: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 9px;
+            font-weight: 800;
+            color: #888;
+        }
+        .collection-meta { min-width: 0; }
+        .collection-name {
+            display: block;
+            font-weight: 700;
+            color: #1a1a1a;
+            font-size: 12.5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 160px;
+        }
+        .collection-count {
+            display: block;
+            font-size: 10.5px;
+            color: #bbb;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 1px;
+        }
 
-            .line-height-1 {
-                line-height: 1;
-            }
+        /* ── Payment cell ── */
+        .td-payment { text-align: center; }
+        .payment-amount {
+            display: block;
+            font-weight: 800;
+            font-size: 13.5px;
+            color: #1a1a1a;
+            letter-spacing: -0.3px;
+        }
+        .payment-split {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            margin-top: 3px;
+        }
+        .split-adv  { font-size: 10px; font-weight: 700; color: #19875499; }
+        .split-due  { font-size: 10px; font-weight: 700; color: #dc354599; }
+        .split-sep  { font-size: 10px; color: #ccc; }
+        .payment-badge-online {
+            display: inline-block;
+            margin-top: 3px;
+            font-size: 9.5px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            color: #198754;
+            background: rgba(25,135,84,0.08);
+            padding: 2px 8px;
+            border-radius: 20px;
+        }
 
-            .hover-translate-y:hover {
-                transform: translateY(-2px);
-                background-color: rgba(var(--bs-primary-rgb), 0.01);
-            }
+        /* ── Status pill ── */
+        .td-status { text-align: center; }
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 0.6px;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+        .status-dot {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: currentColor;
+            display: inline-block;
+            flex-shrink: 0;
+        }
+        .st-placed      { background: rgba(242,112,26,.09);  color: #c85d00; }
+        .st-confirmed   { background: rgba(13,202,240,.09);  color: #0591b0; }
+        .st-processing  { background: rgba(13,202,240,.09);  color: #0591b0; }
+        .st-dispatched  { background: rgba(242,112,26,.09);  color: #c85d00; }
+        .st-shipped     { background: rgba(242,112,26,.09);  color: #c85d00; }
+        .st-ofd         { background: rgba(13,110,253,.09);  color: #0d6efd; }
+        .st-delivered   { background: rgba(25,135,84,.09);   color: #0f6b40; }
+        .st-cancelled   { background: rgba(220,53,69,.09);   color: #b02a37; }
+        .st-returned    { background: rgba(33,37,41,.07);    color: #444;    }
+        .st-default     { background: rgba(108,117,125,.09); color: #555;    }
 
-            .pipeline-container {
-                height: 80px;
-            }
+        /* ── Action buttons ── */
+        .td-action { text-align: center; }
+        .action-group {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+        .act-btn {
+            display: inline-block;
+            padding: 4px 11px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            cursor: pointer;
+            border: none;
+            text-decoration: none;
+            transition: all 0.18s ease;
+            white-space: nowrap;
+            line-height: 1.6;
+        }
+        .act-track  { background: #f0f0f0; color: #444; }
+        .act-track:hover  { background: #0d6efd; color: #fff; }
+        .act-cancel { background: rgba(220,53,69,.08); color: #b02a37; }
+        .act-cancel:hover { background: #dc3545; color: #fff; }
+        .act-return { background: rgba(242,112,26,.08); color: #c85d00; }
+        .act-return:hover { background: #f2701a; color: #fff; }
+        .act-review { background: rgba(25,135,84,.08); color: #0f6b40; }
+        .act-review:hover { background: #198754; color: #fff; }
+        .act-invoice { background: rgba(13,202,240,.08); color: #0591b0; }
+        .act-invoice:hover { background: #0dcaf0; color: #fff; }
 
-            .pipeline-progress-bg {
-                position: absolute;
-                top: 22px;
-                left: 20px;
-                right: 20px;
-                height: 4px;
-                background: #f0f0f0;
-                border-radius: 10px;
-                z-index: 1;
-            }
+        .return-status-badge {
+            font-size: 9.5px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            color: #0591b0;
+            background: rgba(13,202,240,.08);
+            padding: 3px 9px;
+            border-radius: 20px;
+        }
 
-            .pipeline-progress-active {
-                position: absolute;
-                top: 22px;
-                left: 20px;
-                height: 4px;
-                background: var(--bs-primary);
-                border-radius: 10px;
-                z-index: 2;
-                transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);
-            }
+        /* ── Feedback cell ── */
+        .td-feedback { text-align: center; }
+        .feedback-locked {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #ccc;
+        }
 
-            .pipeline-step {
-                position: relative;
-                z-index: 3;
-                text-align: center;
-                flex: 1;
-            }
+        /* ── Pagination ── */
+        .custom-pagination nav svg { width: 14px !important; height: 14px !important; }
+        .custom-pagination .pagination { gap: 6px; }
+        .custom-pagination .page-link {
+            border: 1px solid #eee;
+            border-radius: 12px !important;
+            padding: 10px 18px;
+            font-weight: 800;
+            color: #444;
+            font-size: 0.85rem;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .custom-pagination .page-item.active .page-link {
+            background: var(--bs-primary);
+            border-color: var(--bs-primary);
+            color: #fff;
+            box-shadow: 0 8px 15px rgba(var(--bs-primary-rgb), 0.25);
+        }
+        .custom-pagination .page-link:hover {
+            background: #fff;
+            border-color: var(--bs-primary);
+            color: var(--bs-primary);
+            transform: translateY(-3px);
+        }
 
-            .step-icon-wrapper {
-                position: relative;
-                display: inline-block;
-            }
-
-            .step-icon {
-                width: 48px;
-                height: 48px;
-                background: #fff;
-                border: 2px solid #f0f0f0;
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                transition: all 0.4s ease;
-                color: #ccc;
-                font-size: 1.25rem;
-                margin: 0 auto;
-            }
-
-            .pipeline-step.active .step-icon {
-                background: var(--bs-primary);
-                border-color: var(--bs-primary);
-                color: #fff;
-                transform: scale(1.05);
-            }
-
-            .step-label {
-                font-size: 9px;
-                font-weight: 800;
-                color: #adb5bd;
-                display: block;
-                text-transform: uppercase;
-                letter-spacing: 0.5px;
-            }
-
-            .pipeline-step.active .step-label {
-                color: var(--bs-primary);
-            }
-
-            .current-pulse .step-icon {
-                box-shadow: 0 0 0 0 rgba(var(--bs-primary-rgb), 0.4);
-                animation: pulse-primary 2s infinite;
-            }
-
-            @keyframes pulse-primary {
-                0% {
-                    transform: scale(1.05);
-                }
-
-                50% {
-                    transform: scale(1.15);
-                    box-shadow: 0 0 0 10px rgba(var(--bs-primary-rgb), 0);
-                }
-
-                100% {
-                    transform: scale(1.05);
-                }
-            }
-
-            .pulse-ring {
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 48px;
-                height: 48px;
-                border-radius: 50%;
-                border: 4px solid var(--bs-primary);
-                animation: ripple 2s infinite;
-                opacity: 0;
-            }
-
-            @keyframes ripple {
-                0% {
-                    transform: scale(1);
-                    opacity: 0.5;
-                }
-
-                100% {
-                    transform: scale(1.8);
-                    opacity: 0;
-                }
-            }
-
-            .feed-visual {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                width: 20px;
-                position: relative;
-            }
-
-            .feed-dot {
-                width: 12px;
-                height: 12px;
-                border-radius: 50%;
-                background: #dee2e6;
-                border: 2px solid #fff;
-                position: relative;
-                z-index: 2;
-                margin-top: 15px;
-            }
-
-            .feed-dot.active {
-                background: var(--bs-primary);
-                transform: scale(1.4);
-            }
-
-            .feed-line {
-                width: 2px;
-                flex-grow: 1;
-                background: #f0f0f0;
-                position: absolute;
-                top: 27px;
-                z-index: 1;
-            }
-
-            .hover-translate-x:hover {
-                transform: translateX(5px);
-                border-color: rgba(var(--bs-primary-rgb), 0.2) !important;
-                background: #fff !important;
-            }
-
-            .tracking-summary-card {
-                background: #fff;
-            }
-
-            .summary-bg-icon {
-                position: absolute;
-                right: -20px;
-                bottom: -20px;
-                font-size: 8rem;
-                color: #f8f9fa;
-                transform: rotate(-15deg);
-                pointer-events: none;
-            }
-
-            .custom-scrollbar::-webkit-scrollbar {
-                width: 4px;
-            }
-
-            .custom-scrollbar::-webkit-scrollbar-thumb {
-                background: #eee;
-                border-radius: 10px;
-            }
-
-            .custom-pagination nav svg {
-                width: 14px !important;
-                height: 14px !important;
-            }
-
-            .custom-pagination .pagination {
-                gap: 6px;
-            }
-
-            .custom-pagination .page-link {
-                border: 1px solid #eee;
-                border-radius: 12px !important;
-                padding: 10px 18px;
-                font-weight: 800;
-                color: #444;
-                font-size: 0.85rem;
-                transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            }
-
-            .custom-pagination .page-item.active .page-link {
-                background: var(--bs-primary);
-                border-color: var(--bs-primary);
-                color: #fff;
-                box-shadow: 0 8px 15px rgba(var(--bs-primary-rgb), 0.25);
-            }
-
-            .custom-pagination .page-link:hover {
-                background: #fff;
-                border-color: var(--bs-primary);
-                color: var(--bs-primary);
-                transform: translateY(-3px);
-            }
-
-            table.table-premium thead tr th {
-                border-bottom: 2px solid #f0f0f0;
-                border-top: none;
-            }
-
-            table.table-premium tbody tr {
-                border-bottom: 1px solid #f8f9fa;
-                transition: all 0.2s ease;
-            }
-
-            table.table-premium tbody tr:hover {
-                background-color: rgba(var(--bs-primary-rgb), 0.02);
-            }
-
-            table.table-premium tbody tr:last-child {
-                border-bottom: none;
-            }
-
-            .btn-premium-outline {
-                border: 2px solid #f0f0f0;
-                color: #444;
-                transition: all 0.3s ease;
-            }
-
-            .btn-premium-outline:hover {
-                background: var(--bs-primary);
-                border-color: var(--bs-primary);
-                color: #fff;
-                transform: scale(1.05);
-            }
-
-            .refresh-pill {
-                background: rgba(var(--bs-primary-rgb), 0.05);
-                padding: 4px 12px;
-                border-radius: 50px;
-                transition: all 0.3s ease;
-            }
-
-            .refresh-pill:hover {
-                background: rgba(var(--bs-primary-rgb), 0.1);
-                transform: rotate(180deg);
-            }
-        </style>
+        /* ── Soft color utilities (used in modals) ── */
+        .bg-warning-soft  { background-color: rgba(242,112,26,.08) !important; }
+        .bg-primary-soft  { background-color: rgba(13,110,253,.08) !important; }
+        .bg-success-soft  { background-color: rgba(25,135,84,.08)  !important; }
+        .bg-danger-soft   { background-color: rgba(220,53,69,.08)  !important; }
+        .bg-info-soft     { background-color: rgba(13,202,240,.08) !important; }
+        .bg-dark-soft     { background-color: rgba(33,37,41,.08)   !important; }
+    </style>
     @endpush
 @endsection

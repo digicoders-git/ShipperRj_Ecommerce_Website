@@ -25,7 +25,7 @@ class UserController extends Controller implements HasMiddleware
      */
     public function index()
     {
-        $users = User::latest()->get();
+        $users = User::latest()->paginate(25);
         return view('admin.users', compact('users'));
     }
 
@@ -55,7 +55,8 @@ class UserController extends Controller implements HasMiddleware
             'walletTransactions',
             'wishlists.product',
             'carts.product',
-            'orders' => function($q) { $q->latest(); }
+            'orders' => function ($q) {
+                $q->latest(); }
         ])->findOrFail($id);
 
         return view('admin.users-show', compact('user'));

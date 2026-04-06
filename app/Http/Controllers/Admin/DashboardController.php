@@ -19,7 +19,7 @@ class DashboardController extends Controller
             'total_products' => Product::count(),
             'total_orders' => Order::count(),
             'total_categories' => Category::count(),
-            'recent_orders' => Order::with('user')->latest()->limit(5)->get(),
+            'recent_orders' => Order::with('user')->orderBy('created_at', 'desc')->limit(5)->get(),
         ];
         return view('admin.dashboard', compact('stats'));
     }

@@ -1,553 +1,1362 @@
 @extends('layouts.app')
 
 @push('styles')
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
     <style>
         :root {
-            --premium-gradient: linear-gradient(135deg, #f2701a 0%, #e96715 100%);
-            --glass-bg: rgba(255, 255, 255, 0.7);
-            --glass-border: rgba(255, 255, 255, 0.3);
-            --soft-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-            --premium-shadow: 0 20px 40px rgba(242, 112, 26, 0.15);
+            --brand: #f2701a;
+            --brand-dark: #c9560e;
+            --brand-glow: rgba(242, 112, 26, 0.18);
+            --ink: #0d0d0d;
+            --ink-muted: #6b6b6b;
+            --surface: #faf9f7;
+            --surface-2: #f2f0ec;
+            --white: #ffffff;
+            --success: #1a8a4a;
+            --success-bg: #e8f5ee;
+            --border: rgba(13, 13, 13, 0.07);
+            --radius-xl: 28px;
+            --radius-pill: 100px;
+            --shadow-sm: 0 2px 12px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 8px 32px rgba(0, 0, 0, 0.10);
+            --shadow-brand: 0 12px 40px rgba(242, 112, 26, 0.22);
+            --transition: all 0.38s cubic-bezier(0.22, 1, 0.36, 1);
         }
 
-        .product-breadcrumb {
-            background: #fdfdfd;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
-        .breadcrumb-item+.breadcrumb-item::before {
-            content: "\F285";
-            font-family: "bootstrap-icons";
-            font-size: 0.6rem;
-            opacity: 0.3;
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--surface);
+            color: var(--ink);
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* Gallery Styles */
-        .product-gallery-container {
-            position: sticky;
-            top: 100px;
+        /* BREADCRUMB */
+        .pd-breadcrumb {
+            background: var(--white);
+            border-bottom: 1px solid var(--border);
+            padding: 14px 0;
         }
 
-        .main-image-wrapper {
-            background: #f8f9fa;
-            border-radius: 30px;
-            padding: 40px;
-            transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
-            border: 1px solid rgba(0, 0, 0, 0.02);
-            cursor: zoom-in;
-            overflow: hidden;
-        }
-
-        .main-image-wrapper:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--soft-shadow);
-            border-color: rgba(242, 112, 26, 0.1);
-        }
-
-        .main-image-wrapper img {
-            transition: transform 0.5s ease;
-        }
-
-        .main-image-wrapper:hover img {
-            transform: scale(1.05);
-        }
-
-        .thumb-btn {
-            width: 80px;
-            height: 80px;
-            border-radius: 18px;
-            padding: 5px;
-            border: 2px solid transparent;
-            background: #fff;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
-        }
-
-        .thumb-btn.active {
-            border-color: #f2701a;
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(242, 112, 26, 0.15);
-        }
-
-        /* Info Styles */
-        .product-title {
-            font-family: 'Outfit', sans-serif;
-            font-weight: 800;
-            letter-spacing: -1.5px;
-            line-height: 1.1;
-            color: #1a1a1a;
-        }
-
-        .price-display {
-            background: linear-gradient(to right, #fdfdfd, #fff);
-            padding: 25px;
-            border-radius: 24px;
-            border: 1px solid rgba(0, 0, 0, 0.04);
-            margin: 30px 0;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .price-display::after {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -10%;
-            width: 150px;
-            height: 150px;
-            background: radial-gradient(circle, rgba(242, 112, 26, 0.05) 0%, transparent 70%);
-            z-index: 0;
-        }
-
-        .sell-price {
-            font-size: 2.8rem;
-            font-weight: 800;
-            color: #f2701a;
-            margin-bottom: 0;
-        }
-
-        .mrp-price {
-            font-size: 1.2rem;
-            color: #999;
-            text-decoration: line-through;
-            font-weight: 500;
-        }
-
-        .save-badge {
-            background: #e6f4ea;
-            color: #1e7e34;
-            padding: 6px 12px;
-            border-radius: 50px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        /* Action Buttons */
-        .qty-picker {
-            background: #f1f3f5;
-            border-radius: 50px;
-            padding: 5px;
-            display: flex;
+        .pd-breadcrumb .breadcrumb {
+            margin: 0;
+            gap: 0;
             align-items: center;
-            max-width: 130px;
         }
 
-        .qty-btn {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            border: none;
-            background: #fff;
-            color: #333;
+        .pd-breadcrumb .breadcrumb-item a {
+            color: var(--ink-muted);
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-decoration: none;
+            letter-spacing: 0.01em;
+            transition: color 0.2s;
+        }
+
+        .pd-breadcrumb .breadcrumb-item a:hover {
+            color: var(--brand);
+        }
+
+        .pd-breadcrumb .breadcrumb-item.active {
+            color: var(--ink);
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .pd-breadcrumb .breadcrumb-item+.breadcrumb-item::before {
+            content: "›";
+            color: var(--border);
+            font-size: 1.1rem;
+            line-height: 1;
+            padding: 0 8px;
+        }
+
+        /* GALLERY */
+        .pd-section {
+            padding: 48px 0 80px;
+        }
+
+        .gallery-sticky {
+            position: sticky;
+            top: 90px;
+        }
+
+        .gallery-main {
+            background: var(--white);
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--border);
+            overflow: hidden;
+            aspect-ratio: 1 / 1;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.2s ease;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            cursor: zoom-in;
+            position: relative;
+            transition: var(--transition);
+        }
+
+        .gallery-main::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 80% 20%, var(--brand-glow), transparent 60%);
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
+        .gallery-main:hover::after {
+            opacity: 1;
+        }
+
+        .gallery-main:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .gallery-main img {
+            max-height: 440px;
+            width: 90%;
+            object-fit: contain;
+            transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+            position: relative;
+            z-index: 1;
+        }
+
+        .gallery-main:hover img {
+            transform: scale(1.06);
+        }
+
+        .gallery-badge {
+            position: absolute;
+            top: 18px;
+            left: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            z-index: 2;
+        }
+
+        .g-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 12px;
+            border-radius: var(--radius-pill);
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            backdrop-filter: blur(8px);
+        }
+
+        .g-badge.trending {
+            background: rgba(220, 38, 38, 0.10);
+            color: #dc2626;
+            border: 1px solid rgba(220, 38, 38, 0.15);
+        }
+
+        .g-badge.featured {
+            background: rgba(37, 99, 235, 0.10);
+            color: #2563eb;
+            border: 1px solid rgba(37, 99, 235, 0.15);
+        }
+
+        .gallery-zoom-hint {
+            position: absolute;
+            bottom: 18px;
+            right: 18px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(8px);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 6px 10px;
+            font-size: 0.65rem;
+            color: var(--ink-muted);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 2;
+        }
+
+        .gallery-main:hover .gallery-zoom-hint {
+            opacity: 1;
+        }
+
+        .gallery-thumbs {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 14px;
+        }
+
+        .thumb-item {
+            width: 72px;
+            height: 72px;
+            border-radius: 16px;
+            border: 2px solid transparent;
+            background: var(--white);
+            cursor: pointer;
+            overflow: hidden;
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
+            padding: 4px;
+        }
+
+        .thumb-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 12px;
+        }
+
+        .thumb-item:hover {
+            border-color: rgba(242, 112, 26, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .thumb-item.active {
+            border-color: var(--brand);
+            box-shadow: 0 0 0 4px var(--brand-glow);
+            transform: translateY(-3px);
+        }
+
+        /* INFO */
+        .info-panel {
+            padding-left: 20px;
+        }
+
+        @media (max-width: 991px) {
+            .info-panel {
+                padding-left: 0;
+                margin-top: 32px;
+            }
+        }
+
+        .product-category-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-pill);
+            padding: 6px 14px;
+            font-size: 0.68rem;
+            font-weight: 600;
+            color: var(--ink-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 16px;
+        }
+
+        .product-title {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: clamp(2rem, 4vw, 2.8rem);
+            font-weight: 900;
+            line-height: 1.1;
+            color: var(--ink);
+            letter-spacing: -0.02em;
+            margin-bottom: 18px;
+        }
+
+        .rating-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+        }
+
+        .stars {
+            display: flex;
+            gap: 2px;
+            color: #f59e0b;
+            font-size: 0.85rem;
+        }
+
+        .rating-text {
+            font-size: 0.8rem;
+            color: var(--ink-muted);
+            font-weight: 500;
+        }
+
+        .rating-divider {
+            width: 1px;
+            height: 14px;
+            background: var(--border);
+        }
+
+        .sku-text {
+            font-size: 0.75rem;
+            color: var(--ink-muted);
+        }
+
+        .sku-text strong {
+            color: var(--ink);
+            font-family: 'DM Mono', monospace;
+            font-size: 0.72rem;
+        }
+
+        /* PRICE */
+        .price-box {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            padding: 24px 28px;
+            margin-bottom: 28px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .price-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--brand), #ff9a4a);
+        }
+
+        .sell-price {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.6rem;
+            font-weight: 900;
+            color: var(--brand);
+            line-height: 1;
+            letter-spacing: -0.02em;
+        }
+
+        .mrp-price {
+            font-size: 1rem;
+            color: #aaa;
+            text-decoration: line-through;
+            font-weight: 400;
+            margin-left: 10px;
+        }
+
+        .save-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: var(--success-bg);
+            color: var(--success);
+            border-radius: var(--radius-pill);
+            padding: 4px 12px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            margin-left: 10px;
+        }
+
+        .tax-note {
+            font-size: 0.72rem;
+            color: var(--ink-muted);
+            margin-top: 8px;
+        }
+
+        /* META */
+        .meta-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 28px;
+        }
+
+        .meta-chip {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 14px 16px;
+        }
+
+        .meta-chip-label {
+            font-size: 0.62rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--ink-muted);
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .meta-chip-value {
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--ink);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .stock-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--success);
+            flex-shrink: 0;
+            box-shadow: 0 0 0 3px rgba(26, 138, 74, 0.15);
+        }
+
+        .stock-dot.low {
+            background: #d97706;
+            box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.15);
+        }
+
+        /* ACTIONS */
+        .actions-row {
+            display: flex;
+            gap: 10px;
+            align-items: stretch;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+
+        .qty-control {
+            display: flex;
+            align-items: center;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-pill);
+            padding: 4px;
+            gap: 0;
+            height: 52px;
+        }
+
+        .qty-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            background: transparent;
+            color: var(--ink);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            transition: background 0.2s, color 0.2s;
+            font-weight: 600;
         }
 
         .qty-btn:hover {
-            background: #f2701a;
-            color: #fff;
+            background: var(--brand);
+            color: var(--white);
         }
 
-        .btn-cart-premium {
-            background: #fff;
-            border: 2px solid #f2701a;
-            color: #f2701a;
-            padding: 16px 30px;
-            border-radius: 50px;
-            font-weight: 800;
-            letter-spacing: 1px;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            font-size: 0.9rem;
-        }
-
-        .btn-cart-premium:hover {
-            background: rgba(242, 112, 26, 0.03);
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(242, 112, 26, 0.1);
-        }
-
-        .btn-buy-premium {
-            background: var(--premium-gradient);
+        .qty-input {
+            width: 44px;
             border: none;
-            color: #fff;
-            padding: 16px 30px;
-            border-radius: 50px;
-            font-weight: 800;
-            letter-spacing: 1px;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            font-size: 0.9rem;
-            box-shadow: var(--premium-shadow);
-        }
-
-        .btn-buy-premium:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 30px rgba(242, 112, 26, 0.25);
-            color: #fff;
-        }
-
-        /* Tabs UI */
-        .premium-tabs {
-            border-bottom: 2px solid #f1f3f5;
-            margin-bottom: 50px;
-            display: flex;
-            gap: 40px;
-            overflow-x: auto;
-            padding-bottom: 2px;
-        }
-
-        .tab-link {
-            color: #888;
-            text-decoration: none;
+            background: transparent;
+            text-align: center;
             font-weight: 700;
-            font-size: 0.75rem;
+            font-size: 0.95rem;
+            color: var(--ink);
+            outline: none;
+            font-family: 'DM Mono', monospace;
+        }
+
+        .btn-cart {
+            flex: 1;
+            min-width: 100px;
+            height: 48px;
+            border-radius: var(--radius-pill);
+            border: 2px solid var(--brand);
+            background: transparent;
+            color: var(--brand);
+            font-weight: 700;
+            font-size: 0.7rem;
+            letter-spacing: 0.04em;
             text-transform: uppercase;
-            letter-spacing: 1.5px;
-            padding-bottom: 15px;
-            position: relative;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .btn-cart:hover {
+            background: var(--brand);
+            color: var(--white);
+            box-shadow: var(--shadow-brand);
+            transform: translateY(-2px);
+        }
+
+        .btn-wishlist {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: 2px solid var(--border);
+            background: var(--white);
+            color: var(--ink-muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            transition: var(--transition);
+            flex-shrink: 0;
+        }
+
+        .btn-wishlist:hover {
+            border-color: #dc2626;
+            color: #dc2626;
+            transform: scale(1.08);
+        }
+
+        .btn-buynow {
+            flex: 1;
+            min-width: 100px;
+            height: 48px;
+            border-radius: var(--radius-pill);
+            border: none;
+            background: linear-gradient(135deg, var(--brand) 0%, var(--brand-dark) 100%);
+            color: var(--white);
+            font-weight: 700;
+            font-size: 0.7rem;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: var(--shadow-brand);
+        }
+
+        .btn-buynow:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(242, 112, 26, 0.25);
+        }
+
+        /* TRUST */
+        .trust-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .trust-card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: var(--transition);
+        }
+
+        .trust-card:hover {
+            border-color: rgba(242, 112, 26, 0.2);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .trust-icon {
+            width: 38px;
+            height: 38px;
+            background: rgba(242, 112, 26, 0.08);
+            color: var(--brand);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .trust-title {
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--ink);
+            line-height: 1.2;
+        }
+
+        .trust-sub {
+            font-size: 0.68rem;
+            color: var(--ink-muted);
+            margin-top: 2px;
+        }
+
+        /* TABS */
+        .tabs-section {
+            margin-top: 72px;
+        }
+
+        .tabs-nav {
+            display: flex;
+            gap: 0;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 44px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .tabs-nav::-webkit-scrollbar {
+            display: none;
+        }
+
+        .tab-btn {
+            flex-shrink: 0;
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -1px;
+            padding: 14px 24px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--ink-muted);
+            cursor: pointer;
+            transition: color 0.2s, border-color 0.2s;
             white-space: nowrap;
-            transition: all 0.3s ease;
         }
 
-        .tab-link:hover {
-            color: #333;
+        .tab-btn:hover {
+            color: var(--ink);
         }
 
-        .tab-link.active {
-            color: #f2701a;
+        .tab-btn.active {
+            color: var(--brand);
+            border-bottom-color: var(--brand);
         }
 
-        .tab-link.active::after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 0;
+        .tab-panel {
+            display: none;
+        }
+
+        .tab-panel.active {
+            display: block;
+            animation: fadeUp 0.35s ease forwards;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .desc-content {
+            font-size: 1rem;
+            line-height: 1.85;
+            color: #444;
+            max-width: 680px;
+        }
+
+        .specs-table {
             width: 100%;
-            height: 2px;
-            background: #f2701a;
-            box-shadow: 0 2px 10px rgba(242, 112, 26, 0.3);
+            border-collapse: collapse;
         }
 
-        /* Feature Cards */
-        .feature-card {
-            padding: 20px;
-            border-radius: 20px;
-            background: #fff;
-            border: 1px solid rgba(0, 0, 0, 0.03);
-            transition: all 0.3s ease;
-            height: 100%;
+        .specs-table tr {
+            border-bottom: 1px solid var(--border);
         }
 
-        .feature-card:hover {
-            background: #fafafa;
-            border-color: rgba(242, 112, 26, 0.1);
-            transform: translateY(-5px);
+        .specs-table tr:last-child {
+            border-bottom: none;
         }
 
-        .feature-icon {
-            width: 45px;
-            height: 45px;
-            background: rgba(242, 112, 26, 0.1);
-            color: #f2701a;
+        .specs-table td {
+            padding: 14px 0;
+            font-size: 0.85rem;
+            vertical-align: top;
+        }
+
+        .specs-table td:first-child {
+            width: 35%;
+            color: var(--ink-muted);
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            padding-right: 20px;
+        }
+
+        .specs-table td:last-child {
+            font-weight: 600;
+            color: var(--ink);
+            font-family: 'DM Mono', monospace;
+            font-size: 0.82rem;
+        }
+
+        /* REVIEWS */
+        .review-card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            padding: 26px;
+            margin-bottom: 16px;
+            transition: var(--transition);
+        }
+
+        .review-card:hover {
+            box-shadow: var(--shadow-sm);
+        }
+
+        .review-avatar {
+            width: 44px;
+            height: 44px;
+            background: var(--surface-2);
+            border: 1px solid rgba(242, 112, 26, 0.2);
             border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.3rem;
-            margin-bottom: 15px;
+            font-family: 'Playfair Display', serif;
+            font-size: 1.1rem;
+            font-weight: 900;
+            color: var(--brand);
+            flex-shrink: 0;
         }
 
-        /* Review Card */
-        .review-item {
-            background: #fff;
-            border-radius: 24px;
-            padding: 30px;
-            border: 1px solid rgba(0, 0, 0, 0.03);
+        .review-name {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--ink);
+        }
+
+        .review-date {
+            font-size: 0.68rem;
+            color: var(--ink-muted);
+            margin-top: 1px;
+        }
+
+        .review-stars {
+            display: flex;
+            gap: 2px;
+            color: #f59e0b;
+            font-size: 0.8rem;
+        }
+
+        .review-body {
+            font-size: 0.92rem;
+            color: #555;
+            line-height: 1.7;
+            margin-top: 14px;
+            font-style: italic;
+        }
+
+        .review-reply {
+            background: var(--surface);
+            border-left: 3px solid var(--brand);
+            border-radius: 0 12px 12px 0;
+            padding: 12px 16px;
+            margin-top: 14px;
+        }
+
+        .review-reply-label {
+            font-size: 0.65rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--brand);
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .review-reply p {
+            font-size: 0.8rem;
+            color: var(--ink);
+            line-height: 1.6;
+        }
+
+        .reviews-empty {
+            text-align: center;
+            padding: 60px 20px;
+            background: var(--white);
+            border: 1px dashed var(--border);
+            border-radius: var(--radius-xl);
+            color: var(--ink-muted);
+        }
+
+        .reviews-empty i {
+            font-size: 2.5rem;
+            display: block;
+            margin-bottom: 12px;
+            opacity: 0.3;
+        }
+
+        .btn-review {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            border: 1px solid var(--border);
+            background: var(--white);
+            border-radius: var(--radius-pill);
+            padding: 9px 20px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--ink);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-review:hover {
+            border-color: var(--brand);
+            color: var(--brand);
+            transform: translateY(-1px);
+        }
+
+        .policy-card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 24px;
+        }
+
+        .policy-card h6 {
+            font-size: 0.65rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 10px;
+        }
+
+        .policy-card p {
+            font-size: 0.85rem;
+            color: var(--ink-muted);
+            line-height: 1.65;
+            margin: 0;
+        }
+
+        /* SIDEBAR */
+        .seller-sidebar {
+            position: sticky;
+            top: 90px;
+            background: var(--ink);
+            border-radius: var(--radius-xl);
+            padding: 32px;
+            color: var(--white);
+            overflow: hidden;
+        }
+
+        .seller-sidebar::before {
+            content: '';
+            position: absolute;
+            top: -60px;
+            right: -60px;
+            width: 180px;
+            height: 180px;
+            background: radial-gradient(circle, rgba(242, 112, 26, 0.2) 0%, transparent 65%);
+            pointer-events: none;
+        }
+
+        .seller-tag {
+            font-size: 0.62rem;
+            font-weight: 700;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.35);
+            display: block;
             margin-bottom: 20px;
-            transition: all 0.3s ease;
         }
 
-        .review-item:hover {
-            box-shadow: var(--soft-shadow);
-        }
-
-        .review-avatar {
-            width: 50px;
-            height: 50px;
-            background: #f8f9fa;
-            border-radius: 15px;
+        .seller-logo-wrap {
+            width: 54px;
+            height: 54px;
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: 800;
-            color: #f2701a;
-            border: 1px solid rgba(242, 112, 26, 0.1);
+            flex-shrink: 0;
         }
 
-        /* Floating Side Bar */
-        .seller-box {
-            background: #1a1a1a;
-            border-radius: 30px;
-            padding: 35px;
-            color: #fff;
-            position: sticky;
-            top: 100px;
+        .seller-name {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--white);
         }
 
-        .seller-label {
+        .seller-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(26, 138, 74, 0.2);
+            color: #4ade80;
+            border-radius: var(--radius-pill);
+            padding: 3px 10px;
+            font-size: 0.62rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            margin-top: 4px;
+        }
+
+        .seller-divider {
+            border-color: rgba(255, 255, 255, 0.08);
+            margin: 24px 0;
+        }
+
+        .seller-feature {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+
+        .seller-feature:last-of-type {
+            margin-bottom: 0;
+        }
+
+        .sf-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.07);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .sf-title {
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: var(--white);
+        }
+
+        .sf-sub {
+            font-size: 0.7rem;
             color: rgba(255, 255, 255, 0.4);
-            font-size: 0.65rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            display: block;
-            margin-bottom: 15px;
+            margin-top: 2px;
         }
 
-        /* Related Products */
+        .btn-support {
+            display: block;
+            width: 100%;
+            margin-top: 28px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: transparent;
+            color: rgba(255, 255, 255, 0.6);
+            border-radius: var(--radius-pill);
+            padding: 13px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-support:hover {
+            background: rgba(255, 255, 255, 0.07);
+            color: var(--white);
+        }
+
+        /* RELATED */
+        .related-section {
+            padding: 64px 0;
+            background: var(--white);
+            border-top: 1px solid var(--border);
+        }
+
+        .section-eyebrow {
+            font-size: 0.68rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--brand);
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            font-weight: 900;
+            letter-spacing: -0.02em;
+            color: var(--ink);
+        }
+
+        .section-title em {
+            font-style: italic;
+            color: var(--brand);
+        }
+
+        .btn-view-all {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--ink);
+            text-decoration: none;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-pill);
+            padding: 8px 18px;
+            transition: var(--transition);
+        }
+
+        .btn-view-all:hover {
+            border-color: var(--brand);
+            color: var(--brand);
+            transform: translateY(-1px);
+        }
+
         .related-card {
-            background: #fff;
-            border-radius: 20px;
-            padding: 15px;
-            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-            border: 1px solid rgba(0, 0, 0, 0.02);
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            padding: 16px;
+            transition: var(--transition);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
         }
 
         .related-card:hover {
-            transform: translateY(-8px);
-            box-shadow: var(--soft-shadow);
-            border-color: rgba(242, 112, 26, 0.1);
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-md);
+            border-color: rgba(242, 112, 26, 0.12);
         }
 
-        .related-img-box {
-            background: #f8f9fa;
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 15px;
+        .related-img {
+            background: var(--white);
+            border-radius: 18px;
+            height: 190px;
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 200px;
+            margin-bottom: 14px;
+            overflow: hidden;
         }
 
-        /* Mobile Sticky Bar */
-        @media (max-width: 768px) {
-            .mobile-action-bar {
-                position: fixed;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                background: rgba(255, 255, 255, 0.9);
-                backdrop-filter: blur(10px);
-                padding: 15px 20px;
-                box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.08);
-                z-index: 1000;
+        .related-img img {
+            max-height: 150px;
+            object-fit: contain;
+            transition: transform 0.5s ease;
+        }
+
+        .related-card:hover .related-img img {
+            transform: scale(1.08);
+        }
+
+        .related-name {
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: var(--ink);
+            text-decoration: none;
+            display: block;
+            margin-bottom: 8px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .related-price {
+            font-size: 1rem;
+            font-weight: 800;
+            color: var(--brand);
+        }
+
+        .related-mrp {
+            font-size: 0.78rem;
+            color: #bbb;
+            text-decoration: line-through;
+            font-weight: 400;
+            margin-left: 6px;
+        }
+
+        .btn-related-cart {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            width: 100%;
+            padding: 10px;
+            border-radius: var(--radius-pill);
+            border: none;
+            background: var(--ink);
+            color: var(--white);
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            cursor: pointer;
+            margin-top: auto;
+            transition: var(--transition);
+        }
+
+        .btn-related-cart:hover {
+            background: var(--brand);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-brand);
+        }
+
+        /* MOBILE */
+        .mobile-bar {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(250, 249, 247, 0.92);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-top: 1px solid var(--border);
+            padding: 12px 16px;
+            gap: 10px;
+            z-index: 900;
+            box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.08);
+        }
+
+        @media (max-width: 767px) {
+            .mobile-bar {
                 display: flex;
-                gap: 10px;
-                border-top: 1px solid rgba(0, 0, 0, 0.05);
             }
 
-            .main-image-wrapper {
-                padding: 20px;
-                border-radius: 20px;
+            .pd-section {
+                padding-bottom: 100px;
             }
 
             .product-title {
-                font-size: 2rem;
+                font-size: 1.8rem;
             }
 
             .sell-price {
-                font-size: 2.2rem;
+                font-size: 2rem;
+            }
+        }
+
+        .mob-btn {
+            flex: 1;
+            height: 50px;
+            border-radius: var(--radius-pill);
+            border: none;
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .mob-btn-cart {
+            background: var(--white);
+            border: 2px solid var(--brand);
+            color: var(--brand);
+        }
+
+        .mob-btn-buy {
+            background: linear-gradient(135deg, var(--brand), var(--brand-dark));
+            color: var(--white);
+            box-shadow: 0 4px 16px rgba(242, 112, 26, 0.3);
+        }
+
+        /* ANIMATIONS */
+        .col-anim-l {
+            opacity: 0;
+            transform: translateX(-20px);
+            animation: slideR 0.65s cubic-bezier(0.22, 1, 0.36, 1) 0.08s forwards;
+        }
+
+        .col-anim-r {
+            opacity: 0;
+            transform: translateX(20px);
+            animation: slideL 0.65s cubic-bezier(0.22, 1, 0.36, 1) 0.15s forwards;
+        }
+
+        @keyframes slideR {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideL {
+            to {
+                opacity: 1;
+                transform: translateX(0);
             }
         }
     </style>
 @endpush
 
 @section('content')
-    <!-- Breadcrumb -->
-    <div class="product-breadcrumb py-3">
+
+    {{-- BREADCRUMB --}}
+    <div class="pd-breadcrumb">
         <div class="container">
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb mb-0 align-items-center">
-                    <li class="breadcrumb-item"><a href="{{ url('/') }}"
-                            class="text-decoration-none text-muted small fw-medium">Home</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url('/') }}">Home</a></li>
                     @if($product->subCategory && $product->subCategory->category)
-                        <li class="breadcrumb-item"><a
-                                href="{{ url('/products?category=' . $product->subCategory->category->id) }}"
-                                class="text-decoration-none text-muted small fw-medium">{{ $product->subCategory->category->name }}</a>
+                        <li class="breadcrumb-item">
+                            <a
+                                href="{{ url('/products?category=' . $product->subCategory->category->id) }}">{{ $product->subCategory->category->name }}</a>
                         </li>
-                        <li class="breadcrumb-item"><a href="{{ url('/products?sub_category=' . $product->subCategory->id) }}"
-                                class="text-decoration-none text-muted small fw-medium">{{ $product->subCategory->name }}</a>
+                        <li class="breadcrumb-item">
+                            <a
+                                href="{{ url('/products?sub_category=' . $product->subCategory->id) }}">{{ $product->subCategory->name }}</a>
                         </li>
                     @endif
-                    <li class="breadcrumb-item active text-dark small fw-bold" aria-current="page">
-                        {{ Str::limit($product->name, 30) }}</li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ Str::limit($product->name, 35) }}</li>
                 </ol>
             </nav>
         </div>
     </div>
 
-    <section class="py-5">
+    {{-- MAIN --}}
+    <section class="pd-section">
         <div class="container">
             <div class="row g-5">
-                <!-- Left: Gallery -->
-                <div class="col-lg-6">
-                    <div class="product-gallery-container animate-fade-in">
-                        <div class="main-image-wrapper mb-4">
-                            <img id="mainDisplayImage" src="{{ asset($product->image) }}"
-                                class="img-fluid w-100 h-100 object-fit-contain" style="max-height: 500px;"
-                                alt="{{ $product->name }}">
-                        </div>
 
-                        <div class="d-flex flex-wrap gap-3 pb-2" id="galleryThumbs">
-                            <div class="thumb-btn active"
+                {{-- GALLERY --}}
+                <div class="col-lg-6 col-anim-l">
+                    <div class="gallery-sticky">
+                        <div class="gallery-main" id="galleryMain">
+                            <div class="gallery-badge">
+                                @if($product->trending)
+                                    <span class="g-badge trending"><i class="bi bi-fire"></i> Trending</span>
+                                @endif
+                                @if($product->featured)
+                                    <span class="g-badge featured"><i class="bi bi-patch-check-fill"></i> Featured</span>
+                                @endif
+                            </div>
+                            <img id="mainDisplayImage" src="{{ asset($product->image) }}" alt="{{ $product->name }}">
+                            <div class="gallery-zoom-hint"><i class="bi bi-zoom-in"></i> Hover to zoom</div>
+                        </div>
+                        <div class="gallery-thumbs" id="galleryThumbs">
+                            <div class="thumb-item active"
                                 onclick="updateDisplayImage('{{ asset($product->image) }}', this)">
-                                <img src="{{ asset($product->image) }}" class="w-100 h-100 object-fit-cover rounded-3">
+                                <img src="{{ asset($product->image) }}" alt="">
                             </div>
                             @foreach($product->images as $img)
-                                <div class="thumb-btn" onclick="updateDisplayImage('{{ asset($img->image_path) }}', this)">
-                                    <img src="{{ asset($img->image_path) }}" class="w-100 h-100 object-fit-cover rounded-3">
+                                <div class="thumb-item" onclick="updateDisplayImage('{{ asset($img->image_path) }}', this)">
+                                    <img src="{{ asset($img->image_path) }}" alt="">
                                 </div>
                             @endforeach
                         </div>
                     </div>
                 </div>
 
-                <!-- Right: Details -->
-                <div class="col-lg-6">
-                    <div class="product-info-panel ps-lg-4">
-                        <!-- Badges -->
-                        <div class="d-flex gap-2 mb-3">
-                            @if($product->trending)
-                                <span
-                                    class="badge rounded-pill bg-danger bg-opacity-10 text-danger px-3 py-2 fw-bold text-uppercase"
-                                    style="font-size: 0.65rem;">
-                                    <i class="bi bi-fire me-1"></i> Trending
-                                </span>
-                            @endif
-                            @if($product->featured)
-                                <span
-                                    class="badge rounded-pill bg-primary bg-opacity-10 text-primary px-3 py-2 fw-bold text-uppercase"
-                                    style="font-size: 0.65rem;">
-                                    <i class="bi bi-patch-check-fill me-1"></i> Featured
-                                </span>
-                            @endif
-                        </div>
+                {{-- INFO --}}
+                <div class="col-lg-6 col-anim-r">
+                    <div class="info-panel">
+                        @if($product->subCategory)
+                            <div class="product-category-tag">
+                                <i class="bi bi-tag"></i> {{ $product->subCategory->name }}
+                            </div>
+                        @endif
 
-                        <h1 class="product-title mb-2">{{ $product->name }}</h1>
+                        <h1 class="product-title">{{ $product->name }}</h1>
 
-                        <div class="d-flex align-items-center gap-3 mb-4">
-                            @php
-                                $avgRating = $product->approvedReviews->avg('rating') ?? 5;
-                                $reviewCount = $product->approvedReviews->count();
-                            @endphp
-                            <div class="d-flex align-items-center gap-1 text-warning">
+                        @php
+                            $avgRating = $product->approvedReviews->avg('rating') ?? 5;
+                            $reviewCount = $product->approvedReviews->count();
+                        @endphp
+
+                        <div class="rating-row">
+                            <div class="stars">
                                 @for($i = 1; $i <= 5; $i++)
                                     <i class="bi bi-star{{ $i <= round($avgRating) ? '-fill' : '' }}"></i>
                                 @endfor
                             </div>
-                            <span class="text-muted small fw-medium">({{ number_format($avgRating, 1) }} /
-                                {{ $reviewCount }} Reviews)</span>
-                            <div class="vr opacity-10" style="height: 15px;"></div>
-                            <span class="text-muted small">SKU: <span
-                                    class="text-dark fw-bold">{{ $product->sku }}</span></span>
+                            <span class="rating-text">{{ number_format($avgRating, 1) }} &middot; {{ $reviewCount }}
+                                reviews</span>
+                            <div class="rating-divider"></div>
+                            <span class="sku-text">SKU: <strong>{{ $product->sku }}</strong></span>
                         </div>
 
-                        <div class="price-display">
-                            <div class="d-flex align-items-baseline gap-3 flex-wrap">
-                                <h2 class="sell-price">₹{{ number_format($product->selling_price) }}</h2>
+                        <div class="price-box">
+                            <div style="display:flex; align-items:baseline; flex-wrap:wrap; gap:4px;">
+                                <span class="sell-price">&#8377;{{ number_format($product->selling_price) }}</span>
                                 @if($product->mrp > $product->selling_price)
-                                    <span class="mrp-price">₹{{ number_format($product->mrp) }}</span>
-                                    <span class="save-badge">Save
-                                        {{ round((($product->mrp - $product->selling_price) / $product->mrp) * 100) }}%
-                                        Off</span>
+                                    <span class="mrp-price">&#8377;{{ number_format($product->mrp) }}</span>
+                                    <span class="save-chip">
+                                        <i class="bi bi-arrow-down-short"></i>
+                                        {{ round((($product->mrp - $product->selling_price) / $product->mrp) * 100) }}% off
+                                    </span>
                                 @endif
                             </div>
-                            <p class="text-muted small mt-2 mb-0">Inclusive of all taxes</p>
+                            <p class="tax-note">Inclusive of all taxes &amp; GST</p>
                         </div>
 
-                        <!-- Options/Meta -->
-                        <div class="row g-4 mb-5">
-                            <div class="col-6">
-                                <label
-                                    class="xx-small text-muted fw-bold uppercase tracking-widest d-block mb-2">Color</label>
-                                <span
-                                    class="d-inline-flex align-items-center gap-2 px-3 py-2 bg-light rounded-pill small fw-bold">
-                                    {{ $product->color ?? 'Standard' }}
-                                </span>
+                        <div class="meta-grid">
+                            <div class="meta-chip">
+                                <span class="meta-chip-label">Color</span>
+                                <span class="meta-chip-value">{{ $product->color ?? 'Standard' }}</span>
                             </div>
-                            <div class="col-6">
-                                <label
-                                    class="xx-small text-muted fw-bold uppercase tracking-widest d-block mb-2">Availability</label>
-                                <span
-                                    class="d-inline-flex align-items-center gap-2 px-3 py-2 {{ $product->stock > 5 ? 'bg-success-subtle text-success' : 'bg-warning-subtle text-warning' }} rounded-pill small fw-bold">
-                                    <i class="bi bi-circle-fill" style="font-size: 0.5rem;"></i>
+                            <div class="meta-chip">
+                                <span class="meta-chip-label">Availability</span>
+                                <span class="meta-chip-value">
+                                    <span class="stock-dot {{ $product->stock <= 5 ? 'low' : '' }}"></span>
                                     {{ $product->stock > 0 ? $product->stock . ' In Stock' : 'Out of Stock' }}
                                 </span>
                             </div>
                         </div>
 
-                        <!-- Actions -->
-                        <div class="d-flex flex-wrap gap-3 mb-5">
-                            <div class="qty-picker">
-                                <button class="qty-btn" type="button" onclick="changeQty(-1)"><i
-                                        class="bi bi-dash"></i></button>
-                                <input type="number" id="productQty"
-                                    class="form-control border-0 bg-transparent text-center fw-bold py-0" value="1" min="1"
-                                    max="{{ $product->stock }}" style="width: 50px; box-shadow: none;">
-                                <button class="qty-btn" type="button" onclick="changeQty(1)"><i
-                                        class="bi bi-plus"></i></button>
+                        <div class="actions-row mb-4">
+                            <div class="qty-control">
+                                <button class="qty-btn" type="button" onclick="changeQty(-1)">&minus;</button>
+                                <input type="number" id="productQty" class="qty-input" value="1" min="1"
+                                    max="{{ $product->stock }}" readonly>
+                                <button class="qty-btn" type="button" onclick="changeQty(1)">+</button>
                             </div>
-
-                            <form action="{{ url('/cart/add/' . $product->id) }}" method="POST" class="flex-grow-1">
+                            <form action="{{ url('/cart/add/' . $product->id) }}" method="POST" style="flex:1;">
                                 @csrf
                                 <input type="hidden" name="quantity" value="1" id="cartQtyInput">
-                                <button type="submit" class="btn btn-cart-premium w-100">
-                                    <i class="bi bi-handbag me-2"></i> Add To Cart
+                                <button type="submit" class="btn-cart" style="width:100%;">
+                                    <i class="bi bi-cart-plus"></i> Cart
                                 </button>
                             </form>
-
-                            <form action="{{ url('/wishlist/add/' . $product->id) }}" method="POST">
-                                @csrf
-                                <button type="submit"
-                                    class="btn btn-outline-light border rounded-circle d-flex align-items-center justify-content-center wishlist-hover-premium"
-                                    style="width: 58px; height: 58px;">
-                                    <i class="bi bi-heart fs-5"></i>
-                                </button>
-                            </form>
-                        </div>
-
-                        <div class="mb-5">
-                            <form action="{{ url('/checkout') }}" method="GET">
+                            <form action="{{ url('/checkout') }}" method="GET" style="flex:1;">
                                 <input type="hidden" name="buy_now" value="{{ $product->id }}">
                                 <input type="hidden" name="qty" value="1" id="buyNowQtyInput">
-                                <button type="submit" class="btn btn-buy-premium w-100 py-3">
-                                    <i class="bi bi-lightning-fill me-2 text-warning"></i> Buy it Now
+                                <button type="submit" class="btn-buynow" style="width:100%;">
+                                    Buy Now
+                                </button>
+                            </form>
+                            <form action="{{ url('/wishlist/add/' . $product->id) }}" method="POST">
+                                @csrf
+                                <button type="submit" class="btn-wishlist" title="Wishlist">
+                                    <i class="bi bi-heart"></i>
                                 </button>
                             </form>
                         </div>
 
-                        <!-- Trust Bar -->
-                        <div class="row g-3">
-                            <div class="col-sm-6">
-                                <div class="feature-card">
-                                    <div class="feature-icon"><i class="bi bi-truck"></i></div>
-                                    <h6 class="fw-bold small mb-1">Standard Shipping</h6>
-                                    <p class="xx-small text-muted mb-0">Flat rate
-                                        ₹{{ number_format($product->shipping_charges) }} across India</p>
+                        <div class="trust-grid">
+                            <div class="trust-card">
+                                <div class="trust-icon"><i class="bi bi-truck"></i></div>
+                                <div>
+                                    <div class="trust-title">Shipping</div>
+                                    <div class="trust-sub">&#8377;{{ number_format($product->shipping_charges) }} flat rate
+                                    </div>
                                 </div>
                             </div>
-                            <div class="col-sm-6">
-                                <div class="feature-card">
-                                    <div class="feature-icon"><i class="bi bi-shield-check"></i></div>
-                                    <h6 class="fw-bold small mb-1">100% Authentic</h6>
-                                    <p class="xx-small text-muted mb-0">Direct from Shopping Club India Warehouse</p>
+                            <div class="trust-card">
+                                <div class="trust-icon"><i class="bi bi-shield-check"></i></div>
+                                <div>
+                                    <div class="trust-title">100% Authentic</div>
+                                    <div class="trust-sub">Direct from SCI warehouse</div>
                                 </div>
                             </div>
                         </div>
@@ -555,172 +1364,159 @@
                 </div>
             </div>
 
-            <!-- Secondary Info Tabs -->
-            <div class="mt-5 pt-lg-5">
+            {{-- TABS --}}
+            <div class="tabs-section">
                 <div class="row g-5">
                     <div class="col-lg-8">
-                        <div class="premium-tabs scroll-hide" id="productTabs">
-                            <a href="#tab-description" class="tab-link active">Narrative</a>
-                            <a href="#tab-specs" class="tab-link">Specifications</a>
-                            <a href="#tab-reviews" class="tab-link">Chronicles ({{ $reviewCount }})</a>
-                            <a href="#tab-policy" class="tab-link">Logistics</a>
+                        <nav class="tabs-nav">
+                            <button class="tab-btn active" data-tab="description">Description</button>
+                            <button class="tab-btn" data-tab="specs">Specifications</button>
+                            <button class="tab-btn" data-tab="reviews">Reviews ({{ $reviewCount }})</button>
+                            <button class="tab-btn" data-tab="policy">Logistics</button>
+                        </nav>
+
+                        <div id="tab-description" class="tab-panel active">
+                            <h4
+                                style="font-family:'Playfair Display',serif; font-weight:900; margin-bottom:20px; letter-spacing:-0.02em;">
+                                About this Product</h4>
+                            <div class="desc-content">{!! nl2br(e($product->description)) !!}</div>
                         </div>
 
-                        <div class="tab-content-container">
-                            <div id="tab-description" class="mb-5">
-                                <h4 class="fw-bold mb-4">Product Description</h4>
-                                <div class="lead text-muted" style="line-height: 1.8; font-size: 1.05rem;">
-                                    {!! nl2br(e($product->description)) !!}
-                                </div>
+                        <div id="tab-specs" class="tab-panel">
+                            <h4
+                                style="font-family:'Playfair Display',serif; font-weight:900; margin-bottom:24px; letter-spacing:-0.02em;">
+                                Technical Details</h4>
+                            <table class="specs-table">
+                                <tbody>
+                                    <tr>
+                                        <td>Manufacturer</td>
+                                        <td>{{ $product->manufacturer ?? 'S.C.I Private Limited' }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Weight</td>
+                                        <td>{{ $product->weight ?? 'N/A' }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Dimensions</td>
+                                        <td>{{ $product->dimensions ?? 'N/A' }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Warranty</td>
+                                        <td>{{ $product->warranty ?? '1 Year Manufacturer Warranty' }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Color</td>
+                                        <td>{{ $product->color ?? 'Standard' }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>SKU</td>
+                                        <td>{{ $product->sku }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div id="tab-reviews" class="tab-panel">
+                            <div
+                                style="display:flex; justify-content:space-between; align-items:center; margin-bottom:28px; flex-wrap:wrap; gap:12px;">
+                                <h4
+                                    style="font-family:'Playfair Display',serif; font-weight:900; margin:0; letter-spacing:-0.02em;">
+                                    Customer Reviews</h4>
+                                <button class="btn-review" data-bs-toggle="modal" data-bs-target="#reviewModal">
+                                    <i class="bi bi-pencil-square"></i> Write a Review
+                                </button>
                             </div>
-
-                            <div id="tab-specs" class="mb-5" style="display: none;">
-                                <h4 class="fw-bold mb-4">Technical Details</h4>
-                                <div class="table-responsive">
-                                    <table class="table table-borderless align-middle">
-                                        <tbody class="small">
-                                            <tr class="border-bottom">
-                                                <td class="text-muted py-3 fw-medium uppercase tracking-wider xx-small"
-                                                    style="width: 30%">Manufacturer</td>
-                                                <td class="text-dark fw-bold py-3">
-                                                    {{ $product->manufacturer ?? 'S.C.I Private Limited' }}</td>
-                                            </tr>
-                                            <tr class="border-bottom">
-                                                <td class="text-muted py-3 fw-medium uppercase tracking-wider xx-small">
-                                                    Weight</td>
-                                                <td class="text-dark fw-bold py-3">{{ $product->weight ?? 'N/A' }}</td>
-                                            </tr>
-                                            <tr class="border-bottom">
-                                                <td class="text-muted py-3 fw-medium uppercase tracking-wider xx-small">
-                                                    Dimensions</td>
-                                                <td class="text-dark fw-bold py-3">{{ $product->dimensions ?? 'N/A' }}</td>
-                                            </tr>
-                                            <tr class="border-bottom">
-                                                <td class="text-muted py-3 fw-medium uppercase tracking-wider xx-small">
-                                                    Warranty</td>
-                                                <td class="text-dark fw-bold py-3">
-                                                    {{ $product->warranty ?? '1 Year Manufacturer Warranty' }}</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-
-                            <div id="tab-reviews" class="mb-5" style="display: none;">
-                                <div class="d-flex justify-content-between align-items-center mb-4">
-                                    <h4 class="fw-bold mb-0">Customer Stories</h4>
-                                    <button
-                                        class="btn btn-outline-primary btn-sm rounded-pill px-4 fw-bold xx-small uppercase tracking-widest"
-                                        data-bs-toggle="modal" data-bs-target="#reviewModal">
-                                        Share Your Story
-                                    </button>
-                                </div>
-
-                                @forelse($product->approvedReviews as $review)
-                                    <div class="review-item">
-                                        <div class="d-flex justify-content-between align-items-start mb-3">
-                                            <div class="d-flex align-items-center gap-3">
-                                                <div class="review-avatar">
-                                                    {{ substr($review->user->name, 0, 1) }}
-                                                </div>
-                                                <div>
-                                                    <h6 class="mb-0 fw-bold">{{ $review->user->name }}</h6>
-                                                    <span
-                                                        class="xx-small text-muted fw-medium">{{ $review->created_at->format('M d, Y') }}</span>
-                                                </div>
-                                            </div>
-                                            <div class="d-flex gap-1 text-warning small">
-                                                @for($i = 1; $i <= 5; $i++)
-                                                    <i class="bi bi-star{{ $i <= $review->rating ? '-fill' : '' }}"></i>
-                                                @endfor
+                            @forelse($product->approvedReviews as $review)
+                                <div class="review-card">
+                                    <div
+                                        style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:10px;">
+                                        <div style="display:flex; align-items:center; gap:12px;">
+                                            <div class="review-avatar">{{ substr($review->user->name, 0, 1) }}</div>
+                                            <div>
+                                                <div class="review-name">{{ $review->user->name }}</div>
+                                                <div class="review-date">{{ $review->created_at->format('M d, Y') }}</div>
                                             </div>
                                         </div>
-                                        <p class="text-muted mb-0 italic" style="font-size: 0.95rem;">"{{ $review->comment }}"
+                                        <div class="review-stars">
+                                            @for($i = 1; $i <= 5; $i++)
+                                                <i class="bi bi-star{{ $i <= $review->rating ? '-fill' : '' }}"></i>
+                                            @endfor
+                                        </div>
+                                    </div>
+                                    <p class="review-body">"{{ $review->comment }}"</p>
+                                    @if($review->admin_reply)
+                                        <div class="review-reply">
+                                            <span class="review-reply-label">Official Response</span>
+                                            <p>{{ $review->admin_reply }}</p>
+                                        </div>
+                                    @endif
+                                </div>
+                            @empty
+                                <div class="reviews-empty">
+                                    <i class="bi bi-chat-heart"></i>
+                                    <p style="font-weight:700; margin:0;">No reviews yet. Be the first!</p>
+                                </div>
+                            @endforelse
+                        </div>
+
+                        <div id="tab-policy" class="tab-panel">
+                            <h4
+                                style="font-family:'Playfair Display',serif; font-weight:900; margin-bottom:24px; letter-spacing:-0.02em;">
+                                Logistics &amp; Policy</h4>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="policy-card">
+                                        <h6 style="color:var(--brand);">Return Policy</h6>
+                                        <p>{{ $product->return_policy ?? 'Standard 7-day return policy for unused products in original packaging.' }}
                                         </p>
-
-                                        @if($review->admin_reply)
-                                            <div class="mt-3 p-3 bg-light rounded-4 border-start border-4 border-primary">
-                                                <span
-                                                    class="xx-small fw-black text-primary uppercase tracking-widest d-block mb-1">Official
-                                                    Response</span>
-                                                <p class="xx-small text-dark mb-0 fw-medium">{{ $review->admin_reply }}</p>
-                                            </div>
-                                        @endif
                                     </div>
-                                @empty
-                                    <div class="text-center py-5 bg-light rounded-5 border-dashed border-2">
-                                        <i class="bi bi-chat-square-quote display-4 text-muted mb-3 d-block"></i>
-                                        <p class="fw-bold text-muted mb-0">Be the first to share your experience!</p>
-                                    </div>
-                                @endforelse
-                            </div>
-
-                            <div id="tab-policy" class="mb-5" style="display: none;">
-                                <h4 class="fw-bold mb-4">Logistics & Policy</h4>
-                                <div class="row g-4">
-                                    <div class="col-md-6">
-                                        <div class="p-4 rounded-4 bg-light border-0">
-                                            <h6 class="fw-bold text-primary mb-2 uppercase xx-small tracking-widest">Return
-                                                Policy</h6>
-                                            <p class="text-muted small mb-0">
-                                                {{ $product->return_policy ?? 'Standard 7-day return policy for unused products in original packaging.' }}
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="p-4 rounded-4 bg-light border-0">
-                                            <h6 class="fw-bold text-success mb-2 uppercase xx-small tracking-widest">
-                                                Fulfillment</h6>
-                                            <p class="text-muted small mb-0">This product is fulfilled directly by Shopping
-                                                Club India with multi-level quality checks.</p>
-                                        </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="policy-card">
+                                        <h6 style="color:var(--success);">Fulfillment</h6>
+                                        <p>Fulfilled directly by Shopping Club India with multi-level quality checks before
+                                            dispatch.</p>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Sidebar Box -->
                     <div class="col-lg-4">
-                        <div class="seller-box animate-fade-in shadow-premium">
-                            <span class="seller-label">Authorized Seller</span>
-                            <div class="d-flex align-items-center gap-3 mb-4">
-                                <div class="rounded-circle bg-white bg-opacity-10 d-flex align-items-center justify-content-center"
-                                    style="width: 60px; height: 60px;">
-                                    <img src="{{ asset('assets/images/favicon.png') }}" class="img-fluid" width="30">
+                        <div class="seller-sidebar">
+                            <span class="seller-tag">Authorized Seller</span>
+                            <div style="display:flex; align-items:center; gap:14px;">
+                                <div class="seller-logo-wrap">
+                                    <img src="{{ asset('assets/images/favicon.png') }}" width="28" alt="SCI">
                                 </div>
                                 <div>
-                                    <h5 class="mb-0 fw-bold text-white">{{ $product->seller_name ?? 'Shopping Club India' }}
-                                    </h5>
-                                    <div class="badge bg-success-subtle text-success xx-small fw-bold px-2 py-1 mt-1">
-                                        <i class="bi bi-patch-check-fill me-1"></i> Top Rated
-                                    </div>
+                                    <div class="seller-name">{{ $product->seller_name ?? 'Shopping Club India' }}</div>
+                                    <div class="seller-badge"><i class="bi bi-patch-check-fill"></i> Top Rated</div>
                                 </div>
                             </div>
-
-                            <hr class="opacity-10 my-4">
-
-                            <div class="space-y-4">
-                                <div class="d-flex align-items-center gap-3 mb-3">
-                                    <i class="bi bi-lightning text-primary fs-5"></i>
-                                    <div>
-                                        <span class="d-block small fw-bold text-white">Fast Dispatch</span>
-                                        <span class="xx-small text-white-50">Usually ships within 24 hours</span>
-                                    </div>
-                                </div>
-                                <div class="d-flex align-items-center gap-3">
-                                    <i class="bi bi-arrow-repeat text-info fs-5"></i>
-                                    <div>
-                                        <span class="d-block small fw-bold text-white">Secure Checkout</span>
-                                        <span class="xx-small text-white-50">SSL Encrypted Safe Payments</span>
-                                    </div>
+                            <hr class="seller-divider">
+                            <div class="seller-feature">
+                                <div class="sf-icon"><i class="bi bi-lightning-charge"></i></div>
+                                <div>
+                                    <div class="sf-title">Fast Dispatch</div>
+                                    <div class="sf-sub">Usually ships within 24 hours</div>
                                 </div>
                             </div>
-
-                            <button
-                                class="btn btn-outline-light w-100 py-3 rounded-pill mt-5 fw-bold xx-small uppercase tracking-widest opacity-75">
-                                Contact Support
-                            </button>
+                            <div class="seller-feature">
+                                <div class="sf-icon"><i class="bi bi-shield-lock"></i></div>
+                                <div>
+                                    <div class="sf-title">Secure Checkout</div>
+                                    <div class="sf-sub">SSL encrypted safe payments</div>
+                                </div>
+                            </div>
+                            <div class="seller-feature">
+                                <div class="sf-icon"><i class="bi bi-arrow-counterclockwise"></i></div>
+                                <div>
+                                    <div class="sf-title">Easy Returns</div>
+                                    <div class="sf-sub">Hassle-free 7-day returns</div>
+                                </div>
+                            </div>
+                            <button class="btn-support">Contact Support</button>
                         </div>
                     </div>
                 </div>
@@ -728,128 +1524,97 @@
         </div>
     </section>
 
-    <!-- Related Products -->
-    <section class="py-5 bg-light bg-opacity-50">
+    {{-- RELATED --}}
+    <section class="related-section">
         <div class="container">
-            <div class="d-flex justify-content-between align-items-end mb-5">
+            <div
+                style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:40px; flex-wrap:wrap; gap:16px;">
                 <div>
-                    <span class="xx-small text-primary fw-bold uppercase tracking-widest d-block mb-2">Curated for
-                        you</span>
-                    <h2 class="fw-bold mb-0" style="letter-spacing: -1.5px;">Recommended <span
-                            class="text-primary">Styles</span></h2>
+                    <span class="section-eyebrow">Curated for you</span>
+                    <h2 class="section-title">You may also <em>like</em></h2>
                 </div>
-                <a href="{{ url('/products?sub_category=' . $product->subcategory_id) }}"
-                    class="btn btn-link text-decoration-none text-dark fw-bold small">View All <i
-                        class="bi bi-arrow-right ms-1"></i></a>
+                <a href="{{ url('/products?sub_category=' . $product->subcategory_id) }}" class="btn-view-all">
+                    View All <i class="bi bi-arrow-right"></i>
+                </a>
             </div>
-
-            <div class="row g-4">
+            <div class="row g-3">
                 @php
-                    $related = \App\Models\Product::where('subcategory_id', $product->subcategory_id)->where('id', '!=', $product->id)->limit(4)->get();
+                    $related = \App\Models\Product::where('subcategory_id', $product->subcategory_id)
+                        ->where('id', '!=', $product->id)->limit(4)->get();
                 @endphp
                 @forelse($related as $rel)
                     <div class="col-md-3 col-6">
-                        <div class="related-card border-0 h-100 d-flex flex-column">
-                            <a href="{{ url('product-detail/' . $rel->slug) }}" class="text-decoration-none">
-                                <div class="related-img-box">
-                                    <img src="{{ asset($rel->image) }}" class="img-fluid object-fit-contain"
-                                        style="max-height: 150px;" alt="{{ $rel->name }}">
-                                </div>
-                                <h6 class="text-dark fw-bold text-truncate mb-1 px-2" title="{{ $rel->name }}">{{ $rel->name }}
-                                </h6>
-                            </a>
-                            <div class="px-2 mt-auto">
-                                <div class="d-flex align-items-center gap-2 mb-3">
-                                    <span class="text-primary fw-black">₹{{ number_format($rel->selling_price) }}</span>
-                                    @if($rel->mrp > $rel->selling_price)
-                                        <span
-                                            class="text-muted xx-small text-decoration-line-through">₹{{ number_format($rel->mrp) }}</span>
-                                    @endif
-                                </div>
-                                <form action="{{ route('cart.add', $rel->id) }}" method="POST">
-                                    @csrf
-                                    <button type="submit"
-                                        class="btn btn-dark w-100 py-2 xx-small fw-bold uppercase tracking-widest rounded-pill">
-                                        <i class="bi bi-cart3 me-1"></i> Add
-                                    </button>
-                                </form>
+                        <div class="related-card">
+                            <div class="related-img">
+                                <img src="{{ asset($rel->image) }}" alt="{{ $rel->name }}">
                             </div>
+                            <a href="{{ url('product-detail/' . $rel->slug) }}" class="related-name"
+                                title="{{ $rel->name }}">{{ $rel->name }}</a>
+                            <div style="margin-bottom:14px;">
+                                <span class="related-price">&#8377;{{ number_format($rel->selling_price) }}</span>
+                                @if($rel->mrp > $rel->selling_price)
+                                    <span class="related-mrp">&#8377;{{ number_format($rel->mrp) }}</span>
+                                @endif
+                            </div>
+                            <form action="{{ route('cart.add', $rel->id) }}" method="POST">
+                                @csrf
+                                <button type="submit" class="btn-related-cart"><i class="bi bi-cart3"></i> Add to Cart</button>
+                            </form>
                         </div>
                     </div>
                 @empty
-                    <div class="col-12 text-center py-5">
-                        <p class="text-muted fw-medium">No related products found in this category.</p>
-                    </div>
+                    <div class="col-12" style="text-align:center; padding:40px; color:var(--ink-muted);">No related products
+                        found.</div>
                 @endforelse
             </div>
         </div>
     </section>
 
-    <!-- Mobile Sticky Bar -->
-    <div class="mobile-action-bar d-md-none">
-        <div class="d-flex gap-2 flex-grow-1">
-            <form action="{{ url('/cart/add/' . $product->id) }}" method="POST" class="flex-grow-1">
-                @csrf
-                <input type="hidden" name="quantity" value="1" class="mob-qty-sync">
-                <button type="submit" class="btn btn-cart-premium w-100 py-3 small" style="padding: 12px !important;">
-                    Cart
-                </button>
-            </form>
-            <form action="{{ url('/checkout') }}" method="GET" class="flex-grow-1">
-                <input type="hidden" name="buy_now" value="{{ $product->id }}">
-                <input type="hidden" name="qty" value="1" class="mob-qty-sync">
-                <button type="submit" class="btn btn-buy-premium w-100 py-3 small" style="padding: 12px !important;">
-                    Buy Now
-                </button>
-            </form>
-        </div>
+    {{-- MOBILE BAR --}}
+    <div class="mobile-bar d-md-none">
+        <form action="{{ url('/cart/add/' . $product->id) }}" method="POST" style="flex:1;">
+            @csrf
+            <input type="hidden" name="quantity" value="1" class="mob-qty-sync">
+            <button type="submit" class="mob-btn mob-btn-cart" style="width:100%;">Cart</button>
+        </form>
+        <form action="{{ url('/checkout') }}" method="GET" style="flex:1;">
+            <input type="hidden" name="buy_now" value="{{ $product->id }}">
+            <input type="hidden" name="qty" value="1" class="mob-qty-sync">
+            <button type="submit" class="mob-btn mob-btn-buy" style="width:100%;">Buy Now</button>
+        </form>
     </div>
 
     <script>
         function updateDisplayImage(url, el) {
             document.getElementById('mainDisplayImage').src = url;
-            document.querySelectorAll('.thumb-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.thumb-item').forEach(t => t.classList.remove('active'));
             el.classList.add('active');
         }
-
         function changeQty(delta) {
             const input = document.getElementById('productQty');
-            const cartInput = document.getElementById('cartQtyInput');
-            const buyNowInput = document.getElementById('buyNowQtyInput');
-            const mobSyncs = document.querySelectorAll('.mob-qty-sync');
-
             let val = parseInt(input.value) + delta;
             if (val < 1) val = 1;
             if (val > parseInt(input.max)) val = parseInt(input.max);
-
             input.value = val;
-            cartInput.value = val;
-            buyNowInput.value = val;
-            mobSyncs.forEach(s => s.value = val);
+            document.getElementById('cartQtyInput').value = val;
+            document.getElementById('buyNowQtyInput').value = val;
+            document.querySelectorAll('.mob-qty-sync').forEach(s => s.value = val);
         }
-
-        // Tabs Logic
-        document.querySelectorAll('.tab-link').forEach(link => {
-            link.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = this.getAttribute('href').substring(1);
-
-                // Update active link
-                document.querySelectorAll('.tab-link').forEach(l => l.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const target = this.dataset.tab;
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
                 this.classList.add('active');
-
-                // Update tab content
-                document.querySelectorAll('.tab-content-container > div').forEach(c => c.style.display = 'none');
-                document.getElementById(target).style.display = 'block';
+                document.getElementById('tab-' + target).classList.add('active');
             });
         });
-
-        // Synchronize initial values
         document.addEventListener('DOMContentLoaded', () => {
-            const input = document.getElementById('productQty');
-            document.getElementById('cartQtyInput').value = input.value;
-            document.getElementById('buyNowQtyInput').value = input.value;
-            document.querySelectorAll('.mob-qty-sync').forEach(s => s.value = input.value);
+            const qty = document.getElementById('productQty').value;
+            document.getElementById('cartQtyInput').value = qty;
+            document.getElementById('buyNowQtyInput').value = qty;
+            document.querySelectorAll('.mob-qty-sync').forEach(s => s.value = qty);
         });
     </script>
+
 @endsection

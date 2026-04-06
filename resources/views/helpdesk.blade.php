@@ -8,8 +8,8 @@
             <div class="row g-4 align-items-start dashboard-row-premium ">
                 <!-- Sidebar -->
                 <div class="col-lg-3 dashboard-sidebar-column">
-                    @inclu
-                </div>de('includes.dashboard_sidebar')
+                    @include('includes.dashboard_sidebar')
+                </div>
 
                 <!-- Main Content -->
                 <div class="col-lg-9 fade-in-up">

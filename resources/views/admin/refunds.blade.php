@@ -13,6 +13,7 @@
         <table class="table admin-datatable table-borderless text-secondary align-middle">
             <thead>
                 <tr class="border-bottom border-white border-opacity-10">
+                    <th class="small fw-bold py-3 text-white">S No.</th>
                     <th class="small fw-bold py-3 text-white">Ref ID</th>
                     <th class="small fw-bold py-3 text-white">Order Details</th>
                     <th class="small fw-bold py-3 text-white">Customer Info</th>
@@ -26,7 +27,8 @@
             <tbody>
                 @foreach($refunds as $refund)
                 <tr class="border-bottom border-white border-opacity-5">
-                    <td class="small opacity-50">#{{ $refund->id }}</td>
+                    <td  class="small opacity-50">#{{ $loop->iteration }}</td>
+                    <td class="small opacity-50">{{ $refund->id }}</td>
                     <td>
                         <div class="small text-white fw-bold">ORD-{{ $refund->order->order_number ?? 'N/A' }}</div>
                         <div class="xx-small text-secondary fw-black uppercase opacity-50">{{ $refund->created_at->format('d M, Y H:i') }}</div>
@@ -55,9 +57,9 @@
                         </span>
                     </td>
                     <td class="text-end">
-                        <button class="btn btn-sm btn-outline-light border-0 bg-white bg-opacity-5 rounded-pill px-3 shadow-sm" 
+                        <button class="btn btn-sm btn-outline-light border-0 bg-white bg-opacity-5 rounded-pill px-3 shadow-sm btn-review-hover" 
                                 data-bs-toggle="modal" data-bs-target="#processRefundModal{{ $refund->id }}">
-                            <i class="bi bi-shield-check text-primary me-1"></i> <span class="xx-small fw-black uppercase">Review</span>
+                           <span class="xx-small fw-black uppercase text-info">Review</span>
                         </button>
                     </td>
                 </tr>
@@ -150,5 +152,21 @@
     .badge-glass-premium.text-warning { color: #f2701a !important; }
     .badge-glass-premium.text-success { color: #198754 !important; }
     .badge-glass-premium.text-danger { color: #dc3545 !important; }
+
+    .btn-review-hover {
+        transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+    }
+
+    .btn-review-hover:hover {
+        transform: translateY(-2px) scale(1.05);
+        background-color: rgba(225, 114, 114, 0.15) !important;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25) !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    }
+
+    .btn-review-hover:hover .text-info {
+        color: #00d4ff !important;
+        text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+    }
 </style>
 @endpush

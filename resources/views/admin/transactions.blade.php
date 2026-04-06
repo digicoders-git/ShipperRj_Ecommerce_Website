@@ -34,7 +34,7 @@
                             {{ strtoupper($transaction->display_type) }}
                         </span>
                         @if(isset($transaction->source))
-                            <div class="xx-small text-secondary mt-1 opacity-50">{{ strtoupper($transaction->source) }}</div>
+                            <div class="x-small text-secondary mt-1 opacity-50">{{ strtoupper($transaction->source) }}</div>
                         @endif
                     </td>
                     <td class="fw-bold text-{{ $transaction->display_type == 'credit' ? 'success' : 'danger' }}">

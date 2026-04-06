@@ -78,7 +78,8 @@
                 <div class="text-secondary x-small fw-bold text-uppercase tracking-widest mb-2 position-relative z-1">Total
                     Orders</div>
                 <h2 class="fw-black mb-0 text-dark position-relative z-1" style="letter-spacing: -1px;">
-                    {{ number_format($orders) }}</h2>
+                    {{ number_format($orders) }}
+                </h2>
             </div>
         </div>
 
@@ -98,7 +99,8 @@
                 <div class="text-secondary x-small fw-bold text-uppercase tracking-widest mb-2 position-relative z-1">Active
                     Users</div>
                 <h2 class="fw-black mb-0 text-dark position-relative z-1" style="letter-spacing: -1px;">
-                    {{ number_format($users) }}</h2>
+                    {{ number_format($users) }}
+                </h2>
                 <div class="progress mt-3 bg-light rounded-pill" style="height: 6px;">
                     <div class="progress-bar rounded-pill bg-danger" style="width: 75%;"></div>
                 </div>
@@ -121,7 +123,8 @@
                 <div class="text-secondary x-small fw-bold text-uppercase tracking-widest mb-2 position-relative z-1">
                     Products Base</div>
                 <h2 class="fw-black mb-0 text-dark position-relative z-1" style="letter-spacing: -1px;">
-                    {{ number_format($products) }}</h2>
+                    {{ number_format($products) }}
+                </h2>
                 <div class="text-secondary xx-small fw-bold mt-2 d-flex gap-2 position-relative z-1 pb-1">
                     <span class="bg-light px-2 py-1 rounded text-dark"><i
                             class="bi bi-folder-fill text-warning opacity-75 me-1"></i> {{ $categories }} Cats</span>
@@ -228,7 +231,8 @@
             <div>
                 <h5 class="fw-bold mb-1 text-dark">Latest Real-time Transactions</h5>
                 <p class="text-secondary xx-small fw-bold text-uppercase tracking-widest mb-0">Recent
-                    {{ count($stats['recent_orders']) }} incoming orders across all hubs</p>
+                    {{ count($stats['recent_orders']) }} incoming orders across all hubs
+                </p>
             </div>
             <a href="{{ route('admin.orders.index') }}"
                 class="btn btn-dark btn-sm rounded-pill px-4 py-2 x-small fw-bold shadow-sm d-flex align-items-center gap-2">View
@@ -246,51 +250,49 @@
                 </thead>
                 <tbody>
                     @forelse($stats['recent_orders'] as $order)
-                                    <tr class="border-bottom transition-all">
-                                        <td class="small fw-black py-4 px-4 text-dark">
-                                            <span
-                                                class="bg-light text-dark px-3 py-2 rounded-3 shadow-sm border border-black border-opacity-10">
-                                                <i class="bi bi-hash text-primary opacity-50"></i>{{ $order->order_number }}
-                                            </span>
-                                        </td>
-                                        <td class="px-3">
-                                            <div class="d-flex align-items-center gap-3">
-                                                @php
-                                                    $colors = ['primary', 'success', 'warning', 'danger', 'info'];
-                                                    $scolor = $colors[abs(crc32($order->user->id)) % count($colors)];
-                                                @endphp
-                                                <div class="rounded-circle bg-{{ $scolor }} bg-opacity-10 text-{{ $scolor }} d-flex align-items-center justify-content-center fw-black shadow-sm"
-                                                    style="width: 40px; height: 40px; font-size: 1.1rem;">
-                                                    {{ strtoupper(substr($order->user->name, 0, 1)) }}
-                                                </div>
-                                                <div>
-                                                    <div class="text-dark small fw-bold">{{ $order->user->name }}</div>
-                                                    <div class="xx-small text-secondary fw-bold mt-1">{{ $order->user->email }}</div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td class="px-3">
-                                            @php
-                                                $badgeColor = 'primary';
-                                                $ordStatus = strtolower($order->order_status ?? '');
-                                                if ($ordStatus == 'completed' || $ordStatus == 'delivered')
-                                                    $badgeColor = 'success';
-                                                if ($ordStatus == 'pending')
-                                                    $badgeColor = 'white';
-                                                if ($ordStatus == 'cancelled')
-                                                    $badgeColor = 'danger';
-                                            @endphp
-                         <span
-                                                class="badge bg-{{ $badgeColor }} bg-opacity-10 text-{{ $badgeColor }} px-3 py-2 rounded-pill x-small fw-bold border border-{{ $badgeColor }} border-opacity-25 d-inline-flex align-items-center shadow-sm">
-                                                <span class="pulse-dot bg-{{ $badgeColor }} me-2"
-                                                    style="width: 6px; height: 6px; border-radius: 50%;"></span>
-                                                <span style="letter-spacing: 0.5px;">{{ strtoupper($ordStatus ?: 'UNKNOWN') }}</span>
-                                            </span>
-                                        </td>
-                                        <td class="text-end fw-black fs-6 text-dark px-4">
-                                            ₹{{ number_format($order->total_amount, 2) }}
-                                        </td>
-                                    </tr>
+                        <tr class="border-bottom transition-all">
+                            <td class="small fw-black py-4 px-4 text-dark">
+                                <span
+                                    class="bg-light text-dark px-3 py-2 rounded-3 shadow-sm border border-black border-opacity-10">
+                                    <i class="bi bi-hash text-primary opacity-50"></i>{{ $order->order_number }}
+                                </span>
+                            </td>
+                            <td class="px-3">
+                                <div class="d-flex align-items-center gap-3">
+                                    @php
+                                        $colors = ['primary', 'success', 'warning', 'danger', 'info'];
+                                        $scolor = $colors[abs(crc32($order->user->id)) % count($colors)];
+                                    @endphp
+                                    <div class="rounded-circle bg-{{ $scolor }} bg-opacity-10 text-{{ $scolor }} d-flex align-items-center justify-content-center fw-black shadow-sm"
+                                        style="width: 40px; height: 40px; font-size: 1.1rem;">
+                                        {{ strtoupper(substr($order->user->name, 0, 1)) }}
+                                    </div>
+                                    <div>
+                                        <div class="text-dark small fw-bold">{{ $order->user->name }}</div>
+                                        <div class="xx-small text-secondary fw-bold mt-1">{{ $order->user->email }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-3">
+                                @php
+                                    $badgeColor = 'primary';
+                                    $ordStatus = strtolower($order->order_status ?? '');
+                                    if ($ordStatus == 'completed' || $ordStatus == 'delivered')
+                                        $badgeColor = 'success';
+                                    if ($ordStatus == 'pending')
+                                        $badgeColor = 'white';
+                                    if ($ordStatus == 'cancelled')
+                                        $badgeColor = 'danger';
+                                @endphp
+                                <span
+                                    class="badge bg-{{ $badgeColor }} px-3 py-2 rounded-pill x-small fw-bold d-inline-flex align-items-center shadow-sm text-white">
+                                    <span style="letter-spacing: 0.5px;">{{ strtoupper($ordStatus ?: 'UNKNOWN') }}</span>
+                                </span>
+                            </td>
+                            <td class="text-end fw-black fs-6 text-dark px-4">
+                                ₹{{ number_format($order->total_amount, 2) }}
+                            </td>
+                        </tr>
                     @empty
                         <tr>
                             <td colspan="4" class="text-center py-5">

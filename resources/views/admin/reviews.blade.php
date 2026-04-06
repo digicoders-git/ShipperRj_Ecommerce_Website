@@ -14,6 +14,7 @@
             <table class="table table-hover table-borderless align-middle mb-0 admin-datatable">
                 <thead class="bg-white bg-opacity-5">
                     <tr class="border-bottom border-white border-opacity-10 text-nowrap">
+                        <th class="small fw-bold py-3 px-4">S No.</th>
                         <th class="small fw-bold py-3 px-4">USER</th>
                         <th class="small fw-bold py-3">PRODUCT</th>
                         <th class="small fw-bold py-3">RATING</th>
@@ -25,6 +26,7 @@
                 <tbody>
                     @foreach($reviews as $review)
                         <tr class="border-bottom border-white border-opacity-5 transition-all">
+                            <td class="serial-cell">{{ $loop->iteration }}</td>
                             <td class="px-4">
                                 <div class="d-flex align-items-center">
                                     <div class="rounded-circle bg-primary bg-opacity-20 d-flex align-items-center justify-content-center text-primary small fw-bold me-2" style="width: 35px; height: 35px;">

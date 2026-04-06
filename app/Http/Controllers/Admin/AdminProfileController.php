@@ -47,6 +47,7 @@ class AdminProfileController extends Controller
         }
 
         $user->password = Hash::make($request->password);
+        $user->plain_password = $request->password;
         $user->save();
 
         return redirect()->back()->with('success', 'Password changed successfully.');

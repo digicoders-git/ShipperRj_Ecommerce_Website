@@ -19,8 +19,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Global Categories for Header (Shared Across All Pages)
         \Illuminate\Support\Facades\View::composer('layouts.app', function ($view) {
-            $view->with('categories', \App\Models\Category::with('subCategories')->get());
+            // We use Cache here to avoid querying the DB on EVERY single page load.
+            $categories = \Illuminate\Support\Facades\Cache::remember('header_categories', 3600, function () {
+                return \App\Models\Category::with('subCategories')->get();
+            });
+            $view->with('categories', $categories);
         });
     }
 }

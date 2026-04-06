@@ -16,6 +16,7 @@ class SubAdmin extends Authenticatable
         'email',
         'mobile',
         'password',
+        'plain_password',
         'permissions',
         'status',
         'last_login_at',
@@ -37,8 +38,9 @@ class SubAdmin extends Authenticatable
      */
     public function hasPermission($permission): bool
     {
-        if (!$this->status) return false;
-        
+        if (!$this->status)
+            return false;
+
         $permissions = $this->permissions ?? [];
         return in_array($permission, $permissions);
     }

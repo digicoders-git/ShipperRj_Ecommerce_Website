@@ -24,7 +24,7 @@
                         <div
                             class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top border-white border-opacity-50">
                             <div class="xx-small text-muted uppercase tracking-widest fw-black">Wallet Balance: <b
-                                    class="text-dark">₹{{ number_format(Auth::user()->wallet_balance) }}</b></div>
+                                    class="text-dark">₹{{ number_format(Auth::user()->wallet_balance, 2) }}</b></div>
                             @if(Auth::user()->wallet_balance >= $order->prepaid_amount)
                                 <span class="badge bg-success-soft text-success xx-small fw-black uppercase">Sufficient
                                     Balance</span>

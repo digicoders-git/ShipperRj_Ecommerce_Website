@@ -322,7 +322,16 @@
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="payment-card p-4 rounded-4 border" onclick="selectPayment('online', this)">
+                                                     @if($shipping_savings_amount > 0)
+                                                <div class="p-2 rounded-3 bg-success bg-opacity-10 border border-success border-opacity-10 mb-3 animate-pulse-light">
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        <i class="bi bi-lightning-charge-fill text-success x-small"></i>
+                                                        <span class="xx-small text-success fw-black uppercase tracking-tighter">Save ₹{{ number_format($shipping_savings_amount) }} ({{ round($shipping_savings_pct, 1) }}%) by paying online</span>
+                                                    </div>
+                                                </div>
+                                            @endif
                                                     <div class="d-flex justify-content-between align-items-center mb-3">
+                                                        
                                                         <h6 class="fw-black mb-0">Full Online</h6>
                                                         <div class="payment-select-indicator">
                                                             <i class="bi bi-check-circle-fill"></i>
@@ -385,21 +394,21 @@
                                                         $total_qty += $item['qty']; 
                                                 @endphp
                                                 <span class="text-muted fw-medium">Price ({{ $total_qty }} items)</span>
-                                                <span class="fw-black text-dark">₹<span id="subtotalDisplay">{{ number_format($total) }}</span></span>
+                                                <span class="fw-black text-dark">₹<span id="subtotalDisplay">{{ number_format($total, 2) }}</span></span>
                                             </div>
                                             <div class="d-flex justify-content-between mb-2 align-items-center">
                                                 <span class="text-muted fw-medium" id="shippingMethodLabel">Shipping Charges</span>
                                                 <span class="text-dark fw-bold" id="shippingDisplay">--</span>
                                             </div>
 
-                                            @if($shipping_savings_amount > 0)
+                                            <!-- @if($shipping_savings_amount > 0)
                                                 <div class="p-2 rounded-3 bg-success bg-opacity-10 border border-success border-opacity-10 mb-3 animate-pulse-light">
                                                     <div class="d-flex align-items-center gap-2">
                                                         <i class="bi bi-lightning-charge-fill text-success x-small"></i>
-                                                        <span class="xx-small text-success fw-black uppercase tracking-tighter">Save ₹{{ number_format($shipping_savings_amount) }} ({{ round($shipping_savings_pct, 1) }}%) by paying online</span>
+                                                        <span class="xx-small text-success fw-black uppercase tracking-tighter">Save ₹{{ number_format($shipping_savings_amount, 2) }} ({{ round($shipping_savings_pct, 1) }}%) by paying online</span>
                                                     </div>
                                                 </div>
-                                            @endif
+                                            @endif -->
 
                                             <div id="couponSection" class="mt-4 mb-3">
                                                 <div class="luxury-input-wrapper mb-2">

@@ -74,10 +74,12 @@
                                 <select name="business_type"
                                     class="form-select glass-input @error('business_type') is-invalid @enderror">
                                     <option value="" selected disabled>Select Business Type</option>
+                                    <option value="Interested To Start New Business">Interested To Start New Business</option>
                                     <option value="Retailer">Retailer</option>
                                     <option value="Wholesaler">Wholesaler</option>
                                     <option value="Manufacturer">Manufacturer</option>
                                     <option value="Individual">Individual</option>
+                                    <option value="Other">Other</option>
                                 </select>
                                 @error('business_type')
                                     <div class="invalid-feedback">{{ $message }}</div>

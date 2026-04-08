@@ -104,8 +104,15 @@ class CheckoutController extends Controller
         //     return redirect()->back()->with('error', 'Minimum order amount to place order is ₹'.number_format($min_order_val));
         // }
 
+        $usedCouponCodes = \App\Models\Order::where('user_id', $user->id)
+            ->whereNotNull('coupon_code')
+            ->where('order_status', '!=', 'cancelled')
+            ->pluck('coupon_code')
+            ->toArray();
+
         $coupons = \App\Models\Coupon::where('status', 1)
             ->where('expiry_date', '>=', date('Y-m-d'))
+            ->whereNotIn('code', $usedCouponCodes)
             ->get();
 
         // Calculate total advance required across all items
@@ -276,13 +283,25 @@ class CheckoutController extends Controller
 
         // Coupon Handling
         $discount = 0;
-        if ($request->coupon_code) {
-            $coupon = \App\Models\Coupon::where('code', $request->coupon_code)
+        $coupon_code = $request->coupon_code ? strtoupper($request->coupon_code) : null;
+        if ($coupon_code) {
+            $coupon = \App\Models\Coupon::where('code', $coupon_code)
                 ->where('status', 1)
                 ->where('expiry_date', '>=', date('Y-m-d'))
                 ->first();
+            
             if ($coupon && $total >= $coupon->min_spend) {
-                $discount = $coupon->discount_amount;
+                // Double check if already used (extra safety)
+                $couponUsed = \App\Models\Order::where('user_id', $user->id)
+                    ->where('coupon_code', $coupon_code)
+                    ->where('order_status', '!=', 'cancelled')
+                    ->exists();
+
+                if (!$couponUsed) {
+                    $discount = $coupon->discount_amount;
+                } else {
+                    return redirect()->back()->with('error', 'You have already used this coupon.');
+                }
             }
         }
 
@@ -317,7 +336,7 @@ class CheckoutController extends Controller
             'order_number' => strtoupper(uniqid('ORD')),
             'shipping_amount' => $shipping,
             'coupon_discount' => $discount,
-            'coupon_code' => $request->coupon_code,
+            'coupon_code' => $coupon_code,
             'total_amount' => $grand_total,
             'prepaid_amount' => $prepaid_amount,
             'cod_amount' => $grand_total - $prepaid_amount,

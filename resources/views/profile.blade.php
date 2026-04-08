@@ -33,7 +33,8 @@
 
                 <!-- Main Content -->
                 <div class="col-lg-9 fade-in-up">
-                    <div class="profile-header-premium mb-4 rounded-4 p-4 d-flex align-items-center justify-content-between flex-wrap gap-3">
+                    <div
+                        class="profile-header-premium mb-4 rounded-4 p-4 d-flex align-items-center justify-content-between flex-wrap gap-3">
                         <div class="d-flex align-items-center gap-4">
                             <div class="position-relative">
                                 <div class="profile-avatar-container">
@@ -49,9 +50,11 @@
                                     <label for="profile_photo_top" class="avatar-edit-btn">
                                         <i class="bi bi-camera-fill"></i>
                                     </label>
-                                    <form action="{{ url('/profile/update') }}" method="POST" enctype="multipart/form-data" id="topAvatarForm" class="d-none">
+                                    <form action="{{ url('/profile/update') }}" method="POST" enctype="multipart/form-data"
+                                        id="topAvatarForm" class="d-none">
                                         @csrf
-                                        <input type="file" name="profile_photo" id="profile_photo_top" onchange="document.getElementById('topAvatarForm').submit()">
+                                        <input type="file" name="profile_photo" id="profile_photo_top"
+                                            onchange="document.getElementById('topAvatarForm').submit()">
                                     </form>
                                 </div>
                             </div>
@@ -59,7 +62,8 @@
                                 <h3 class="fw-black text-dark mb-1">{{ Auth::user()->name }}</h3>
                                 <div class="d-flex align-items-center gap-2">
                                     <span class="text-muted small fw-medium">{{ Auth::user()->email }}</span>
-                                    <span class="badge bg-success-soft text-success rounded-pill px-2 py-1 x-small fw-bold border border-success border-opacity-10">
+                                    <span
+                                        class="badge bg-success-soft text-success rounded-pill px-2 py-1 x-small fw-bold border border-success border-opacity-10">
                                         <i class="bi bi-patch-check-fill me-1"></i> Verified
                                     </span>
                                 </div>
@@ -82,17 +86,20 @@
                         <div class="profile-tabs-nav border-bottom bg-light bg-opacity-50 px-4">
                             <ul class="nav nav-pills gap-1 py-2" id="profileTabs" role="tablist">
                                 <li class="nav-item" role="presentation">
-                                    <button class="nav-link active" id="details-tab" data-bs-toggle="pill" data-bs-target="#details" type="button" role="tab">
+                                    <button class="nav-link active" id="details-tab" data-bs-toggle="pill"
+                                        data-bs-target="#details" type="button" role="tab">
                                         <i class="bi bi-person-fill"></i> <span>Personal Details</span>
                                     </button>
                                 </li>
                                 <li class="nav-item" role="presentation">
-                                    <button class="nav-link" id="address-tab" data-bs-toggle="pill" data-bs-target="#address" type="button" role="tab">
+                                    <button class="nav-link" id="address-tab" data-bs-toggle="pill"
+                                        data-bs-target="#address" type="button" role="tab">
                                         <i class="bi bi-geo-alt-fill"></i> <span>Customer Address</span>
                                     </button>
                                 </li>
                                 <li class="nav-item" role="presentation">
-                                    <button class="nav-link" id="security-tab" data-bs-toggle="pill" data-bs-target="#security" type="button" role="tab">
+                                    <button class="nav-link" id="security-tab" data-bs-toggle="pill"
+                                        data-bs-target="#security" type="button" role="tab">
                                         <i class="bi bi-shield-lock-fill"></i> <span>Security</span>
                                     </button>
                                 </li>
@@ -107,7 +114,8 @@
                                     <div class="row g-4">
                                         <div class="col-12">
                                             <div class="section-divider mb-4">
-                                                <span class="fw-bold small text-primary text-uppercase ls-1">Account Information</span>
+                                                <span class="fw-bold small text-primary text-uppercase ls-1">Account
+                                                    Information</span>
                                                 <hr>
                                             </div>
                                         </div>
@@ -115,26 +123,35 @@
                                             <label class="form-label-premium">Display Name</label>
                                             <div class="input-with-icon">
                                                 <i class="bi bi-person text-muted"></i>
-                                                <input type="text" name="name" class="form-control form-control-premium" value="{{ Auth::user()->name }}" required>
+                                                <input type="text" name="name" class="form-control form-control-premium"
+                                                    value="{{ Auth::user()->name }}" required>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label-premium">Phone Number</label>
                                             <div class="input-with-icon">
                                                 <i class="bi bi-phone text-muted"></i>
-                                                <input type="text" name="mobile" class="form-control form-control-premium" value="{{ Auth::user()->mobile }}" required>
+                                                <input type="text" name="mobile" class="form-control form-control-premium"
+                                                    value="{{ Auth::user()->mobile }}" required>
                                             </div>
                                         </div>
                                         <div class="col-md-12">
-                                            <label class="form-label-premium">Email Address <small class="text-muted">(Primary)</small></label>
+                                            <label class="form-label-premium">Email Address <small
+                                                    class="text-muted">(Primary)</small></label>
                                             <div class="input-with-icon">
                                                 <i class="bi bi-envelope text-muted"></i>
-                                                <input type="email" class="form-control form-control-premium bg-light opacity-75" value="{{ Auth::user()->email }}" readonly>
+                                                <input type="email"
+                                                    class="form-control form-control-premium bg-light opacity-75"
+                                                    value="{{ Auth::user()->email }}" readonly>
                                             </div>
-                                            <p class="xx-small text-muted mt-2 fw-medium"><i class="bi bi-info-circle me-1"></i> Email address cannot be changed. Contact support for updates.</p>
+                                            <p class="xx-small text-muted mt-2 fw-medium"><i
+                                                    class="bi bi-info-circle me-1"></i> Email address cannot be changed.
+                                                Contact support for updates.</p>
                                         </div>
                                         <div class="col-12 mt-4 pt-2">
-                                            <button type="submit" class="btn btn-premium px-5 py-3 rounded-pill fw-bold">Update Account Details</button>
+                                            <button type="submit"
+                                                class="btn btn-premium px-5 py-3 rounded-pill fw-bold">Update Account
+                                                Details</button>
                                         </div>
                                     </div>
                                 </form>
@@ -147,28 +164,34 @@
                                     <div class="row g-4">
                                         <div class="col-12">
                                             <div class="section-divider mb-4">
-                                                <span class="fw-bold small text-primary text-uppercase ls-1">User Address</span>
+                                                <span class="fw-bold small text-primary text-uppercase ls-1">User
+                                                    Address</span>
                                                 <hr>
                                             </div>
                                         </div>
                                         <div class="col-12">
                                             <label class="form-label-premium">Address</label>
-                                            <textarea name="address" rows="3" class="form-control form-control-premium" placeholder="Flat No, Building, Street Name...">{{ Auth::user()->address }}</textarea>
+                                            <textarea name="address" rows="3" class="form-control form-control-premium"
+                                                placeholder="Flat No, Building, Street Name...">{{ Auth::user()->address }}</textarea>
                                         </div>
                                         <div class="col-md-4">
                                             <label class="form-label-premium">City</label>
-                                            <input type="text" name="city" class="form-control form-control-premium" value="{{ Auth::user()->city }}">
+                                            <input type="text" name="city" class="form-control form-control-premium"
+                                                value="{{ Auth::user()->city }}">
                                         </div>
                                         <div class="col-md-4">
                                             <label class="form-label-premium">State</label>
-                                            <input type="text" name="state" class="form-control form-control-premium" value="{{ Auth::user()->state }}">
+                                            <input type="text" name="state" class="form-control form-control-premium"
+                                                value="{{ Auth::user()->state }}">
                                         </div>
                                         <div class="col-md-4">
                                             <label class="form-label-premium">Pincode</label>
-                                            <input type="text" name="pincode" class="form-control form-control-premium" value="{{ Auth::user()->pincode }}">
+                                            <input type="text" name="pincode" class="form-control form-control-premium"
+                                                value="{{ Auth::user()->pincode }}">
                                         </div>
                                         <div class="col-12 mt-4 pt-2">
-                                            <button type="submit" class="btn btn-premium px-5 py-3 rounded-pill fw-bold">Save Address</button>
+                                            <button type="submit"
+                                                class="btn btn-premium px-5 py-3 rounded-pill fw-bold">Save Address</button>
                                         </div>
                                     </div>
                                 </form>
@@ -181,7 +204,8 @@
                                         <form action="{{ url('/profile/password') }}" method="POST">
                                             @csrf
                                             <div class="section-divider mb-4">
-                                                <span class="fw-bold small text-primary text-uppercase ls-1">Change Account Password</span>
+                                                <span class="fw-bold small text-primary text-uppercase ls-1">Change Account
+                                                    Password</span>
                                                 <hr>
                                             </div>
                                             <div class="row g-4">
@@ -189,37 +213,49 @@
                                                     <label class="form-label-premium">Current Password</label>
                                                     <div class="input-group input-group-premium">
                                                         <span class="input-group-text"><i class="bi bi-lock"></i></span>
-                                                        <input type="password" name="current_password" class="form-control form-control-premium border-start-0" placeholder="••••••••" required>
+                                                        <input type="password" name="current_password"
+                                                            class="form-control form-control-premium border-start-0"
+                                                            placeholder="••••••••" required>
                                                     </div>
                                                 </div>
                                                 <div class="col-12">
                                                     <label class="form-label-premium">New Password</label>
                                                     <div class="input-group input-group-premium">
-                                                        <span class="input-group-text"><i class="bi bi-shield-lock"></i></span>
-                                                        <input type="password" name="new_password" class="form-control form-control-premium border-start-0" placeholder="Minimum 8 characters" required>
+                                                        <span class="input-group-text"><i
+                                                                class="bi bi-shield-lock"></i></span>
+                                                        <input type="password" name="new_password"
+                                                            class="form-control form-control-premium border-start-0"
+                                                            placeholder="Minimum 8 characters" required>
                                                     </div>
                                                 </div>
                                                 <div class="col-12">
                                                     <label class="form-label-premium">Confirm New Password</label>
                                                     <div class="input-group input-group-premium">
-                                                        <span class="input-group-text"><i class="bi bi-shield-check"></i></span>
-                                                        <input type="password" name="new_password_confirmation" class="form-control form-control-premium border-start-0" placeholder="Repeat new password" required>
+                                                        <span class="input-group-text"><i
+                                                                class="bi bi-shield-check"></i></span>
+                                                        <input type="password" name="new_password_confirmation"
+                                                            class="form-control form-control-premium border-start-0"
+                                                            placeholder="Repeat new password" required>
                                                     </div>
                                                 </div>
                                                 <div class="col-12 mt-4">
-                                                    <button type="submit" class="btn btn-dark px-5 py-3 rounded-pill fw-bold w-100">Update Secure Password</button>
+                                                    <button type="submit"
+                                                        class="btn btn-dark px-5 py-3 rounded-pill fw-bold w-100">Update
+                                                        Secure Password</button>
                                                 </div>
                                             </div>
                                         </form>
                                     </div>
                                     <div class="col-lg-5">
-                                        <div class="account-security-info h-100 p-4 rounded-4 bg-light d-flex flex-column border">
+                                        <div
+                                            class="account-security-info h-100 p-4 rounded-4 bg-light d-flex flex-column border">
                                             <div class="text-center mb-4">
                                                 <div class="security-icon-circle mx-auto mb-3">
                                                     <i class="bi bi-shield-fill-check"></i>
                                                 </div>
                                                 <h6 class="fw-black mb-1">Security Health</h6>
-                                                <p class="xx-small text-muted fw-medium">Keep your account safe and secure.</p>
+                                                <p class="xx-small text-muted fw-medium">Keep your account safe and secure.
+                                                </p>
                                             </div>
                                             <ul class="list-unstyled mb-4 flex-grow-1">
                                                 <li class="d-flex gap-2 mb-3 align-items-start small">
@@ -233,8 +269,11 @@
                                             </ul>
                                             <div class="pt-4 border-top">
                                                 <h6 class="fw-bold text-danger small mb-3">Danger Zone</h6>
-                                                <button type="button" onclick="confirmDeletion()" class="btn btn-outline-danger w-100 rounded-pill small fw-bold py-2">Delete My Account Permanently</button>
-                                                <form id="deleteAccountForm" action="{{ route('profile.delete') }}" method="POST" class="d-none">
+                                                <button type="button" onclick="confirmDeletion()"
+                                                    class="btn btn-outline-danger w-100 rounded-pill small fw-bold py-2">Delete
+                                                    My Account Permanently</button>
+                                                <form id="deleteAccountForm" action="{{ route('profile.delete') }}"
+                                                    method="POST" class="d-none">
                                                     @csrf
                                                 </form>
                                             </div>
@@ -468,14 +507,17 @@
                 flex-direction: column;
                 text-align: center;
             }
+
             .profile-header-premium .d-flex {
                 flex-direction: column;
             }
+
             .profile-tabs-nav .nav {
                 flex-wrap: nowrap;
                 overflow-x: auto;
                 padding-bottom: 5px;
             }
+
             .profile-tabs-nav .nav-link span {
                 white-space: nowrap;
             }

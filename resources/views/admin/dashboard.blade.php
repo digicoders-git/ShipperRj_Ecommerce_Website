@@ -52,7 +52,7 @@
                 <div class="text-secondary x-small fw-bold text-uppercase tracking-widest mb-2 position-relative z-1">Total
                     Revenue</div>
                 <h2 class="fw-black mb-0 text-dark position-relative z-1" style="letter-spacing: -1px;">
-                    ₹{{ number_format($rev) }}</h2>
+                    ₹{{ number_format($rev, 2) }}</h2>
             </div>
         </div>
 

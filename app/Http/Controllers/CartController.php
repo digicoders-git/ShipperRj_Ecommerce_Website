@@ -26,10 +26,21 @@ class CartController extends Controller
         return back()->with('success', 'Product added to cart!');
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
-        // logic later, keep empty for now
-        return back();
+        $quantities = $request->input('quantities');
+
+        if (!is_array($quantities)) {
+            return back()->with('error', 'Invalid data.');
+        }
+
+        foreach ($quantities as $id => $quantity) {
+            Cart::where('user_id', Auth::id())
+                ->where('id', $id)
+                ->update(['quantity' => max(1, (int) $quantity)]);
+        }
+
+        return back()->with('success', 'Cart updated!');
     }
 
     public function remove($id)

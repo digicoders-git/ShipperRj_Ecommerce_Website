@@ -14,6 +14,7 @@ Route::get('/', function () {
     return view('home', compact('featured_products', 'home_categories'));
 });
 
+/*
 Route::get('/clear-cache', function () {
     \Illuminate\Support\Facades\Artisan::call('optimize:clear');
     return 'Cache cleared successfully! You can now go back and try again.';
@@ -48,6 +49,7 @@ Route::get('/session-read', function () {
         'action' => session()->has('test_key') ? 'Everything is fine' : 'Session is breaking!'
     ]);
 });
+*/
 
 // Auth Routes
 Route::get('/auth', [AuthController::class, 'showAuthForm'])->name('login');

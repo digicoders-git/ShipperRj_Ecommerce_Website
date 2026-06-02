@@ -82,9 +82,7 @@ class AuthController extends Controller
                 'plain_password' => $request->password,
             ]);
 
-            Auth::login($user);
-
-            return redirect('/dashboard')->with('success', 'Account created successfully!');
+            return redirect('/auth')->with('success', 'Account created successfully! Please login to continue.');
         } catch (\Exception $e) {
             \Log::error('Registration Error: ' . $e->getMessage());
             return back()->withInput()->withErrors(['error' => 'Something went wrong while creating your account. Please try again.']);

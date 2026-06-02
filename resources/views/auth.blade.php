@@ -12,12 +12,12 @@
                     <p class="text-secondary small">Access your premium tricolor account profile</p>
                 </div>
 
-                @if(session('success'))
+                <!-- @if(session('success'))
                     <div class="alert alert-success border-0 rounded-4 small">{{ session('success') }}</div>
                 @endif
                 @if(session('error'))
                     <div class="alert alert-danger border-0 rounded-4 small">{{ session('error') }}</div>
-                @endif
+                @endif -->
 
                 <ul class="nav nav-pills nav-justified mb-4 border rounded-pill p-1 bg-light" id="authTab" role="tablist">
                     <li class="nav-item" role="presentation">
@@ -61,10 +61,12 @@
                                     </span>
                                 </div>
                             </div>
-
                             <div class="form-check small my-2">
                                 <input class="form-check-input" type="checkbox" name="remember" id="rem">
                                 <label class="form-check-label text-secondary" for="rem">Keep me logged in</label>
+                            </div>
+                            <div id="rememberMsg" class="d-none text-danger small mt-1" style="margin-top: -6px !important;">
+                                <i class="bi bi-exclamation-circle-fill me-1"></i>Please check "Keep me logged in" to continue.
                             </div>
 
                             <button type="submit" class="btn btn-premium w-100 py-3 rounded-pill shadow-premium fw-bold mt-2">Login to Account</button>
@@ -156,5 +158,24 @@
                 });
             });
         });
+
+        // ─── Checkbox mandatory alert ───────────────────────────────────────
+        const loginForm   = document.querySelector('#login form');
+        const rememberChk = document.getElementById('rem');
+        const rememberMsg = document.getElementById('rememberMsg');
+
+        if (loginForm) {
+            loginForm.addEventListener('submit', function (e) {
+                if (!rememberChk.checked) {
+                    e.preventDefault();
+                    rememberMsg.classList.remove('d-none');
+                    rememberChk.focus();
+                }
+            });
+            rememberChk.addEventListener('change', function () {
+                if (this.checked) rememberMsg.classList.add('d-none');
+            });
+        }
+        // ───────────────────────────────────────────────────────────────────
     </script>
 @endsection

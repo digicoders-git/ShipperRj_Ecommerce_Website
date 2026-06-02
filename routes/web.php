@@ -14,6 +14,41 @@ Route::get('/', function () {
     return view('home', compact('featured_products', 'home_categories'));
 });
 
+Route::get('/clear-cache', function () {
+    \Illuminate\Support\Facades\Artisan::call('optimize:clear');
+    return 'Cache cleared successfully! You can now go back and try again.';
+});
+
+Route::get('/session-check', function () {
+    $driver = config('session.driver');
+    $fileStatus = 'N/A';
+    if ($driver === 'file') {
+        $sessionPath = storage_path('framework/sessions');
+        $fileStatus = is_writable($sessionPath) ? 'Writable' : 'NOT WRITABLE!';
+    }
+    $dbStatus = 'N/A';
+    if ($driver === 'database') {
+        $dbStatus = \Illuminate\Support\Facades\Schema::hasTable(config('session.table')) ? 'Table Exists' : 'TABLE MISSING!';
+    }
+    session()->put('test_key', 'Session is working correctly!');
+    return response()->json([
+        'driver' => $driver,
+        'file_writable' => $fileStatus,
+        'db_table_status' => $dbStatus,
+        'secure_cookie' => config('session.secure'),
+        'app_url' => config('app.url'),
+        'request_scheme' => request()->getScheme(),
+        'message' => 'Step 1 complete. Now open /session-read in your browser to verify.'
+    ]);
+});
+
+Route::get('/session-read', function () {
+    return response()->json([
+        'result' => session('test_key', 'FAILED: Session is not saving. CSRF will fail.'),
+        'action' => session()->has('test_key') ? 'Everything is fine' : 'Session is breaking!'
+    ]);
+});
+
 // Auth Routes
 Route::get('/auth', [AuthController::class, 'showAuthForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.post');
@@ -152,6 +187,11 @@ Route::middleware(['auth', 'check.blocked'])->group(function () {
 
     Route::post('/product/review', [App\Http\Controllers\ProductReviewController::class, 'store'])->name('product.review.store');
     Route::post('/complaint', [App\Http\Controllers\ComplaintController::class, 'store'])->name('complaints.store');
+
+    Route::get('/clear-cache', function () {
+        \Illuminate\Support\Facades\Artisan::call('optimize:clear');
+        return 'Cache cleared successfully! You can now go back and try again.';
+    });
 
     Route::get('/helpdesk', function () {
         $user_id = Illuminate\Support\Facades\Auth::id();

@@ -91,7 +91,7 @@
                             
                             <div class="form-group">
                                 <div class="position-relative">
-                                    <input type="email" name="email" class="form-control px-4 py-3 bg-light border-0 rounded-4 @error('email') is-invalid @enderror" value="{{ old('email') }}" placeholder="Email Address (Optional)">
+                                    <input type="email" name="email" class="form-control px-4 py-3 bg-light border-0 rounded-4 @error('email') is-invalid @enderror" value="{{ old('email') }}" placeholder="Email Address" required>
                                 </div>
                                 @error('email')<span class="text-danger small">{{ $message }}</span>@enderror
                             </div>

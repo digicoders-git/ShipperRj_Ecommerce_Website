@@ -24,7 +24,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}?v=1.0.3">
 
     <style>
         /* Extra styles for the layout that might not be in style.css yet */
@@ -140,13 +140,12 @@
     <div id="loader" class="loader-wrapper">
         <div class="loader-spinner"></div>
     </div>
-
     <div class="top-bar d-none d-lg-block">
         <div class="container d-flex justify-content-between align-items-center">
             <div class="top-info d-flex gap-4 align-items-center">
-                <a href="tel:+919838048633"><i class="bi bi-telephone-fill me-1"></i> +91 98380 48633</a>
+                <a href="tel:+917088213888"><i class="bi bi-telephone-fill me-1"></i> +91 70882 13888</a>
                 <div class="vr bg-secondary opacity-25" style="height: 15px;"></div>
-                <a href="mailto:shoppingserviceclub@gmail.com"><i class="bi bi-envelope-fill me-1"></i> shoppingserviceclub@gmail.com</a>
+                <a href="mailto:shoppingclubindia1@gmail.com"><i class="bi bi-envelope-fill me-1"></i> shoppingclubindia1@gmail.com</a>
             </div>
             <div class="top-links d-flex gap-4 align-items-center">
                 <a href="{{ route('orders') }}"><i class="bi bi-bag-heart-fill me-1"></i> My Orders</a>
@@ -284,29 +283,39 @@
     <!-- Mobile Navigation Offcanvas -->
     <div class="offcanvas offcanvas-start mobile-menu-offcanvas" tabindex="-1" id="mobileMenu"
         aria-labelledby="mobileMenuLabel">
-        <div class="offcanvas-header border-bottom py-4 bg">
+        <div class="offcanvas-header border-bottom py-4" style="background: #111827; border-color: rgba(255, 255, 255, 0.08) !important;">
             <div class="d-flex align-items-center gap-3">
                 <img src="{{ asset('assets/images/logo1.png') }}" alt="Logo" height="50">
-                <h5 class="offcanvas-title fw-bold" id="mobileMenuLabel">Menu</h5>
+                <h5 class="offcanvas-title fw-bold text-white mb-0" id="mobileMenuLabel" style="letter-spacing: -0.5px;">Menu</h5>
             </div>
-            <button type="button" class="btn-close text-reset shadow-none" data-bs-dismiss="offcanvas"
+            <button type="button" class="btn-close btn-close-white text-reset shadow-none" data-bs-dismiss="offcanvas"
                 aria-label="Close"></button>
         </div>
         <div class="offcanvas-body p-0">
             <!-- User Account Brief -->
             <div class="user-brief p-4 bg-light d-flex align-items-center gap-3">
-                <div class="user-avatar rounded-circle bg-primary-gradient d-flex align-items-center justify-content-center text-white shadow-sm"
-                    style="width: 50px; height: 50px;">
-                    <i class="bi bi-person-fill fs-4"></i>
+                <div class="user-avatar rounded-circle bg-gradient-primary d-flex align-items-center justify-content-center text-white shadow-sm"
+                    style="width: 52px; height: 52px; overflow: hidden; border: 2px solid #fff;">
+                    @auth
+                        @if(Auth::user()->profile_photo)
+                            <img src="{{ asset('storage/' . Auth::user()->profile_photo) }}"
+                                 style="width: 100%; height: 100%; object-fit: cover;">
+                        @else
+                            <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=FF7A18&color=fff&size=52&bold=true"
+                                 style="width: 100%; height: 100%; object-fit: cover;">
+                        @endif
+                    @else
+                        <i class="bi bi-person-fill fs-4"></i>
+                    @endauth
                 </div>
                 <div>
                     @auth
-                        <h6 class="mb-0 fw-bold">{{ Auth::user()->name }}</h6>
-                        <a href="{{ url('/dashboard') }}" class="text-primary small text-decoration-none fw-medium">View
+                        <h6 class="mb-0 fw-black text-dark">{{ Auth::user()->name }}</h6>
+                        <a href="{{ url('/dashboard') }}" class="text-primary small text-decoration-none fw-bold">View
                             Profile</a>
                     @else
-                        <h6 class="mb-0 fw-bold">Welcome Guest</h6>
-                        <a href="{{ route('login') }}" class="text-primary small text-decoration-none fw-medium">Login /
+                        <h6 class="mb-0 fw-black text-dark">Welcome Guest</h6>
+                        <a href="{{ route('login') }}" class="text-primary small text-decoration-none fw-bold">Login /
                             Register</a>
                     @endauth
                 </div>
@@ -646,7 +655,7 @@
     </style> <!-- Footer -->
     <!-- Premium E-commerce Footer -->
     <footer class="footer-main py-5 text-white border-top border-white border-opacity-5" style="background: #09090b;">
-        <div class="container py-4">
+        <div class="container pt-5 pb-3">
             <div class="row g-5">
                 <!-- Column 1: Brand Essence -->
                 <div class="col-lg-3 col-md-6 text-start">
@@ -655,9 +664,7 @@
                             class="mb-4 brightness-110">
                         <p class="text-white-50 small fw-medium mb-4"
                             style="line-height: 1.8; opacity: 0.8 !important;">
-                            Shopping Club India is India's leading destination for premium electronics, trendy fashion,
-                            and modern lifestyle essentials. We bring quality and value right to your doorstep with
-                            unmatched delivery speed and customer care.
+                            Shopping Club India – Your trusted destination for premium electronics, trendy fashion, and lifestyle essentials. Quality products, fast delivery, and exceptional customer service
                         </p>
                     </div>
                 </div>
@@ -673,42 +680,41 @@
                     </ul>
                 </div>
 
-                <!-- Column Utility -->
+                <!-- Column 3: Customer Care -->
                 <div class="col-lg-2 col-md-6">
                     <h6 class="footer-header">Customer Care</h6>
                     <ul class="list-unstyled footer-link-list">
                         <li><a href="{{ url('/helpdesk') }}" class="footer-link">Help Center</a></li>
                         <li><a href="{{ url('/refund-policy') }}" class="footer-link">Returns & Refunds</a></li>
-                        <li><a href="{{ url('/helpdesk') }}" class="footer-link">FAQs</a></li>
+                        <li><a href="{{ route('faqs') }}" class="footer-link">FAQs</a></li>
                         <li><a href="{{ url('/privacy') }}" class="footer-link">Privacy Policy</a></li>
-                        <li><a href="{{ url('/terms') }}" class="footer-link">Terms & Conditions</a></li>
+                        <li><a href="{{ route('seller.inquiry') }}" class="footer-link">Become a Seller</a></li>
                     </ul>
                 </div>
 
-                <!-- Column 4: Newsletter & Trust -->
+                <!-- Column 4: Contact & Trust -->
                 <div class="col-lg-4 col-md-6">
-                    <h6 class="footer-header">India's Trust</h6>
-                    <p class="text-white x-small mb-4 opacity-75 mt-0 pt-0" style="font-weight: 500;">shoppingclubindia
-                        is
-                        a trusted name in the Indian e-commerce industry. We are committed to providing our customers
-                        with the best possible shopping experience. We offer a wide range of products at competitive
-                        prices. Our website is easy to navigate and use. We offer a variety of payment options and
-                        shipping methods. We are committed to customer satisfaction and offer a money-back guarantee if
-                        you are not satisfied with your purchase.</p>
-                    <div class="newsletter-group mb-4">
-                        <!-- <div class="input-group overflow-hidden rounded-pill p-1 bg-white shadow-sm"
-                            style="border: none !important;">
-                            <input type="email" class="form-control border-0 py-2 px-4 shadow-none fs-6"
-                                placeholder="Email address"
-                                style="color: #333 !important; background: transparent; font-size: 0.85rem !important;">
-                            <button
-                                class="btn btn-primary rounded-pill border-0 px-4 py-2 fs-6 fw-black uppercase tracking-tight btn-subscribe-premium"
-                                type="button" style="min-width: 120px;">Subscribe</button>
-                        </div> -->
-                    </div>
+                    <h6 class="footer-header">Get in Touch</h6>
+                    
+                    <!-- Premium Contact Links -->
+                    <ul class="list-unstyled mb-4">
+                        <li class="mb-3 d-flex align-items-center gap-3">
+                            <div class="icon-box-sm flex-shrink-0" style="width: 32px; height: 32px; font-size: 0.95rem;">
+                                <i class="bi bi-telephone-fill"></i>
+                            </div>
+                            <a href="tel:+917088213888" class="footer-link fs-8 text-white-50" style="text-decoration: none; text-transform: none !important; margin-bottom: 0 !important; display: inline-block;">+91 70882 13888</a>
+                        </li>
+                        <li class="mb-3 d-flex align-items-center gap-3">
+                            <div class="icon-box-sm flex-shrink-0" style="width: 32px; height: 32px; font-size: 0.95rem;">
+                                <i class="bi bi-envelope-fill"></i>
+                            </div>
+                            <a href="mailto:shoppingclubindia1@gmail.com" class="footer-link fs-8 text-white-50" style="text-decoration: none; text-transform: none !important; margin-bottom: 0 !important; display: inline-block; word-break: break-all;">shoppingclubindia1@gmail.com</a>
+                        </li>
+                       
+                    </ul>
 
                     <!-- Updated Premium Trust Badges -->
-                    <div class="d-flex flex-row gap-2 mt-4">
+                    <div class="d-flex flex-row gap-2">
                         <div class="trust-badge-card d-flex align-items-center gap-2">
                             <div class="icon-box-sm flex-shrink-0">
                                 <i class="bi bi-shield-lock-fill"></i>
@@ -733,7 +739,7 @@
 
             </div>
 
-            <div class="pt-5 mt-5 border-top" style="border-top: 1px solid rgba(255,255,255,0.08) !important;">
+            <div class="pt-4 mt-3 border-top" style="border-top: 1px solid rgba(255,255,255,0.08) !important;">
                 <div class="row align-items-center g-4">
                     <!-- Column 1: Social Hub (Left) -->
                     <div class="col-lg-3 col-md-12 text-center text-lg-start order-2 order-lg-1">
@@ -1755,28 +1761,12 @@
                                 // Invalid pincode or API error
                                 field.style.borderColor = '#ef4444';
                             }
-                        })
-                        .catch(err => {
-                            console.error('Pincode API Error:', err);
-                            field.style.borderColor = '#ef4444';
-                        })
-                        .finally(() => {
                             field.classList.remove('loading-pincode');
                         });
                 }
             }
         });
     </script>
-    <!-- Floating Contact Icons -->
-    <div class="floating-contact-container">
-        <a href="https://wa.me/918800123456" class="floating-btn whatsapp-btn shadow-lg" target="_blank"
-            title="Chat on WhatsApp">
-            <i class="bi bi-whatsapp"></i>
-        </a>
-        <a href="tel:+918800123456" class="floating-btn phone-btn shadow-lg" title="Call Us">
-            <i class="bi bi-telephone-fill"></i>
-        </a>
-    </div>
 
     <style>
         .floating-contact-container {
@@ -1837,6 +1827,16 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
     @stack('modals')
     @stack('scripts')
+    <!-- Floating Contact Icons -->
+    <div class="floating-contact-container">
+        <a href="https://wa.me/917088213888" class="floating-btn whatsapp-btn shadow-lg" target="_blank"
+            title="Chat on WhatsApp">
+            <i class="bi bi-whatsapp"></i>
+        </a>
+        <a href="tel:+917088213888" class="floating-btn phone-btn shadow-lg" title="Call Us">
+            <i class="bi bi-telephone-fill"></i>
+        </a>
+    </div>
 </body>
 
 </html>

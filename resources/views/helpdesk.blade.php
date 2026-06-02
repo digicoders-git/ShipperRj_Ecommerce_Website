@@ -43,31 +43,27 @@
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <div
-                                    class="bg-light bg-opacity-50 p-4 rounded-4 border border-white h-100 transition-all hover-translate-y text-center">
+                                <div class="bg-light bg-opacity-50 p-4 rounded-4 border border-white h-100 transition-all hover-translate-y text-center">
                                     <div class="avatar-sm bg-warning-soft text-warning mx-auto mb-3 rounded-circle d-flex align-items-center justify-content-center"
                                         style="width: 50px; height: 50px;">
                                         <i class="bi bi-envelope-paper-fill fs-5"></i>
                                     </div>
                                     <h6 class="fw-black text-dark mb-1">Email Archive</h6>
                                     <p class="xx-small text-muted fw-bold uppercase mb-3">24h Response Goal</p>
-                                    <a href="mailto:support@shoppingclubindia.com"
-                                        class="btn btn-sm btn-premium-outline rounded-pill px-4 w-100 fw-bold text-decoration-none">EMAIL
-                                        US</a>
+                                    <a href="mailto:shoppingclubindia1@gmail.com"
+                                        class="btn btn-sm btn-premium-outline rounded-pill px-4 w-100 fw-bold text-decoration-none">EMAIL US</a>
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <div
-                                    class="bg-light bg-opacity-50 p-4 rounded-4 border border-white h-100 transition-all hover-translate-y text-center">
+                                <div class="bg-light bg-opacity-50 p-4 rounded-4 border border-white h-100 transition-all hover-translate-y text-center">
                                     <div class="avatar-sm bg-success-soft text-success mx-auto mb-3 rounded-circle d-flex align-items-center justify-content-center"
                                         style="width: 50px; height: 50px;">
                                         <i class="bi bi-telephone-outbound-fill fs-5"></i>
                                     </div>
                                     <h6 class="fw-black text-dark mb-1">Direct Hotline</h6>
-                                    <p class="xx-small text-muted fw-bold uppercase mb-3">+91 999 999 9999</p>
-                                    <a href="tel:+919999999999"
-                                        class="btn btn-sm btn-premium-outline rounded-pill px-4 w-100 fw-bold text-decoration-none">CALL
-                                        NOW</a>
+                                    <p class="xx-small text-muted fw-bold uppercase mb-3">+91 70882 13888</p>
+                                    <a href="tel:+917088213888"
+                                        class="btn btn-sm btn-premium-outline rounded-pill px-4 w-100 fw-bold text-decoration-none">CALL NOW</a>
                                 </div>
                             </div>
                         </div>

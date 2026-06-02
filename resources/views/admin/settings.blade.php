@@ -77,12 +77,12 @@
                             <div class="col-md-6">
                                 <label class="form-label text-secondary small">Support Email</label>
                                 <input type="email" name="support_email" class="form-control glass-input"
-                                    value="{{ $settings['support_email'] ?? 'support@shoppingclubindia.com' }}">
+                                    value="{{ $settings['support_email'] ?? 'shoppingclubindia1@gmail.com' }}">
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label text-secondary small">Support Phone</label>
                                 <input type="text" name="support_phone" class="form-control glass-input"
-                                    value="{{ $settings['support_phone'] ?? '+91 999 999 9999' }}">
+                                    value="{{ $settings['support_phone'] ?? '+91 70882 13888' }}">
                             </div>
                         </div>
                     </div>

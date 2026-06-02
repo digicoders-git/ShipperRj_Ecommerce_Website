@@ -71,8 +71,9 @@
 <style>
     @media (min-width: 992px) {
         #sidebarCard {
+            position: -webkit-sticky;
             position: sticky;
-            top: 100px;
+            top: 120px;
             /* Accounts for the sticky main header */
             z-index: 90;
         }
@@ -122,3 +123,33 @@
         color: #dc3545;
     }
 </style>
+
+<script>
+    // Sticky parent self-healing debugger & auto-fixer for Dashboard Sidebar
+    document.addEventListener('DOMContentLoaded', () => {
+        const stickyEl = document.getElementById('sidebarCard');
+        if (stickyEl) {
+            let parent = stickyEl.parentElement;
+            while (parent && parent !== document.documentElement) {
+                const style = window.getComputedStyle(parent);
+                const overflowX = style.getPropertyValue('overflow-x');
+                const overflowY = style.getPropertyValue('overflow-y');
+                const overflow = style.getPropertyValue('overflow');
+                
+                if (
+                    (overflowX !== 'visible' && overflowX !== 'clip') ||
+                    (overflowY !== 'visible' && overflowY !== 'clip') ||
+                    (overflow !== 'visible' && overflow !== 'clip')
+                ) {
+                    console.log('Fixed sticky-breaking ancestor in dashboard:', parent.tagName, parent.className);
+                    if (parent.tagName === 'BODY' || parent.tagName === 'HTML') {
+                        parent.style.overflowX = 'clip';
+                    } else {
+                        parent.style.overflow = 'visible';
+                    }
+                }
+                parent = parent.parentElement;
+            }
+        }
+    });
+</script>

@@ -5,7 +5,7 @@
 @section('admin_content')
     <div class="mb-4 d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
         <div>
-            <h4 class="fw-black text-dark mb-1">Order #{{ $order->id }}</h4>
+            <h4 class="fw-black text-dark mb-1">Order #{{ $order->order_number }}</h4>
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb mb-0">
                     <li class="breadcrumb-item"><a href="{{ route('admin.orders.index') }}"

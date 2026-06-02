@@ -1197,6 +1197,25 @@
                 transform: translateX(0);
             }
         }
+
+        /* Premium Review Modal Styling */
+        .star-btn {
+            color: #e2e8f0;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+        .star-btn.active {
+            color: #ffb703;
+            text-shadow: 0 0 10px rgba(255, 183, 3, 0.3);
+        }
+        .star-btn:hover {
+            transform: scale(1.2) rotate(5deg);
+        }
+        .btn-submit-review:hover {
+            opacity: 0.95;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4) !important;
+        }
     </style>
 @endpush
 
@@ -1422,9 +1441,15 @@
                                 <h4
                                     style="font-family:'Playfair Display',serif; font-weight:900; margin:0; letter-spacing:-0.02em;">
                                     Customer Reviews</h4>
-                                <button class="btn-review" data-bs-toggle="modal" data-bs-target="#reviewModal">
-                                    <i class="bi bi-pencil-square"></i> Write a Review
-                                </button>
+                                @auth
+                                    <button class="btn-review" data-bs-toggle="modal" data-bs-target="#reviewModal">
+                                        <i class="bi bi-pencil-square"></i> Write a Review
+                                    </button>
+                                @else
+                                    <a href="{{ route('login') }}?redirect={{ urlencode(request()->url() . '?write_review=1') }}" class="btn-review text-decoration-none d-inline-flex align-items-center">
+                                        <i class="bi bi-pencil-square"></i> Write a Review
+                                    </a>
+                                @endauth
                             </div>
                             @forelse($product->approvedReviews as $review)
                                 <div class="review-card">
@@ -1614,7 +1639,94 @@
             document.getElementById('cartQtyInput').value = qty;
             document.getElementById('buyNowQtyInput').value = qty;
             document.querySelectorAll('.mob-qty-sync').forEach(s => s.value = qty);
+
+            // Interactive Star Rating
+            document.querySelectorAll('.star-btn').forEach(star => {
+                star.addEventListener('click', function() {
+                    const value = parseInt(this.dataset.value);
+                    const ratingInput = document.getElementById('reviewRatingInput');
+                    if (ratingInput) {
+                        ratingInput.value = value;
+                    }
+                    document.querySelectorAll('.star-btn').forEach(s => {
+                        const sVal = parseInt(s.dataset.value);
+                        if (sVal <= value) {
+                            s.classList.add('active');
+                            s.classList.replace('bi-star', 'bi-star-fill');
+                        } else {
+                            s.classList.remove('active');
+                            s.classList.replace('bi-star-fill', 'bi-star');
+                        }
+                    });
+                });
+            });
+
+            // Auto-open review modal and switch to review tab if redirecting back after login
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('write_review')) {
+                // Find review tab button and trigger click
+                const reviewTabBtn = document.querySelector('.tab-btn[data-tab="reviews"]');
+                if (reviewTabBtn) {
+                    reviewTabBtn.click();
+                    setTimeout(() => {
+                        reviewTabBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 300);
+                }
+                
+                // Open review modal
+                const reviewModalEl = document.getElementById('reviewModal');
+                if (reviewModalEl) {
+                    const modal = new bootstrap.Modal(reviewModalEl);
+                    modal.show();
+                }
+            }
         });
     </script>
+
+    @auth
+        <!-- Write Review Modal -->
+        <div class="modal fade" id="reviewModal" tabindex="-1" aria-labelledby="reviewModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg" style="border-radius: 24px; overflow: hidden; background: #ffffff;">
+                    <div class="modal-header border-0 pb-0 pt-4 px-4 d-flex justify-content-between align-items-center">
+                        <h5 class="modal-title fw-black letter-spacing-n1 mb-0" id="reviewModalLabel" style="font-family:'Playfair Display', serif; font-weight:900; font-size:1.5rem;">Write a Review</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="background: transparent; border: 0; font-size: 1.25rem;"><i class="bi bi-x-lg text-dark"></i></button>
+                    </div>
+                    <form action="{{ route('product.review.store') }}" method="POST">
+                        @csrf
+                        <input type="hidden" name="product_id" value="{{ $product->id }}">
+                        
+                        <div class="modal-body p-4">
+                            <div class="text-center mb-4">
+                                <div class="small text-muted mb-2">How would you rate this product?</div>
+                                <div class="rating-stars-interactive d-flex gap-3 justify-content-center">
+                                    <i class="bi bi-star-fill fs-2 star-btn active" data-value="1"></i>
+                                    <i class="bi bi-star-fill fs-2 star-btn active" data-value="2"></i>
+                                    <i class="bi bi-star-fill fs-2 star-btn active" data-value="3"></i>
+                                    <i class="bi bi-star-fill fs-2 star-btn active" data-value="4"></i>
+                                    <i class="bi bi-star-fill fs-2 star-btn active" data-value="5"></i>
+                                </div>
+                                <input type="hidden" name="rating" id="reviewRatingInput" value="5" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold text-uppercase opacity-75" style="letter-spacing: 0.05em; font-size: 0.75rem;">Your Feedback</label>
+                                <textarea name="comment" class="form-control border bg-light bg-opacity-50" rows="4"
+                                    placeholder="Share your experience with this product..."
+                                    style="border-radius: 16px; padding: 15px; font-size: 0.9rem; resize: none; border-color: #e2e8f0 !important;" required></textarea>
+                            </div>
+                        </div>
+                        
+                        <div class="modal-footer border-0 p-4 pt-0">
+                            <button type="submit" class="btn w-100 fw-bold rounded-pill py-3 text-uppercase btn-submit-review" 
+                                style="background: var(--brand, #ff6b35); color: #ffffff; letter-spacing: 0.1em; font-size: 0.85rem; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(255, 107, 53, 0.25);">
+                                Submit Review
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    @endauth
 
 @endsection

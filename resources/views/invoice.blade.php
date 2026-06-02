@@ -183,7 +183,7 @@
                 <div class="company-details small text-secondary">
                     <p class="mb-1 fw-bold text-dark">SHOPPING CLUB INDIA (P) LTD.</p>
                     <p class="mb-0">Avenue 7, New Delhi, India 110001</p>
-                    <p class="mb-0">T: +91 8800 123 456 | E: info@shoppingclubindia.com</p>
+                    <p class="mb-0">T: +91 70882 13888 | E: shoppingclubindia1@gmail.com</p>
                     <p class="mb-0 fw-medium mt-2">GSTIN: 07AAGCS1234A1Z1</p>
                 </div>
             </div>

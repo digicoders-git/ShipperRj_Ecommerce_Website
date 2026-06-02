@@ -151,9 +151,9 @@
         <div class="container">
             <div class="row g-5">
                 <!-- Sidebar -->
-                <div class="col-lg-3 d-none d-lg-block" style="align-self: flex-start;">
+                <div class="col-lg-3 d-none d-lg-block">
                     <div class="sidebar-wrapper sticky-top"
-                        style="top: 90px; z-index: 1; max-height: calc(100vh - 110px); overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none;">
+                        style="position: -webkit-sticky; position: sticky; top: 120px; z-index: 90; max-height: calc(100vh - 160px); overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none;">
                         <!-- Filter Header -->
                         <div class="d-flex align-items-center justify-content-between mb-4 px-1">
                             <h5 class="fw-black mb-0"><i class="bi bi-funnel-fill me-2 text-primary"></i>Filters</h5>
@@ -377,5 +377,33 @@
         function updatePriceLabel(val) {
             document.getElementById('priceLabel').innerHTML = '₹' + parseInt(val).toLocaleString() + '+';
         }
+
+        // Sticky parent self-healing debugger & auto-fixer for Product Filters Sidebar
+        document.addEventListener('DOMContentLoaded', () => {
+            const stickyEl = document.querySelector('.sidebar-wrapper');
+            if (stickyEl) {
+                let parent = stickyEl.parentElement;
+                while (parent && parent !== document.documentElement) {
+                    const style = window.getComputedStyle(parent);
+                    const overflowX = style.getPropertyValue('overflow-x');
+                    const overflowY = style.getPropertyValue('overflow-y');
+                    const overflow = style.getPropertyValue('overflow');
+                    
+                    if (
+                        (overflowX !== 'visible' && overflowX !== 'clip') ||
+                        (overflowY !== 'visible' && overflowY !== 'clip') ||
+                        (overflow !== 'visible' && overflow !== 'clip')
+                    ) {
+                        console.log('Fixed sticky-breaking ancestor in products:', parent.tagName, parent.className);
+                        if (parent.tagName === 'BODY' || parent.tagName === 'HTML') {
+                            parent.style.overflowX = 'clip';
+                        } else {
+                            parent.style.overflow = 'visible';
+                        }
+                    }
+                    parent = parent.parentElement;
+                }
+            }
+        });
     </script>
 @endsection

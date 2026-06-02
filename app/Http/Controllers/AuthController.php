@@ -15,6 +15,9 @@ class AuthController extends Controller
         if (Auth::check()) {
             return redirect('/');
         }
+        if (request()->has('redirect')) {
+            session(['url.intended' => request('redirect')]);
+        }
         return view('auth');
     }
 

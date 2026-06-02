@@ -41,15 +41,18 @@
                             <span id="btnLoader" class="spinner-border spinner-border-sm d-none"></span>
                         </button>
                     </form>
-
                     <div class="row mt-5 pt-4 border-top border-secondary border-opacity-25">
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-4 mb-3">
                             <h6 class="text-uppercase small fw-bold text-primary">Email Support</h6>
-                            <p class="text-secondary">support@premiumstore.com</p>
+                            <p class="text-secondary small">shoppingclubindia1@gmail.com</p>
                         </div>
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-4 mb-3">
+                            <h6 class="text-uppercase small fw-bold text-primary">Phone Support</h6>
+                            <p class="text-secondary small">+91 70882 13888</p>
+                        </div>
+                        <div class="col-md-4 mb-3">
                             <h6 class="text-uppercase small fw-bold text-primary">Office Address</h6>
-                            <p class="text-secondary">123 Tech Avenue, Digital City, India</p>
+                            <p class="text-secondary small">123 Tech Avenue, Digital City, India</p>
                         </div>
                     </div>
                 </div>

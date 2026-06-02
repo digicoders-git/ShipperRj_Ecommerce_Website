@@ -152,6 +152,16 @@ Route::middleware(['auth', 'check.blocked'])->group(function () {
 
     Route::post('/product/review', [App\Http\Controllers\ProductReviewController::class, 'store'])->name('product.review.store');
     Route::post('/complaint', [App\Http\Controllers\ComplaintController::class, 'store'])->name('complaints.store');
+
+    Route::get('/helpdesk', function () {
+        $user_id = Illuminate\Support\Facades\Auth::id();
+        $deliveredProducts = \App\Models\Product::whereHas('orderItems.order', function ($query) use ($user_id) {
+            $query->where('user_id', $user_id)->where('order_status', 'delivered');
+        })->get();
+        $userComplaints = \App\Models\Complaint::with('product')->where('user_id', $user_id)->latest()->get();
+        
+        return view('helpdesk', compact('deliveredProducts', 'userComplaints'));
+    });
 });
 
 Route::post('/contact', function (Illuminate\Http\Request $request) {
@@ -187,6 +197,10 @@ Route::get('/terms', function () {
     return view('terms');
 });
 
+Route::get('/faqs', function () {
+    return view('faqs');
+})->name('faqs');
+
 Route::get('/become-a-seller', [SellerInquiryController::class, 'index'])->name('seller.inquiry');
 Route::post('/become-a-seller', [SellerInquiryController::class, 'submit'])->name('seller.inquiry.submit');
 
@@ -194,18 +208,7 @@ Route::get('/refund-policy', function () {
     return view('refund-policy');
 });
 
-Route::get('/helpdesk', function () {
-    $deliveredProducts = collect();
-    $userComplaints = collect();
-    if (Illuminate\Support\Facades\Auth::check()) {
-        $user_id = Illuminate\Support\Facades\Auth::id();
-        $deliveredProducts = \App\Models\Product::whereHas('orderItems.order', function ($query) use ($user_id) {
-            $query->where('user_id', $user_id)->where('order_status', 'delivered');
-        })->get();
-        $userComplaints = \App\Models\Complaint::with('product')->where('user_id', $user_id)->latest()->get();
-    }
-    return view('helpdesk', compact('deliveredProducts', 'userComplaints'));
-});
+
 
 // Admin & Sub-Admin Auth Routes
 Route::prefix('admin')->name('admin.')->group(function () {

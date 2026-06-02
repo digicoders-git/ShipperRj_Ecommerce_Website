@@ -42,7 +42,7 @@ body {
     background-color: var(--light);
     color: var(--dark);
     margin: 0;
-    overflow-x: hidden;
+    overflow-x: clip;
     -webkit-font-smoothing: antialiased;
 }
 

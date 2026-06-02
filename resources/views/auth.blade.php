@@ -127,12 +127,12 @@
                     </div>
                 </div>
 
-                <div class="mt-4 pt-4 border-top d-flex justify-content-center gap-3">
+                <!-- <div class="mt-4 pt-4 border-top d-flex justify-content-center gap-3">
                     <a href="{{ route('auth.google') }}" class="action-btn px-4 w-auto h-auto py-3 rounded-pill bg-light border-0 fs-6 shadow-sm text-dark small text-decoration-none fw-bold transition-all hover-bg-light border">
                         <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google" width="20" class="me-2"> 
                         Continue with Google
                     </a>
-                </div>
+                </div> -->
             </div>
         </div>
     </section>

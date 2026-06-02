@@ -5,6 +5,18 @@
 
     RewriteEngine On
 
+    # Disable LiteSpeed Cache for dynamic Laravel routes to fix CSRF issues
+    <IfModule LiteSpeed>
+        CacheDisable public /
+        CacheDisable public /checkout
+        CacheDisable public /admin
+        CacheDisable public /auth
+    </IfModule>
+
+    # Force browsers and proxies not to cache the HTML pages
+    Header set Cache-Control "no-store, no-cache, must-revalidate, max-age=0"
+    Header set Pragma "no-cache"
+
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]

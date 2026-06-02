@@ -14,7 +14,7 @@ Route::get('/', function () {
     return view('home', compact('featured_products', 'home_categories'));
 });
 
-/*
+
 Route::get('/clear-cache', function () {
     \Illuminate\Support\Facades\Artisan::call('optimize:clear');
     return 'Cache cleared successfully! You can now go back and try again.';
@@ -49,15 +49,12 @@ Route::get('/session-read', function () {
         'action' => session()->has('test_key') ? 'Everything is fine' : 'Session is breaking!'
     ]);
 });
-*/
-
 // Auth Routes
 Route::get('/auth', [AuthController::class, 'showAuthForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.post');
 Route::post('/register', [AuthController::class, 'register'])->name('register');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('/check-auth', [AuthController::class, 'checkAuth'])->name('auth.check');
-
 // Google Socialite Routes
 Route::get('/auth/google', [\App\Http\Controllers\SocialAuthController::class, 'redirectToGoogle'])->name('auth.google');
 Route::get('/auth/google/callback', [\App\Http\Controllers\SocialAuthController::class, 'handleGoogleCallback']);

@@ -827,7 +827,7 @@
                             // Use fresh CSRF token from meta tag (never stale even if page is cached)
                             formData.set('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
 
-                            fetch('{{ route("checkout.address.save") }}', {
+                            fetch('{{ route("checkout.address.save", [], false) }}', {
                                 method: 'POST',
                                 body: formData,
                                 headers: {
@@ -961,7 +961,7 @@
 
                             if(!code) return;
 
-                            fetch('{{ route("checkout.coupon.check") }}', {
+                            fetch('{{ route("checkout.coupon.check", [], false) }}', {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json',

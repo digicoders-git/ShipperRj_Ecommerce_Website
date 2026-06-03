@@ -227,11 +227,11 @@
 
             const amount = document.getElementById('walletAmountInput').value;
 
-            fetch('{{ route("wallet.add") }}', {
+            fetch('{{ route("wallet.add", [], false) }}', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                 },
                 body: JSON.stringify({ amount: amount })
             })
@@ -256,11 +256,11 @@
                             "order_id": data.order_id,
                             "handler": function (response) {
                                 // Success handler
-                                fetch('{{ route("wallet.verify") }}', {
+                                fetch('{{ route("wallet.verify", [], false) }}', {
                                     method: 'POST',
                                     headers: {
                                         'Content-Type': 'application/json',
-                                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                                     },
                                     body: JSON.stringify({
                                         razorpay_payment_id: response.razorpay_payment_id,

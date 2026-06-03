@@ -70,11 +70,11 @@
             "order_id": "{{ $order->razorpay_order_id }}",
             "handler": function (response) {
                 // Success handler
-                fetch('{{ route("checkout.payment.verify") }}', {
+                fetch('{{ route("checkout.payment.verify", [], false) }}', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                     },
                     body: JSON.stringify({
                         razorpay_payment_id: response.razorpay_payment_id,
@@ -150,11 +150,11 @@
                 btn.disabled = true;
                 btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> PROCESSING...';
 
-                fetch('{{ route("checkout.payment.wallet") }}', {
+                fetch('{{ route("checkout.payment.wallet", [], false) }}', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                     },
                     body: JSON.stringify({
                         order_id: '{{ $order->id }}'

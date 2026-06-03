@@ -79,13 +79,14 @@
         $('#contactForm').on('submit', function(e) {
             e.preventDefault();
             
+            $(this).find('input[name="_token"]').val($('meta[name="csrf-token"]').attr('content'));
             let formData = $(this).serialize();
             $('#btnText').addClass('d-none');
             $('#btnLoader').removeClass('d-none');
             $('#submitBtn').attr('disabled', true);
 
             $.ajax({
-                url: "{{ route('contact.submit') }}",
+                url: "{{ route('contact.submit', [], false) }}",
                 type: "POST",
                 data: formData,
                 success: function(response) {

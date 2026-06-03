@@ -4,6 +4,10 @@
     </IfModule>
 
     RewriteEngine On
+ 
+    # Force HTTPS redirect
+    RewriteCond %{HTTPS} !=on
+    RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
     # Disable LiteSpeed Cache completely to prevent cached CSRF tokens & session issues
     <IfModule LiteSpeed>

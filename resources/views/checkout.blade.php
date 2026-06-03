@@ -62,7 +62,7 @@
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body p-4 pt-0">
-                                <form id="addressForm" onsubmit="return handleAddressSave(event)">
+                                <form id="addressForm" action="{{ route('checkout.address.save', [], false) }}" method="POST" onsubmit="handleAddressSaveSubmit(event)">
                                     @csrf
                                     <div class="luxury-form-group mb-3">
                                         <label class="small fw-bold text-dark mb-2 ms-1">Contact Information</label>
@@ -812,7 +812,7 @@
                             if(continueBtn) continueBtn.disabled = false;
                         }
 
-                        window.handleAddressSave = async function(e) {
+                        window.handleAddressSaveSubmit = async function(e) {
                             e.preventDefault();
                             const form = e.target;
                             const saveBtn = form.querySelector('button[type="submit"]');
@@ -824,50 +824,14 @@
                             }
  
                             try {
-                                const formData = new FormData(form);
                                 const freshToken = await window.getFreshCsrfToken();
-                                formData.set('_token', freshToken);
- 
-                                const res = await fetch('{{ route("checkout.address.save", [], false) }}', {
-                                    method: 'POST',
-                                    body: formData,
-                                    headers: {
-                                        'X-Requested-With': 'XMLHttpRequest'
-                                    }
-                                });
-                                const data = await res.json();
-                                if(!res.ok) throw new Error(data.message || 'Validation failed');
- 
-                                if(data.success) {
-                                    Swal.fire({
-                                        icon: 'success',
-                                        title: 'SUCCESSFUL',
-                                        text: 'New address added to your profile.',
-                                        timer: 2000,
-                                        showConfirmButton: false,
-                                        background: '#fff',
-                                        color: '#1a202c',
-                                        iconColor: '#f2701a'
-                                    }).then(() => {
-                                        location.reload();
-                                    });
-                                }
+                                const tokenInput = form.querySelector('input[name="_token"]');
+                                if (tokenInput) tokenInput.value = freshToken;
+                                form.submit(); // traditional form submit
                             } catch(err) {
                                 console.error('Save Error:', err);
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'SAVE FAILED',
-                                    text: err.message || 'Could not save address. Please try again.',
-                                    confirmButtonColor: '#f2701a'
-                                });
-                            } finally {
-                                if(saveBtn) {
-                                    saveBtn.disabled = false;
-                                    saveBtn.innerHTML = originalText;
-                                }
+                                form.submit(); // fallback
                             }
- 
-                            return false;
                         };
 
                         const baseSubtotal = {{ $total }};

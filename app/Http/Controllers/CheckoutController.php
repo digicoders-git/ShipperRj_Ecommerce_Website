@@ -201,7 +201,11 @@ class CheckoutController extends Controller
             'is_default' => $is_first
         ]);
 
-        return response()->json(['success' => true, 'address' => $address]);
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json(['success' => true, 'address' => $address]);
+        }
+
+        return redirect()->back()->with('success', 'New address added successfully.');
     }
 
     public function selectAddress(Request $request)

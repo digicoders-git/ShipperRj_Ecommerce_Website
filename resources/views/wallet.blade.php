@@ -218,23 +218,25 @@
 @push('scripts')
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script>
-        document.getElementById('walletAddForm').onsubmit = function (e) {
+        document.getElementById('walletAddForm').onsubmit = async function (e) {
             e.preventDefault();
             const btn = document.getElementById('walletPayBtn');
             const originalText = btn.innerHTML;
             btn.disabled = true;
             btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Connecting...';
-
+ 
             const amount = document.getElementById('walletAmountInput').value;
-
-            fetch('{{ route("wallet.add", [], false) }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                },
-                body: JSON.stringify({ amount: amount })
-            })
+ 
+            try {
+                const freshToken = await window.getFreshCsrfToken();
+                fetch('{{ route("wallet.add", [], false) }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': freshToken
+                    },
+                    body: JSON.stringify({ amount: amount })
+                })
                 .then(res => {
                     if (!res.ok) throw new Error('Server Error');
                     return res.json();
@@ -254,13 +256,14 @@
                             "description": "Wallet Recharge",
                             "image": "{{ asset('assets/images/logo.jpeg') }}",
                             "order_id": data.order_id,
-                            "handler": function (response) {
+                            "handler": async function (response) {
                                 // Success handler
+                                const freshToken = await window.getFreshCsrfToken();
                                 fetch('{{ route("wallet.verify", [], false) }}', {
                                     method: 'POST',
                                     headers: {
                                         'Content-Type': 'application/json',
-                                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                                        'X-CSRF-TOKEN': freshToken
                                     },
                                     body: JSON.stringify({
                                         razorpay_payment_id: response.razorpay_payment_id,
@@ -312,6 +315,11 @@
                     btn.disabled = false;
                     btn.innerHTML = originalText;
                 });
+            } catch (err) {
+                console.error(err);
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
         };
     </script>
 @endpush

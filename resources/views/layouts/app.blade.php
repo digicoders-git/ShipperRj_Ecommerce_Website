@@ -1318,6 +1318,18 @@
                 showToast('Status', "{{ session('status') }}", 'primary');
             @endif
         });
+ 
+        window.getFreshCsrfToken = async function() {
+            try {
+                const res = await fetch('/fresh-csrf?_t=' + Date.now());
+                const data = await res.json();
+                return data.token;
+            } catch (e) {
+                console.error('Failed to get fresh CSRF token', e);
+                const meta = document.querySelector('meta[name="csrf-token"]');
+                return meta ? meta.getAttribute('content') : '';
+            }
+        };
 
         document.getElementById('supportForm')?.addEventListener('submit', async function (e) {
             e.preventDefault();

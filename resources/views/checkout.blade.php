@@ -812,34 +812,32 @@
                             if(continueBtn) continueBtn.disabled = false;
                         }
 
-                        window.handleAddressSave = function(e) {
+                        window.handleAddressSave = async function(e) {
                             e.preventDefault();
                             const form = e.target;
                             const saveBtn = form.querySelector('button[type="submit"]');
                             const originalText = saveBtn ? saveBtn.innerHTML : 'SAVE';
-
+ 
                             if(saveBtn) {
                                 saveBtn.disabled = true;
                                 saveBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> PROCESSING...';
                             }
-
-                            const formData = new FormData(form);
-                            // Use fresh CSRF token from meta tag (never stale even if page is cached)
-                            formData.set('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
-
-                            fetch('{{ route("checkout.address.save", [], false) }}', {
-                                method: 'POST',
-                                body: formData,
-                                headers: {
-                                    'X-Requested-With': 'XMLHttpRequest'
-                                }
-                            })
-                            .then(async res => {
+ 
+                            try {
+                                const formData = new FormData(form);
+                                const freshToken = await window.getFreshCsrfToken();
+                                formData.set('_token', freshToken);
+ 
+                                const res = await fetch('{{ route("checkout.address.save", [], false) }}', {
+                                    method: 'POST',
+                                    body: formData,
+                                    headers: {
+                                        'X-Requested-With': 'XMLHttpRequest'
+                                    }
+                                });
                                 const data = await res.json();
                                 if(!res.ok) throw new Error(data.message || 'Validation failed');
-                                return data;
-                            })
-                            .then(data => {
+ 
                                 if(data.success) {
                                     Swal.fire({
                                         icon: 'success',
@@ -854,8 +852,7 @@
                                         location.reload();
                                     });
                                 }
-                            })
-                            .catch(err => {
+                            } catch(err) {
                                 console.error('Save Error:', err);
                                 Swal.fire({
                                     icon: 'error',
@@ -863,14 +860,13 @@
                                     text: err.message || 'Could not save address. Please try again.',
                                     confirmButtonColor: '#f2701a'
                                 });
-                            })
-                            .finally(() => {
+                            } finally {
                                 if(saveBtn) {
                                     saveBtn.disabled = false;
                                     saveBtn.innerHTML = originalText;
                                 }
-                            });
-
+                            }
+ 
                             return false;
                         };
 
@@ -887,7 +883,10 @@
                             return amount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                         }
 
-                        function validateCheckout(e) {
+                        async function validateCheckout(e) {
+                            e.preventDefault();
+                            const form = e.currentTarget || e.target;
+ 
                             for (const item of orderItems) {
                                 if (item.qty < item.min_qty) {
                                     Swal.fire({
@@ -899,7 +898,7 @@
                                     return false;
                                 }
                             }
-
+ 
                             const currentGrandTotal = parseFloat(document.getElementById('grandTotalDisplay').innerText.replace(/,/g, ''));
                             if (minOrderVal > 0 && currentGrandTotal < minOrderVal) {
                                 Swal.fire({
@@ -910,13 +909,22 @@
                                 });
                                 return false;
                             }
-
+ 
                             const btn = document.getElementById('placeOrderBtn');
                             if(btn) {
                                 btn.disabled = true;
                                 btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> PROCESSING...';
                             }
-                            return true;
+ 
+                            try {
+                                const freshToken = await window.getFreshCsrfToken();
+                                const tokenInput = form.querySelector('input[name="_token"]');
+                                if (tokenInput) tokenInput.value = freshToken;
+                                form.submit();
+                            } catch (err) {
+                                console.error('Submit Error:', err);
+                                form.submit(); // Fallback
+                            }
                         }
 
                         function selectPayment(method, element) {
@@ -955,35 +963,41 @@
                             applyCoupon();
                         }
 
-                        function applyCoupon() {
+                        async function applyCoupon() {
                             const code = document.getElementById('couponInput').value;
                             const msg = document.getElementById('couponMsg');
-
+ 
                             if(!code) return;
-
-                            fetch('{{ route("checkout.coupon.check", [], false) }}', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                                },
-                                body: JSON.stringify({ coupon_code: code, total: baseSubtotal + currentShipping })
-                            })
-                            .then(res => res.json())
-                            .then(data => {
+ 
+                            try {
+                                const freshToken = await window.getFreshCsrfToken();
+                                const res = await fetch('{{ route("checkout.coupon.check", [], false) }}', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'X-CSRF-TOKEN': freshToken
+                                    },
+                                    body: JSON.stringify({ coupon_code: code, total: baseSubtotal + currentShipping })
+                                });
+                                const data = await res.json();
                                 if(data.success) {
                                     currentDiscount = data.discount;
                                     msg.className = 'xx-small fw-bold mb-0 mt-1 text-success';
                                     msg.innerText = data.message;
-
+ 
                                     document.getElementById('discountInfo').classList.remove('d-none');
                                     document.getElementById('discountDisplay').innerText = '₹' + currentDiscount;
                                     updateGrandTotal();
                                 } else {
                                     msg.className = 'xx-small fw-bold mb-0 mt-1 text-danger';
                                     msg.innerText = data.message;
+                                    currentDiscount = 0;
+                                    document.getElementById('discountInfo').classList.add('d-none');
+                                    updateGrandTotal();
                                 }
-                            });
+                            } catch(err) {
+                                console.error('Coupon Error:', err);
+                            }
                         }
                     </script>
 @endsection

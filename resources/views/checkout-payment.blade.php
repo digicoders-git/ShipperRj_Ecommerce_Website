@@ -68,13 +68,14 @@
             "description": "Payment for Order #{{ $order->order_number }}",
             "image": "{{ asset('assets/images/logo.jpeg') }}",
             "order_id": "{{ $order->razorpay_order_id }}",
-            "handler": function (response) {
+            "handler": async function (response) {
                 // Success handler
+                const freshToken = await window.getFreshCsrfToken();
                 fetch('{{ route("checkout.payment.verify", [], false) }}', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        'X-CSRF-TOKEN': freshToken
                     },
                     body: JSON.stringify({
                         razorpay_payment_id: response.razorpay_payment_id,
@@ -144,38 +145,38 @@
             e.preventDefault();
         }
 
-        document.getElementById('walletPayBtn').onclick = function (e) {
+        document.getElementById('walletPayBtn').onclick = async function (e) {
             if (confirm('Are you sure you want to pay ₹{{ number_format($order->prepaid_amount, 2) }} from your wallet?')) {
                 const btn = this;
                 btn.disabled = true;
                 btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> PROCESSING...';
-
-                fetch('{{ route("checkout.payment.wallet", [], false) }}', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                    },
-                    body: JSON.stringify({
-                        order_id: '{{ $order->id }}'
-                    })
-                })
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data.success) {
-                            window.location.href = '/order-success?order_id={{ $order->id }}';
-                        } else {
-                            alert(data.message || 'Wallet Payment Failed!');
-                            btn.disabled = false;
-                            btn.innerHTML = '<i class="bi bi-wallet2 me-2"></i> PAY VIA WALLET';
-                        }
-                    })
-                    .catch(err => {
-                        console.error(err);
-                        alert('Something went wrong!');
+ 
+                try {
+                    const freshToken = await window.getFreshCsrfToken();
+                    const res = await fetch('{{ route("checkout.payment.wallet", [], false) }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': freshToken
+                        },
+                        body: JSON.stringify({
+                            order_id: '{{ $order->id }}'
+                        })
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                        window.location.href = '/order-success?order_id={{ $order->id }}';
+                    } else {
+                        alert(data.message || 'Wallet Payment Failed!');
                         btn.disabled = false;
                         btn.innerHTML = '<i class="bi bi-wallet2 me-2"></i> PAY VIA WALLET';
-                    });
+                    }
+                } catch (err) {
+                    console.error(err);
+                    alert('Something went wrong!');
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="bi bi-wallet2 me-2"></i> PAY VIA WALLET';
+                }
             }
             e.preventDefault();
         }

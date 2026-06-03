@@ -68,6 +68,10 @@ Route::get('/session-debug', function () {
     ]);
 });
 
+Route::get('/fresh-csrf', function () {
+    return response()->json(['token' => csrf_token()]);
+});
+
 // Auth Routes
 Route::get('/auth', [AuthController::class, 'showAuthForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.post');

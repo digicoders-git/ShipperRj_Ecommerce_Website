@@ -64,6 +64,7 @@ Route::get('/session-debug', function () {
         'csrf_token' => csrf_token(),
         'auth_check' => \Illuminate\Support\Facades\Auth::check(),
         'auth_user' => \Illuminate\Support\Facades\Auth::user() ? \Illuminate\Support\Facades\Auth::user()->only(['id', 'name', 'email']) : null,
+        'request_cookies' => request()->cookies->all(),
     ]);
 });
 

@@ -72,6 +72,15 @@ Route::get('/fresh-csrf', function () {
     return response()->json(['token' => csrf_token()]);
 });
 
+Route::get('/fix-sessions-db', function () {
+    try {
+        \Illuminate\Support\Facades\DB::statement("ALTER TABLE sessions MODIFY user_id VARCHAR(50) NULL");
+        return 'Sessions table altered successfully! user_id is now VARCHAR(50).';
+    } catch (\Exception $e) {
+        return 'Error: ' . $e->getMessage();
+    }
+});
+
 // Auth Routes
 Route::get('/auth', [AuthController::class, 'showAuthForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.post');

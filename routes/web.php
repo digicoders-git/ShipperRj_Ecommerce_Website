@@ -58,6 +58,15 @@ Route::get('/view-logs', function () {
     return '<pre>' . htmlspecialchars(substr($content, -10000)) . '</pre>';
 });
 
+Route::get('/session-debug', function () {
+    return response()->json([
+        'session_id' => session()->getId(),
+        'csrf_token' => csrf_token(),
+        'auth_check' => \Illuminate\Support\Facades\Auth::check(),
+        'auth_user' => \Illuminate\Support\Facades\Auth::user() ? \Illuminate\Support\Facades\Auth::user()->only(['id', 'name', 'email']) : null,
+    ]);
+});
+
 // Auth Routes
 Route::get('/auth', [AuthController::class, 'showAuthForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.post');

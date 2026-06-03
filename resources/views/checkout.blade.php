@@ -824,13 +824,14 @@
                             }
 
                             const formData = new FormData(form);
+                            // Use fresh CSRF token from meta tag (never stale even if page is cached)
+                            formData.set('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
 
                             fetch('{{ route("checkout.address.save") }}', {
                                 method: 'POST',
                                 body: formData,
                                 headers: {
-                                    'X-Requested-With': 'XMLHttpRequest',
-                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                    'X-Requested-With': 'XMLHttpRequest'
                                 }
                             })
                             .then(async res => {
@@ -964,7 +965,7 @@
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json',
-                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                                 },
                                 body: JSON.stringify({ coupon_code: code, total: baseSubtotal + currentShipping })
                             })

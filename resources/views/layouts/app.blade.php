@@ -1366,8 +1366,7 @@
             }
         });
     </script>
-    @stack('modals')
-    @stack('scripts')
+
 
     <style>
         /* Acura / Premium Modal Enhancements */

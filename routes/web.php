@@ -49,6 +49,15 @@ Route::get('/session-read', function () {
         'action' => session()->has('test_key') ? 'Everything is fine' : 'Session is breaking!'
     ]);
 });
+Route::get('/view-logs', function () {
+    $path = storage_path('logs/laravel.log');
+    if (!file_exists($path)) {
+        return 'No logs found!';
+    }
+    $content = file_get_contents($path);
+    return '<pre>' . htmlspecialchars(substr($content, -10000)) . '</pre>';
+});
+
 // Auth Routes
 Route::get('/auth', [AuthController::class, 'showAuthForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.post');

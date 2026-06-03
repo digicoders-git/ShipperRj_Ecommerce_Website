@@ -52,7 +52,7 @@
                             <div class="form-group">
                                 <div class="d-flex justify-content-between">
                                     <label class="small fw-bold mb-2">Password</label>
-                                    <a href="#" class="small text-secondary text-decoration-none">Forgot?</a>
+                                    {{-- <a href="#" class="small text-secondary text-decoration-none">Forgot?</a> --}}
                                 </div>
                                 <div class="position-relative">
                                     <input type="password" id="loginPassword" name="password" class="form-control px-4 py-3 bg-light border-0 rounded-4" placeholder="Your secure password" required>

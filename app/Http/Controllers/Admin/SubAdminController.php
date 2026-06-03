@@ -25,7 +25,9 @@ class SubAdminController extends Controller
         'support' => ['view', 'reply', 'delete'],
         'reviews' => ['view', 'update', 'delete'],
         'refunds' => ['view', 'update'],
-        'seller_inquiries' => ['view', 'delete']
+        'seller_inquiries' => ['view', 'delete'],
+        'faqs' => ['view', 'add', 'edit', 'delete'],
+        'home_sliders' => ['view', 'add', 'edit', 'delete']
     ];
 
     public function index()

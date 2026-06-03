@@ -210,7 +210,6 @@
             border-color: var(--brand-orange);
             box-shadow: 0 0 0 4px rgba(255, 126, 59, 0.1);
             /* Glow effect */
-            border-width: 2px;
         }
 
         .password-toggle {
@@ -445,7 +444,7 @@
                     <input type="password" name="password" id="adminPass" class="form-control-custom"
                         placeholder="Password" required>
                     <i class="bi bi-eye password-toggle" onclick="togglePass()"></i>
-                    <a href="#" class="forgot-link">Forgot password?</a>
+                    {{-- <a href="#" class="forgot-link">Forgot password?</a> --}}
                 </div>
 
                 <button type="submit" class="btn-login">Login</button>

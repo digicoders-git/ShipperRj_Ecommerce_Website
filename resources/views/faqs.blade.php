@@ -6,7 +6,7 @@
 <style>
     .faq-hero {
         background: linear-gradient(135deg, #111827 0%, #1F2937 100%);
-        padding: 90px 0 70px 0;
+        padding: 50px 0 40px 0;
         position: relative;
         overflow: hidden;
         border-bottom: 1px solid rgba(255, 122, 24, 0.1);
@@ -51,7 +51,7 @@
     /* Search Bar Design */
     .faq-search-wrapper {
         max-width: 600px;
-        margin: 30px auto 0 auto;
+        margin: 20px auto 0 auto;
         position: relative;
     }
     .faq-search-input {
@@ -237,175 +237,25 @@
         <!-- FAQs Accordions Column -->
         <div class="col-lg-10 offset-lg-1">
             <div class="faq-accordion-container">
-                
-                <div class="faq-item-card">
-                    <button class="faq-question-btn" onclick="toggleFaq(this)">
-                        <span>1. What is Shopping Club India?</span>
-                        <div class="faq-icon-arrow"><i class="bi bi-chevron-down"></i></div>
-                    </button>
-                    <div class="faq-answer-collapse">
-                        <div class="faq-answer-body">
-                            <a href="https://scib2b.com" target="_blank">Shopping Club India</a> is a B2B and retail platform providing premium products across India with business support services, reseller opportunities, and friendly customer service support.
+                @forelse($faqs as $faq)
+                    <div class="faq-item-card">
+                        <button class="faq-question-btn" onclick="toggleFaq(this)">
+                            <span>{{ $loop->iteration }}. {{ $faq->question }}</span>
+                            <div class="faq-icon-arrow"><i class="bi bi-chevron-down"></i></div>
+                        </button>
+                        <div class="faq-answer-collapse">
+                            <div class="faq-answer-body">
+                                {!! $faq->answer !!}
+                            </div>
                         </div>
                     </div>
-                </div>
-
-                <div class="faq-item-card">
-                    <button class="faq-question-btn" onclick="toggleFaq(this)">
-                        <span>2. Since when is Shopping Club India operating?</span>
-                        <div class="faq-icon-arrow"><i class="bi bi-chevron-down"></i></div>
-                    </button>
-                    <div class="faq-answer-collapse">
-                        <div class="faq-answer-body">
-                            Shopping Club India was started on <span class="highlight-badge">07 May 2016</span> and has been proudly providing stellar services all over India for more than a decade.
-                        </div>
+                @empty
+                    <div class="text-center py-5">
+                        <i class="bi bi-patch-question text-muted mb-3" style="font-size: 2.5rem;"></i>
+                        <h5 class="fw-bold">No FAQs Available</h5>
+                        <p class="text-muted">Please check back later or contact support if you need help.</p>
                     </div>
-                </div>
-
-                <div class="faq-item-card">
-                    <button class="faq-question-btn" onclick="toggleFaq(this)">
-                        <span>3. Can I start a business with Shopping Club India?</span>
-                        <div class="faq-icon-arrow"><i class="bi bi-chevron-down"></i></div>
-                    </button>
-                    <div class="faq-answer-collapse">
-                        <div class="faq-answer-body">
-                            Absolutely! We actively help entrepreneurs, store owners, and resellers start and rapidly grow their own business through our portal and extensive supply chain support system.
-                        </div>
-                    </div>
-                </div>
-
-                <div class="faq-item-card">
-                    <button class="faq-question-btn" onclick="toggleFaq(this)">
-                        <span>4. What is the minimum order value?</span>
-                        <div class="faq-icon-arrow"><i class="bi bi-chevron-down"></i></div>
-                    </button>
-                    <div class="faq-answer-collapse">
-                        <div class="faq-answer-body">
-                            The minimum order value for placing wholesale/B2B purchases through the portal is <span class="highlight-badge">₹2000</span>.
-                        </div>
-                    </div>
-                </div>
-
-                <div class="faq-item-card">
-                    <button class="faq-question-btn" onclick="toggleFaq(this)">
-                        <span>5. How can I place an order?</span>
-                        <div class="faq-icon-arrow"><i class="bi bi-chevron-down"></i></div>
-                    </button>
-                    <div class="faq-answer-collapse">
-                        <div class="faq-answer-body">
-                            You can place orders directly and quickly through our official website or by contacting our dedicated support/sales team directly.
-                        </div>
-                    </div>
-                </div>
-
-                <div class="faq-item-card">
-                    <button class="faq-question-btn" onclick="toggleFaq(this)">
-                        <span>6. Can I cancel my order?</span>
-                        <div class="faq-icon-arrow"><i class="bi bi-chevron-down"></i></div>
-                    </button>
-                    <div class="faq-answer-collapse">
-                        <div class="faq-answer-body">
-                            Yes, orders can be easily cancelled before they are formally accepted and processed by our logistics hub.
-                        </div>
-                    </div>
-                </div>
-
-                <div class="faq-item-card">
-                    <button class="faq-question-btn" onclick="toggleFaq(this)">
-                        <span>7. How will I receive my refund?</span>
-                        <div class="faq-icon-arrow"><i class="bi bi-chevron-down"></i></div>
-                    </button>
-                    <div class="faq-answer-collapse">
-                        <div class="faq-answer-body">
-                            Approved refund amounts are directly credited back to the customer's <strong class="text-dark">Wallet</strong> instantly for seamless future purchases.
-                        </div>
-                    </div>
-                </div>
-
-                <div class="faq-item-card">
-                    <button class="faq-question-btn" onclick="toggleFaq(this)">
-                        <span>8. What happens if the courier returns my parcel?</span>
-                        <div class="faq-icon-arrow"><i class="bi bi-chevron-down"></i></div>
-                    </button>
-                    <div class="faq-answer-collapse">
-                        <div class="faq-answer-body">
-                            If a parcel is returned due to courier-side logistics issues, it will be promptly re-dispatched to your address after being received back at the Shopping Club India Hub.
-                        </div>
-                    </div>
-                </div>
-
-                <div class="faq-item-card">
-                    <button class="faq-question-btn" onclick="toggleFaq(this)">
-                        <span>9. What if the buyer rejects the order?</span>
-                        <div class="faq-icon-arrow"><i class="bi bi-chevron-down"></i></div>
-                    </button>
-                    <div class="faq-answer-collapse">
-                        <div class="faq-answer-body">
-                            If the buyer rejects the order, the advance payment percentage will not be refunded.<br>
-                            If full payment was made, the advance percentage and actual shipping charges will be deducted, and the remaining balance will be added back to your wallet.
-                        </div>
-                    </div>
-                </div>
-
-                <div class="faq-item-card">
-                    <button class="faq-question-btn" onclick="toggleFaq(this)">
-                        <span>10. Is there any replacement policy?</span>
-                        <div class="faq-icon-arrow"><i class="bi bi-chevron-down"></i></div>
-                    </button>
-                    <div class="faq-answer-collapse">
-                        <div class="faq-answer-body">
-                            Yes, we offer a <span class="highlight-badge">2-day replacement policy</span>. Customers must record a clear, complete, and unedited <strong class="text-dark">unboxing video</strong> to validate replacement claims.
-                        </div>
-                    </div>
-                </div>
-
-                <div class="faq-item-card">
-                    <button class="faq-question-btn" onclick="toggleFaq(this)">
-                        <span>11. Do you provide delivery across India?</span>
-                        <div class="faq-icon-arrow"><i class="bi bi-chevron-down"></i></div>
-                    </button>
-                    <div class="faq-answer-collapse">
-                        <div class="faq-answer-body">
-                            Yes, we provide reliable, fast express delivery services all over India, reaching pin codes far and wide.
-                        </div>
-                    </div>
-                </div>
-
-                <div class="faq-item-card">
-                    <button class="faq-question-btn" onclick="toggleFaq(this)">
-                        <span>12. Do you have your own courier service?</span>
-                        <div class="faq-icon-arrow"><i class="bi bi-chevron-down"></i></div>
-                    </button>
-                    <div class="faq-answer-collapse">
-                        <div class="faq-answer-body">
-                            Yes, Shopping Club India also provides direct <span class="highlight-badge">self courier service support</span> in selected regions and major cities.
-                        </div>
-                    </div>
-                </div>
-
-                <div class="faq-item-card">
-                    <button class="faq-question-btn" onclick="toggleFaq(this)">
-                        <span>13. Who is the founder of Shopping Club India?</span>
-                        <div class="faq-icon-arrow"><i class="bi bi-chevron-down"></i></div>
-                    </button>
-                    <div class="faq-answer-collapse">
-                        <div class="faq-answer-body">
-                            The proud founder of Shopping Club India is <strong class="text-dark">RJ Shiva (Fateh Singh)</strong>.
-                        </div>
-                    </div>
-                </div>
-
-                <div class="faq-item-card">
-                    <button class="faq-question-btn" onclick="toggleFaq(this)">
-                        <span>14. How can I contact customer support?</span>
-                        <div class="faq-icon-arrow"><i class="bi bi-chevron-down"></i></div>
-                    </button>
-                    <div class="faq-answer-collapse">
-                        <div class="faq-answer-body">
-                            You can easily contact our dedicated support team through the official website's contact form, email support at <strong class="text-dark">shoppingclubindia1@gmail.com</strong>, phone support at <strong class="text-dark">+91 70882 13888</strong>, or via our official social handles.
-                        </div>
-                    </div>
-                </div>
+                @endforelse
 
                 <!-- No Results State -->
                 <div id="faqNoResults" class="text-center py-5 d-none">
@@ -413,7 +263,6 @@
                     <h5 class="fw-bold">No FAQs Found</h5>
                     <p class="text-muted">We couldn't find any questions matching your query. Try searching other keywords.</p>
                 </div>
-
             </div>
         </div>
 

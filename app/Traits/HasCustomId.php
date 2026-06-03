@@ -43,6 +43,8 @@ trait HasCustomId
             'wallet_transactions' => 'WLT',
             'wishlists' => 'WSH',
             'user_addresses' => 'ADR',
+            'faqs' => 'FAQ',
+            'home_sliders' => 'HSL',
         ];
 
         return $prefixes[$this->getTable()] ?? 'ID';

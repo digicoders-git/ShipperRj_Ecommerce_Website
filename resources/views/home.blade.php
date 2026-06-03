@@ -32,57 +32,68 @@
     <section class="hero-slider overflow-hidden">
         <div id="heroCarousel" class="carousel slide" data-bs-ride="carousel">
             <div class="carousel-inner">
-                <div class="carousel-item active" style="background: #F4F7F9; min-height: 500px;">
-                    <div class="container py-5">
-                        <div class="row align-items-center">
-                            <div class="col-lg-6 fade-in-up text-start">
-                                <span
-                                    class="badge bg-primary bg-opacity-10 text-white rounded-pill px-3 py-2 mb-4 fw-black uppercase tracking-widest border border-primary border-opacity-10">Super
-                                    Deal</span>
-                                <h1 class="display-3 fw-bold mb-4 text-dark" style="letter-spacing: -2px;">India's <br><span
-                                        class="text-gradient-primary">E-Shopping</span></h1>
-                                <h2 class="h1 fw-light mb-4 text-secondary">BIG SALE <span class="text-primary fw-bold">UP
-                                        TO 50% OFF</span></h2>
-                                <p class="lead text-secondary mb-5 pe-lg-5 opacity-75">Discover premium electronics,
-                                    fashion, and lifestyle brands at the best prices. Experience the joy of shopping with
-                                    Club India.</p>
-                                <div class="d-flex gap-4">
-                                    <a href="{{ url('/products') }}"
-                                        class="btn btn-premium btn-lg shadow-lg px-5 py-3 rounded-pill fw-bold">Shop Now</a>
+                @if($home_sliders && $home_sliders->isNotEmpty())
+                    @foreach($home_sliders as $index => $slider)
+                        <div class="carousel-item {{ $index === 0 ? 'active' : '' }}" style="background: {{ $slider->bg_color ?? '#F4F7F9' }}; min-height: 500px;">
+                            <div class="container py-5">
+                                <div class="row align-items-center">
+                                    <div class="col-lg-6 fade-in-up text-start">
+                                        @if($slider->badge)
+                                            <span class="badge bg-primary bg-opacity-10 text-white rounded-pill px-3 py-2 mb-4 fw-black uppercase tracking-widest border border-primary border-opacity-10">
+                                                {{ $slider->badge }}
+                                            </span>
+                                        @endif
+                                        <h1 class="display-3 fw-bold mb-4 text-dark" style="letter-spacing: -2px;">
+                                            {!! $slider->title !!}
+                                        </h1>
+                                        @if($slider->subtitle)
+                                            <h2 class="h1 fw-light mb-4 text-secondary">
+                                                {!! $slider->subtitle !!}
+                                            </h2>
+                                        @endif
+                                        @if($slider->description)
+                                            <p class="lead text-secondary mb-5 pe-lg-5 opacity-75">
+                                                {{ $slider->description }}
+                                            </p>
+                                        @endif
+                                        <div class="d-flex gap-4">
+                                            <a href="{{ url($slider->button_url ?? '/products') }}"
+                                                class="btn btn-premium btn-lg shadow-lg px-5 py-3 rounded-pill fw-bold">
+                                                {{ $slider->button_text ?? 'Shop Now' }}
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 d-none d-lg-block text-center">
+                                        @if($slider->image)
+                                            <img src="{{ asset($slider->image) }}" class="img-fluid animate-float animate-delay-1"
+                                                alt="{{ strip_tags($slider->title) }}" style="object-fit: cover;">
+                                        @endif
+                                    </div>
                                 </div>
                             </div>
-                            <div class="col-lg-6 d-none d-lg-block">
-                                <img src="{{asset('images/slider-1.png')}}" class="img-fluid  animate-float animate-delay-1"
-                                    alt="Electronics Deal" style="object-fit: cover;">
+                        </div>
+                    @endforeach
+                @else
+                    <div class="carousel-item active" style="background: #F4F7F9; min-height: 500px;">
+                        <div class="container py-5">
+                            <div class="row align-items-center">
+                                <div class="col-lg-6 fade-in-up text-start">
+                                    <span class="badge bg-primary bg-opacity-10 text-white rounded-pill px-3 py-2 mb-4 fw-black uppercase tracking-widest border border-primary border-opacity-10">Super Deal</span>
+                                    <h1 class="display-3 fw-bold mb-4 text-dark" style="letter-spacing: -2px;">India's <br><span class="text-gradient-primary">E-Shopping</span></h1>
+                                    <h2 class="h1 fw-light mb-4 text-secondary">BIG SALE <span class="text-primary fw-bold">UP TO 50% OFF</span></h2>
+                                    <p class="lead text-secondary mb-5 pe-lg-5 opacity-75">Discover premium electronics, fashion, and lifestyle brands at the best prices. Experience the joy of shopping with Club India.</p>
+                                    <div class="d-flex gap-4">
+                                        <a href="{{ url('/products') }}" class="btn btn-premium btn-lg shadow-lg px-5 py-3 rounded-pill fw-bold">Shop Now</a>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 d-none d-lg-block">
+                                    <img src="{{asset('images/slider-1.png')}}" class="img-fluid animate-float animate-delay-1" alt="Electronics Deal" style="object-fit: cover;">
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <!-- Slide 2 -->
-                <div class="carousel-item" style="background: #E8F9F9; min-height: 500px;">
-                    <div class="container py-5">
-                        <div class="row align-items-center">
-                            <div class="col-lg-6 fade-in-up text-start">
-                                <span
-                                    class="badge bg-danger bg-opacity-10 text-danger rounded-pill px-3 py-2 mb-4 fw-black uppercase tracking-widest border border-danger border-opacity-10">Hot
-                                    New Collection</span>
-                                <h1 class="display-3 fw-bold mb-4 text-dark" style="letter-spacing: -2px;">Quality <br><span
-                                        class="text-gradient-primary">Lifestyle</span></h1>
-                                <p class="lead text-secondary mb-5 pe-lg-5 opacity-75">Everything you need for your home and
-                                    lifestyle. From gadgets to furniture, we've got you covered.</p>
-                                <a href="{{ url('/products') }}"
-                                    class="btn btn-premium btn-lg shadow-lg px-5 py-3 rounded-pill fw-bold">Explore More</a>
-                            </div>
-                            <div class="col-lg-6 d-none d-lg-block">
-                                <img src="{{asset('images/slider-2.png')}}"
-                                    class="img-fluid  animate-float animate-delay-1 " alt="Fashion Sale"
-                                    style="object-fit: cover; ">
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                @endif
             </div>
-            <!-- Removed carousel controls as requested -->
         </div>
     </section>
 
@@ -164,7 +175,7 @@
                                 @endif
                             </div>
                             <h6 class="fw-bold mb-1 text-dark text-truncate">{{ $cat->name }}</h6>
-                            <span class="x-small text-secondary fw-semibold">{{ ($cat->sub_categories_count ?? 0)  }}+
+                            <span class="x-small text-secondary fw-semibold">{{ ($cat->products_count ?? 0)  }}+
                                 Items</span>
                         </a>
                     </div>
@@ -330,6 +341,54 @@
         </div>
     </section>
 
+    <!-- Home FAQ Section -->
+    <section class="py-5" style="background: #ffffff; border-top: 1px solid rgba(0, 0, 0, 0.03);">
+        <div class="container py-4">
+            <div class="section-header text-center mb-5">
+                <h2 class="display-5 fw-black mb-0">Frequently Asked <span class="text-gradient-primary">Questions</span></h2>
+                <div class="header-line mx-auto mt-2"
+                    style="width: 80px; height: 4px; background: var(--primary-gradient); border-radius: 2px;"></div>
+                <p class="mt-3 opacity-75">Quick answers to common queries about B2B orders and services</p>
+            </div>
+            
+            <div class="row g-4">
+                @if($home_faqs && $home_faqs->isNotEmpty())
+                    @php $faqCounter = 1; @endphp
+                    @foreach($home_faqs->split(2) as $chunk)
+                        <div class="col-lg-6">
+                            <div class="faq-accordion-container">
+                                @foreach($chunk as $faq)
+                                    <div class="faq-item-card">
+                                        <button class="faq-question-btn" onclick="toggleFaq(this)">
+                                            <span>{{ $faqCounter++ }}. {{ $faq->question }}</span>
+                                            <div class="faq-icon-arrow"><i class="bi bi-chevron-down"></i></div>
+                                        </button>
+                                        <div class="faq-answer-collapse">
+                                            <div class="faq-answer-body">
+                                                {!! $faq->answer !!}
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endforeach
+                @else
+                    <div class="col-12 text-center py-5">
+                        <i class="bi bi-patch-question text-muted mb-3" style="font-size: 2.5rem;"></i>
+                        <h5 class="fw-bold">No FAQs Available</h5>
+                        <p class="text-muted">Please check back later.</p>
+                    </div>
+                @endif
+
+                <div class="col-12 text-center mt-4">
+                    <a href="{{ route('faqs') }}" class="btn btn-premium btn-lg px-5 py-3 rounded-pill fw-bold shadow-lg transform-transition hover-scale">
+                        View More FAQs
+                    </a>
+                </div>
+            </div>
+        </section>
+
     <!-- Final CTA Section (Soft White Theme) -->
     <section class="py-5 text-center" style="background: #F9FAFB;  ">
         <div class="container py-5">
@@ -349,4 +408,132 @@
 
         </div>
     </section>
+
+@push('styles')
+<style>
+    /* FAQ Item Cards */
+    .faq-item-card {
+        background: #ffffff;
+        border: 1px solid rgba(0, 0, 0, 0.06);
+        border-radius: 16px;
+        margin-bottom: 20px;
+        overflow: hidden;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+    }
+    .faq-item-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        border-color: rgba(242, 112, 26, 0.15);
+    }
+    
+    .faq-question-btn {
+        width: 100%;
+        text-align: left;
+        background: transparent;
+        border: none;
+        padding: 22px 28px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+        font-weight: 700;
+        font-size: 1.05rem;
+        color: #1f2937;
+        transition: all 0.2s ease;
+        cursor: pointer;
+    }
+    .faq-question-btn:focus {
+        outline: none;
+    }
+    .faq-question-btn:hover {
+        color: #f2701aff;
+    }
+    
+    .faq-answer-collapse {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .faq-answer-body {
+        padding: 0 28px 24px 28px;
+        color: #4b5563;
+        font-size: 0.95rem;
+        line-height: 1.7;
+        border-top: 1px solid rgba(0,0,0,0.02);
+        padding-top: 16px;
+    }
+    .faq-answer-body a {
+        color: #f2701aff;
+        text-decoration: none;
+        font-weight: 700;
+        transition: opacity 0.2s ease;
+    }
+    .faq-answer-body a:hover {
+        opacity: 0.85;
+    }
+    
+    .faq-icon-arrow {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: rgba(242, 112, 26, 0.05);
+        color: #f2701aff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        flex-shrink: 0;
+    }
+    
+    /* Open State */
+    .faq-item-card.open {
+        border-color: rgba(242, 112, 26, 0.25);
+        box-shadow: 0 12px 30px rgba(242, 112, 26, 0.06);
+    }
+    .faq-item-card.open .faq-question-btn {
+        color: #f2701aff;
+    }
+    .faq-item-card.open .faq-icon-arrow {
+        transform: rotate(180deg);
+        background: #f2701aff;
+        color: #fff;
+    }
+    .highlight-badge {
+        background: rgba(242, 112, 26, 0.08);
+        color: #f2701aff;
+        padding: 3px 10px;
+        border-radius: 6px;
+        font-weight: 700;
+        font-size: 0.85rem;
+    }
+</style>
+@endpush
+
+@push('scripts')
+<script>
+    function toggleFaq(btn) {
+        const card = btn.closest('.faq-item-card');
+        const collapse = card.querySelector('.faq-answer-collapse');
+        const isOpen = card.classList.contains('open');
+
+        document.querySelectorAll('.faq-item-card.open').forEach(openCard => {
+            if (openCard !== card) {
+                openCard.classList.remove('open');
+                openCard.querySelector('.faq-answer-collapse').style.maxHeight = null;
+            }
+        });
+
+        if (isOpen) {
+            card.classList.remove('open');
+            collapse.style.maxHeight = null;
+        } else {
+            card.classList.add('open');
+            collapse.style.maxHeight = collapse.scrollHeight + "px";
+        }
+    }
+</script>
+@endpush
 @endsection

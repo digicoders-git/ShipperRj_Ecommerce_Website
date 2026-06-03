@@ -10,8 +10,10 @@ use App\Http\Controllers\SellerInquiryController;
 
 Route::get('/', function () {
     $featured_products = \App\Models\Product::with('subCategory')->where('status', 1)->latest()->take(12)->get();
-    $home_categories = \App\Models\Category::withCount('subCategories')->get();
-    return view('home', compact('featured_products', 'home_categories'));
+    $home_categories = \App\Models\Category::withCount('products')->get();
+    $home_faqs = \App\Models\Faq::where('status', 1)->orderBy('sort_order', 'asc')->take(6)->get();
+    $home_sliders = \App\Models\HomeSlider::where('status', 1)->orderBy('sort_order', 'asc')->get();
+    return view('home', compact('featured_products', 'home_categories', 'home_faqs', 'home_sliders'));
 });
 
 
@@ -269,7 +271,8 @@ Route::get('/terms', function () {
 });
 
 Route::get('/faqs', function () {
-    return view('faqs');
+    $faqs = \App\Models\Faq::where('status', 1)->orderBy('sort_order', 'asc')->get();
+    return view('faqs', compact('faqs'));
 })->name('faqs');
 
 Route::get('/become-a-seller', [SellerInquiryController::class, 'index'])->name('seller.inquiry');
@@ -312,6 +315,8 @@ Route::prefix('admin')->name('admin.')->middleware('admin.auth')->group(function
     Route::resource('/order-tracking', App\Http\Controllers\Admin\OrderTrackingController::class);
     Route::resource('/refunds', App\Http\Controllers\Admin\RefundController::class);
     Route::resource('/seller-inquiries', App\Http\Controllers\Admin\SellerInquiryController::class);
+    Route::resource('/faqs', App\Http\Controllers\Admin\FaqController::class);
+    Route::resource('/home-sliders', App\Http\Controllers\Admin\HomeSliderController::class);
 
     // Sub-Admin Management (Crucial)
     Route::post('/sub-admins/{subadmin}/toggle-status', [App\Http\Controllers\Admin\SubAdminController::class, 'toggleStatus'])->name('subadmins.toggle-status');

@@ -175,7 +175,7 @@
                     </a>
                 @endif
 
-                @if($isAdmin || ($subAdmin && ($subAdmin->hasPermission('complaints_view') || $subAdmin->hasPermission('contacts_view') || $subAdmin->hasPermission('support_view') || $subAdmin->hasPermission('reviews_view') || $subAdmin->hasPermission('seller_inquiries_view'))))
+                @if($isAdmin || ($subAdmin && ($subAdmin->hasPermission('complaints_view') || $subAdmin->hasPermission('contacts_view') || $subAdmin->hasPermission('support_view') || $subAdmin->hasPermission('reviews_view') || $subAdmin->hasPermission('seller_inquiries_view') || $subAdmin->hasPermission('faqs_view'))))
                     <div class="sidebar-section-title">Customer Support</div>
                 @endif
 
@@ -218,6 +218,20 @@
                     <a href="{{ route('admin.refunds.index') }}"
                         class="nav-link-admin {{ request()->routeIs('admin.refunds.*') ? 'active' : '' }}">
                         <i class="bi bi-arrow-counterclockwise"></i> <span>Refund & Cancellations</span>
+                    </a>
+                @endif
+
+                @if($isAdmin || ($subAdmin && $subAdmin->hasPermission('faqs_view')))
+                    <a href="{{ route('admin.faqs.index') }}"
+                        class="nav-link-admin {{ request()->routeIs('admin.faqs.*') ? 'active' : '' }}">
+                        <i class="bi bi-question-circle"></i> <span>Manage FAQs</span>
+                    </a>
+                @endif
+
+                @if($isAdmin || ($subAdmin && $subAdmin->hasPermission('home_sliders_view')))
+                    <a href="{{ route('admin.home-sliders.index') }}"
+                        class="nav-link-admin {{ request()->routeIs('admin.home-sliders.*') ? 'active' : '' }}">
+                        <i class="bi bi-images"></i> <span>Manage Hero Sliders</span>
                     </a>
                 @endif
 

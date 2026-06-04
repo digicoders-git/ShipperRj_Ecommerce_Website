@@ -269,7 +269,7 @@
                                             </h6>
                                             <div class="row g-2">
                                                 <div class="col-md-3">
-                                                    <label class="form-label text-secondary xx-small fw-bold">SIZES</label>
+                                                    <label class="form-label text-secondary x-small fw-bold">SIZES</label>
                                                     <div id="size-container-{{ $product->id }}">
                                                         <div class="position-relative mb-1">
                                                             <input type="text" name="size[]"
@@ -292,7 +292,7 @@
                                                     </div>
                                                 </div>
                                                 <div class="col-md-3 text-white text-md-start">
-                                                    <label class="form-label text-secondary xx-small fw-bold">COLORS</label>
+                                                    <label class="form-label text-secondary x-small fw-bold">COLORS</label>
                                                     <div id="color-container-{{ $product->id }}">
                                                         <div class="position-relative mb-1">
                                                             <input type="text" name="color[]"
@@ -783,7 +783,7 @@
                 const inputGroup = document.createElement('div');
                 inputGroup.className = 'd-flex gap-2 mb-2';
                 inputGroup.innerHTML = `
-                                    <input type="${type}" name="${name}" class="form-control glass-input" placeholder="e.g. New Value">
+                                    <input type="${type}" name="${name}" class="form-control glass-input x-small" placeholder="e.g. New Value">
                                     <button type="button" class="btn btn-danger btn-sm px-2" onclick="this.parentElement.remove()"><i class="bi bi-trash"></i></button>
                                 `;
                 container.appendChild(inputGroup);
@@ -947,7 +947,7 @@
                                         </h6>
                                         <div class="row g-2">
                                             <div class="col-md-3">
-                                                <label class="form-label text-secondary xx-small fw-bold">SIZES</label>
+                                                <label class="form-label text-secondary x-small fw-bold">SIZES</label>
                                                 <div id="add-size-container">
                                                     <div class="position-relative mb-1">
                                                         <input type="text" name="size[]"
@@ -960,7 +960,7 @@
                                                 </div>
                                             </div>
                                             <div class="col-md-3 text-white text-md-start">
-                                                <label class="form-label text-secondary xx-small fw-bold">COLORS</label>
+                                                <label class="form-label text-secondary x-small fw-bold">COLORS</label>
                                                 <div id="add-color-container">
                                                     <div class="position-relative mb-1">
                                                         <input type="text" name="color[]"

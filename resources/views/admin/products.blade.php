@@ -1025,7 +1025,7 @@
                                                     <div class="form-check form-switch ps-5">
                                                         <input class="form-check-input" type="checkbox" name="status" value="1"
                                                             checked id="addStatusSwitch">
-                                                        <label class="form-check-label text-white x-small fw-bold"
+                                                        <label class="form-check-label text-black x-small fw-bold"
                                                             for="addStatusSwitch">Active</label>
                                                     </div>
                                                 </div>
@@ -1033,7 +1033,7 @@
                                                     <div class="form-check form-switch ps-5">
                                                         <input class="form-check-input" type="checkbox" name="featured"
                                                             value="1" id="addFeaturedSwitch">
-                                                        <label class="form-check-label text-white x-small fw-bold"
+                                                        <label class="form-check-label text-black x-small fw-bold"
                                                             for="addFeaturedSwitch">Featured</label>
                                                     </div>
                                                 </div>
@@ -1041,7 +1041,7 @@
                                                     <div class="form-check form-switch ps-5">
                                                         <input class="form-check-input" type="checkbox" name="trending"
                                                             value="1" id="addTrendingSwitch">
-                                                        <label class="form-check-label text-white x-small fw-bold"
+                                                        <label class="form-check-label text-black x-small fw-bold"
                                                             for="addTrendingSwitch">Trending</label>
                                                     </div>
                                                 </div>

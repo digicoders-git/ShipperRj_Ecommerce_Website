@@ -26,6 +26,11 @@
                 font-size: 0.95rem !important;
                 margin-bottom: 2rem !important;
             }
+
+            .btn-responsive {
+                padding: 6px 16px !important;
+                font-size: 0.85rem !important;
+            }
         }
     </style>
     <!-- Hero Slider -->
@@ -188,13 +193,13 @@
     <section class="py-5" style="background: #FAFAFB;">
         <div class="container">
             <div
-                class="section-header d-flex flex-column flex-md-row justify-content-between align-items-end mb-5 text-start">
+                class="section-header d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-end mb-5 text-start">
                 <div class="text-start">
                     <h2 class="mb-0">Featured <span class="text-gradient-primary">Products</span></h2>
                     <p class="ms-0">Our most wanted products this week</p>
                 </div>
-                <div class="mt-4 mt-md-0">
-                    <a href="{{ url('/products') }}" class="btn btn-primary bg-gradient-primary rounded-pill px-4 py-2 fw-bold shadow-sm d-flex align-items-center gap-2">
+                <div class="mt-4 mt-md-0 w-100 w-md-auto d-flex justify-content-center justify-content-md-end">
+                    <a href="{{ url('/products') }}" class="btn btn-primary bg-gradient-primary rounded-pill px-4 py-2 fw-bold shadow-sm d-flex align-items-center gap-2 btn-responsive">
                         View All Products <i class="bi bi-arrow-right"></i>
                     </a>
                 </div>

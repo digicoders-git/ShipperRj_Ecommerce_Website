@@ -658,12 +658,12 @@
         <div class="container pt-5 pb-3">
             <div class="row g-5">
                 <!-- Column 1: Brand Essence -->
-                <div class="col-lg-3 col-md-6 text-start">
+                <div class="col-lg-3 col-md-6 text-center text-md-start">
                     <div class="footer-brand-hub mb-4">
                         <img src="{{ asset('assets/images/logo1.png') }}" alt="Shopping Club India" height="55"
                             class="mb-4 brightness-110">
                         <p class="text-white-50 small fw-medium mb-4"
-                            style="line-height: 1.8; opacity: 0.8 !important;">
+                            style="line-height: 1.8; opacity: 0.8 !important; text-align: justify;">
                             Shopping Club India – Your trusted destination for premium electronics, trendy fashion, and lifestyle essentials. Quality products, fast delivery, and exceptional customer service
                         </p>
                     </div>
@@ -698,13 +698,13 @@
                     
                     <!-- Premium Contact Links -->
                     <ul class="list-unstyled mb-4">
-                        <li class="mb-3 d-flex align-items-center gap-3">
+                        <li class="mb-3 d-flex justify-content-center justify-content-sm-start align-items-center gap-3">
                             <div class="icon-box-sm flex-shrink-0" style="width: 32px; height: 32px; font-size: 0.95rem;">
                                 <i class="bi bi-telephone-fill"></i>
                             </div>
                             <a href="tel:+917088213888" class="footer-link fs-8 text-white-50" style="text-decoration: none; text-transform: none !important; margin-bottom: 0 !important; display: inline-block;">+91 70882 13888</a>
                         </li>
-                        <li class="mb-3 d-flex align-items-center gap-3">
+                        <li class="mb-3 d-flex justify-content-center justify-content-sm-start align-items-center gap-3">
                             <div class="icon-box-sm flex-shrink-0" style="width: 32px; height: 32px; font-size: 0.95rem;">
                                 <i class="bi bi-envelope-fill"></i>
                             </div>

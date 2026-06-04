@@ -287,9 +287,7 @@
             <!-- Right Side: Profile & Actions -->
             <div class="d-flex align-items-center ms-2 flex-shrink-0">
                 <div class="header-glass-pill py-2 px-3 d-flex align-items-center">
-                    <i
-                        class="bi bi-bell text-white opacity-75 me-3 d-none d-sm-block hover-white cursor-pointer transition-all"></i>
-                    <div class="vr bg-white opacity-25 me-3 d-none d-sm-block" style="height: 20px;"></div>
+
                     <div class="dropdown">
                         <div class="d-flex align-items-center cursor-pointer" data-bs-toggle="dropdown"
                             aria-expanded="false">

@@ -6,7 +6,7 @@
     <div class="mb-5 d-flex justify-content-between align-items-end flex-wrap gap-3">
         <div>
             <h3 class="fw-black mb-1 text-dark d-flex align-items-center gap-2" style="letter-spacing: -1px;">
-                <div class="bg-primary bg-opacity-10 text-primary rounded p-2 d-inline-flex">
+                <div class="text-primary rounded p-2 d-inline-flex" style="background-color: rgba(255, 184, 0, 0.1) !important;">
                     <i class="bi bi-grid-1x2-fill fs-5"></i>
                 </div>
                 Executive Overview
@@ -23,21 +23,98 @@
     </div>
 
     @php
-        $rev = \App\Models\Order::where('order_status', 'completed')->sum('total_amount') ?? 0;
+        $isAdmin = auth('admin')->check();
+        $subAdmin = auth('subadmin')->user();
+
+        $rev = \App\Models\Order::where('payment_status', 'paid')->sum('total_amount') ?? 0;
         $pending = \App\Models\Order::where('order_status', 'pending')->count() ?? 0;
         $totalSubcategories = \App\Models\SubCategory::count() ?? 0;
         $users = $stats['total_users'] ?? 0;
         $orders = $stats['total_orders'] ?? 0;
         $products = $stats['total_products'] ?? 0;
         $categories = $stats['total_categories'] ?? 0;
+
+        // Dynamic metrics for the sidebar status cards
+        $totalCoupons = \App\Models\Coupon::count() ?? 0;
+        $totalOffers = \App\Models\Offer::count() ?? 0;
+        $totalOffersAndCoupons = $totalCoupons + $totalOffers;
+        
+        $totalWalletTransactions = \App\Models\WalletTransaction::count() ?? 0;
+        $totalOrderPayments = \App\Models\Order::where('payment_status', 'paid')->count() ?? 0;
+        $totalTransactions = $totalWalletTransactions + $totalOrderPayments;
+
+        $totalWalletOffers = \App\Models\WalletOffer::count() ?? 0;
+        $totalSellerInquiries = \App\Models\SellerInquiry::count() ?? 0;
+        $totalComplaints = \App\Models\Complaint::count() ?? 0;
+        $totalContacts = \App\Models\Contact::count() ?? 0;
+        $totalSupportTickets = \App\Models\SupportTicket::count() ?? 0;
+        $totalReviews = \App\Models\ProductReview::count() ?? 0;
+        $totalRefunds = \App\Models\Refund::count() ?? 0;
+        $totalFaqs = \App\Models\Faq::count() ?? 0;
+        $totalSliders = \App\Models\HomeSlider::count() ?? 0;
+        $totalSubAdmins = \App\Models\SubAdmin::count() ?? 0;
+
+        // Fetch revenue for last 6 months dynamically
+        $months = [];
+        $chartData = [];
+        for ($i = 5; $i >= 0; $i--) {
+            $date = now()->subMonths($i);
+            $months[] = $date->format('M');
+            $chartData[] = \App\Models\Order::where('payment_status', 'paid')
+                ->whereYear('created_at', $date->year)
+                ->whereMonth('created_at', $date->month)
+                ->sum('total_amount') ?? 0;
+        }
+
+        // Fetch revenue for this year dynamically
+        $thisYearMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        $thisYearData = [];
+        $currentYear = now()->year;
+        for ($m = 1; $m <= 12; $m++) {
+            $thisYearData[] = \App\Models\Order::where('payment_status', 'paid')
+                ->whereYear('created_at', $currentYear)
+                ->whereMonth('created_at', $m)
+                ->sum('total_amount') ?? 0;
+        }
+
+        // Fetch revenue for all time dynamically (grouped by year)
+        $yearsData = \App\Models\Order::where('payment_status', 'paid')
+            ->selectRaw('YEAR(created_at) as year, sum(total_amount) as total')
+            ->groupBy('year')
+            ->orderBy('year', 'asc')
+            ->get();
+            
+        $allTimeLabels = [];
+        $allTimeData = [];
+        if ($yearsData->isEmpty()) {
+            $allTimeLabels = [now()->year];
+            $allTimeData = [0];
+        } else {
+            foreach ($yearsData as $yData) {
+                $allTimeLabels[] = (string)$yData->year;
+                $allTimeData[] = (float)$yData->total;
+            }
+        }
+
+        // Fetch order status breakdown dynamically
+        $orderStatuses = \App\Models\Order::selectRaw('order_status, count(*) as count')
+            ->groupBy('order_status')
+            ->get();
+            
+        $statusLabels = [];
+        $statusCounts = [];
+        foreach ($orderStatuses as $status) {
+            $statusLabels[] = ucfirst(str_replace('_', ' ', $status->order_status ?? 'unknown'));
+            $statusCounts[] = (int)$status->count;
+        }
     @endphp
 
     <!-- Executive Status Cards Row -->
     <div class="row g-4 mb-5">
         <!-- Revenue Card -->
         <div class="col-sm-6 col-xl-3">
-            <div
-                class="card bg-white border-0 rounded-4 p-4 h-100 shadow-sm transition-all hover-shadow-lg position-relative overflow-hidden group border-top border-4 border-success">
+            <a href="{{ route('admin.transactions.index') }}"
+                class="card bg-white border-0 rounded-4 p-4 h-100 shadow-sm transition-all hover-shadow-lg position-relative overflow-hidden group border-top border-4 border-success text-decoration-none">
                 <div class="position-absolute top-0 end-0 bg-success bg-opacity-10 w-50 h-100"
                     style="border-radius: 100% 0 0 100%; transform: translateX(50%);"></div>
 
@@ -46,26 +123,24 @@
                         style="width: 50px; height: 50px;">
                         <i class="bi bi-wallet2 fs-4"></i>
                     </div>
-                    <span class="badge bg-success bg-opacity-10 text-success rounded-pill fw-bold px-3 py-2 x-small"><i
-                            class="bi bi-arrow-up-right me-1"></i>+12.5%</span>
                 </div>
                 <div class="text-secondary x-small fw-bold text-uppercase tracking-widest mb-2 position-relative z-1">Total
                     Revenue</div>
                 <h2 class="fw-black mb-0 text-dark position-relative z-1" style="letter-spacing: -1px;">
                     ₹{{ number_format($rev, 2) }}</h2>
-            </div>
+            </a>
         </div>
 
         <!-- Orders Card -->
         <div class="col-sm-6 col-xl-3">
-            <div
-                class="card bg-white border-0 rounded-4 p-4 h-100 shadow-sm transition-all hover-shadow-lg position-relative overflow-hidden group border-top border-4 border-primary">
-                <div class="position-absolute top-0 end-0 bg-primary bg-opacity-10 w-50 h-100"
-                    style="border-radius: 100% 0 0 100%; transform: translateX(50%);"></div>
+            <a href="{{ route('admin.orders.index') }}"
+                class="card bg-white border-0 rounded-4 p-4 h-100 shadow-sm transition-all hover-shadow-lg position-relative overflow-hidden group border-top border-4 border-primary text-decoration-none">
+                <div class="position-absolute top-0 end-0 w-50 h-100"
+                    style="border-radius: 100% 0 0 100%; transform: translateX(50%); background-color: rgba(255, 122, 24, 0.08) !important;"></div>
 
                 <div class="d-flex justify-content-between align-items-start mb-4 position-relative z-1">
-                    <div class="rounded-circle bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center"
-                        style="width: 50px; height: 50px;">
+                    <div class="rounded-circle text-primary d-flex align-items-center justify-content-center"
+                        style="width: 50px; height: 50px; background-color: rgba(255, 184, 0, 0.1) !important;">
                         <i class="bi bi-bag-check fs-4"></i>
                     </div>
                     @if($pending > 0)
@@ -80,13 +155,13 @@
                 <h2 class="fw-black mb-0 text-dark position-relative z-1" style="letter-spacing: -1px;">
                     {{ number_format($orders) }}
                 </h2>
-            </div>
+            </a>
         </div>
 
         <!-- Users Card -->
         <div class="col-sm-6 col-xl-3">
-            <div
-                class="card bg-white border-0 rounded-4 p-4 h-100 shadow-sm transition-all hover-shadow-lg position-relative overflow-hidden group border-top border-4 border-danger">
+            <a href="{{ route('admin.users.index') }}"
+                class="card bg-white border-0 rounded-4 p-4 h-100 shadow-sm transition-all hover-shadow-lg position-relative overflow-hidden group border-top border-4 border-danger text-decoration-none">
                 <div class="position-absolute top-0 end-0 bg-danger bg-opacity-10 w-50 h-100"
                     style="border-radius: 100% 0 0 100%; transform: translateX(50%);"></div>
 
@@ -101,16 +176,13 @@
                 <h2 class="fw-black mb-0 text-dark position-relative z-1" style="letter-spacing: -1px;">
                     {{ number_format($users) }}
                 </h2>
-                <div class="progress mt-3 bg-light rounded-pill" style="height: 6px;">
-                    <div class="progress-bar rounded-pill bg-danger" style="width: 75%;"></div>
-                </div>
-            </div>
+            </a>
         </div>
 
         <!-- Inventory Card -->
         <div class="col-sm-6 col-xl-3">
-            <div
-                class="card bg-white border-0 rounded-4 p-4 h-100 shadow-sm transition-all hover-shadow-lg position-relative overflow-hidden group border-top border-4 border-warning">
+            <a href="{{ route('admin.products.index') }}"
+                class="card bg-white border-0 rounded-4 p-4 h-100 shadow-sm transition-all hover-shadow-lg position-relative overflow-hidden group border-top border-4 border-warning text-decoration-none">
                 <div class="position-absolute top-0 end-0 bg-warning bg-opacity-10 w-50 h-100"
                     style="border-radius: 100% 0 0 100%; transform: translateX(50%);"></div>
 
@@ -125,15 +197,313 @@
                 <h2 class="fw-black mb-0 text-dark position-relative z-1" style="letter-spacing: -1px;">
                     {{ number_format($products) }}
                 </h2>
-                <div class="text-secondary xx-small fw-bold mt-2 d-flex gap-2 position-relative z-1 pb-1">
-                    <span class="bg-light px-2 py-1 rounded text-dark"><i
-                            class="bi bi-folder-fill text-warning opacity-75 me-1"></i> {{ $categories }} Cats</span>
-                    <span class="bg-light px-2 py-1 rounded text-dark"><i
-                            class="bi bi-diagram-3-fill text-warning opacity-75 me-1"></i> {{ $totalSubcategories }}
-                        Subs</span>
-                </div>
-            </div>
+            </a>
         </div>
+    </div>
+
+    <!-- Module Status Cards Grid -->
+    <div class="mb-4">
+        <h4 class="fw-black mb-1 text-dark d-flex align-items-center gap-2" style="letter-spacing: -0.5px;">
+            <div class="text-primary rounded p-2 d-inline-flex" style="font-size: 1.1rem; background-color: rgba(255, 184, 0, 0.1) !important;">
+                <i class="bi bi-collection"></i>
+            </div>
+            Module Quick Stats
+        </h4>
+        <p class="text-secondary small fw-bold mb-0">Navigate to sections and view metrics for all system modules.</p>
+    </div>
+
+    <div class="row g-3 mb-5">
+        <!-- Categories -->
+        @if($isAdmin || ($subAdmin && $subAdmin->hasPermission('categories_view')))
+            <div class="col-6 col-sm-4 col-md-3 col-xl-2">
+                <a href="{{ route('admin.categories.index') }}"
+                    class="card bg-white border-0 rounded-4 p-3 h-100 shadow-sm text-decoration-none transition-all hover-translate-y border-top border-4 border-primary">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div class="rounded-circle text-primary d-flex align-items-center justify-content-center"
+                            style="width: 38px; height: 38px; background-color: rgba(255, 184, 0, 0.1) !important;">
+                            <i class="bi bi-grid-3x3-gap fs-5"></i>
+                        </div>
+                    </div>
+                    <div class="text-secondary xx-small fw-bold text-uppercase tracking-widest mb-1 text-truncate">Categories</div>
+                    <h4 class="fw-black mb-0 text-dark">{{ number_format($categories) }}</h4>
+                </a>
+            </div>
+        @endif
+
+        <!-- Sub Categories -->
+        @if($isAdmin || ($subAdmin && $subAdmin->hasPermission('sub_categories_view')))
+            <div class="col-6 col-sm-4 col-md-3 col-xl-2">
+                <a href="{{ route('admin.sub-categories.index') }}"
+                    class="card bg-white border-0 rounded-4 p-3 h-100 shadow-sm text-decoration-none transition-all hover-translate-y border-top border-4 border-warning">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div class="rounded-circle bg-warning bg-opacity-10 text-warning d-flex align-items-center justify-content-center"
+                            style="width: 38px; height: 38px;">
+                            <i class="bi bi-grid fs-5"></i>
+                        </div>
+                    </div>
+                    <div class="text-secondary xx-small fw-bold text-uppercase tracking-widest mb-1 text-truncate">Sub Categories</div>
+                    <h4 class="fw-black mb-0 text-dark">{{ number_format($totalSubcategories) }}</h4>
+                </a>
+            </div>
+        @endif
+
+        <!-- Products -->
+        <!-- @if($isAdmin || ($subAdmin && $subAdmin->hasPermission('products_view')))
+            <div class="col-6 col-sm-4 col-md-3 col-xl-2">
+                <a href="{{ route('admin.products.index') }}"
+                    class="card bg-white border-0 rounded-4 p-3 h-100 shadow-sm text-decoration-none transition-all hover-translate-y border-top border-4 border-success">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div class="rounded-circle bg-success bg-opacity-10 text-success d-flex align-items-center justify-content-center"
+                            style="width: 38px; height: 38px;">
+                            <i class="bi bi-box-seam fs-5"></i>
+                        </div>
+                    </div>
+                    <div class="text-secondary xx-small fw-bold text-uppercase tracking-widest mb-1 text-truncate">Products</div>
+                    <h4 class="fw-black mb-0 text-dark">{{ number_format($products) }}</h4>
+                </a>
+            </div>
+        @endif -->
+
+        <!-- Offers & Coupons -->
+        @if($isAdmin || ($subAdmin && $subAdmin->hasPermission('coupons_view')))
+            <div class="col-6 col-sm-4 col-md-3 col-xl-2">
+                <a href="{{ route('admin.coupons.index') }}"
+                    class="card bg-white border-0 rounded-4 p-3 h-100 shadow-sm text-decoration-none transition-all hover-translate-y border-top border-4 border-info">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div class="rounded-circle bg-info bg-opacity-10 text-info d-flex align-items-center justify-content-center"
+                            style="width: 38px; height: 38px;">
+                            <i class="bi bi-ticket-perforated fs-5"></i>
+                        </div>
+                    </div>
+                    <div class="text-secondary xx-small fw-bold text-uppercase tracking-widest mb-1 text-truncate">Offers & Coupons</div>
+                    <h4 class="fw-black mb-0 text-dark">{{ number_format($totalOffersAndCoupons) }}</h4>
+                </a>
+            </div>
+        @endif
+
+        <!-- Orders -->
+        <!-- @if($isAdmin || ($subAdmin && $subAdmin->hasPermission('orders_view')))
+            <div class="col-6 col-sm-4 col-md-3 col-xl-2">
+                <a href="{{ route('admin.orders.index') }}"
+                    class="card bg-white border-0 rounded-4 p-3 h-100 shadow-sm text-decoration-none transition-all hover-translate-y border-top border-4 border-primary">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div class="rounded-circle text-primary d-flex align-items-center justify-content-center"
+                            style="width: 38px; height: 38px; background-color: rgba(255, 184, 0, 0.1) !important;">
+                            <i class="bi bi-cart-check fs-5"></i>
+                        </div>
+                        @if($pending > 0)
+                            <span class="badge bg-warning text-white xx-small px-2 py-1 rounded-pill">Pending</span>
+                        @endif
+                    </div>
+                    <div class="text-secondary xx-small fw-bold text-uppercase tracking-widest mb-1 text-truncate">Orders</div>
+                    <h4 class="fw-black mb-0 text-dark">{{ number_format($orders) }}</h4>
+                </a>
+            </div>
+        @endif -->
+
+        <!-- Payments & Transactions -->
+        @if($isAdmin || ($subAdmin && $subAdmin->hasPermission('transactions_view')))
+            <div class="col-6 col-sm-4 col-md-3 col-xl-2">
+                <a href="{{ route('admin.transactions.index') }}"
+                    class="card bg-white border-0 rounded-4 p-3 h-100 shadow-sm text-decoration-none transition-all hover-translate-y border-top border-4 border-success">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div class="rounded-circle bg-success bg-opacity-10 text-success d-flex align-items-center justify-content-center"
+                            style="width: 38px; height: 38px;">
+                            <i class="bi bi-journal-text fs-5"></i>
+                        </div>
+                    </div>
+                    <div class="text-secondary xx-small fw-bold text-uppercase tracking-widest mb-1 text-truncate">Transactions</div>
+                    <h4 class="fw-black mb-0 text-dark">{{ number_format($totalTransactions) }}</h4>
+                </a>
+            </div>
+        @endif
+
+        <!-- Wallet Bonus Deals -->
+        @if($isAdmin || ($subAdmin && $subAdmin->hasPermission('wallet_deals_view')))
+            <div class="col-6 col-sm-4 col-md-3 col-xl-2">
+                <a href="{{ route('admin.wallet-offers.index') }}"
+                    class="card bg-white border-0 rounded-4 p-3 h-100 shadow-sm text-decoration-none transition-all hover-translate-y border-top border-4 border-warning">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div class="rounded-circle bg-warning bg-opacity-10 text-warning d-flex align-items-center justify-content-center"
+                            style="width: 38px; height: 38px;">
+                            <i class="bi bi-gift fs-5"></i>
+                        </div>
+                    </div>
+                    <div class="text-secondary xx-small fw-bold text-uppercase tracking-widest mb-1 text-truncate">Wallet Deals</div>
+                    <h4 class="fw-black mb-0 text-dark">{{ number_format($totalWalletOffers) }}</h4>
+                </a>
+            </div>
+        @endif
+
+        <!-- Users/Customers -->
+        @if($isAdmin || ($subAdmin && $subAdmin->hasPermission('users_view')))
+            <div class="col-6 col-sm-4 col-md-3 col-xl-2">
+                <a href="{{ route('admin.users.index') }}"
+                    class="card bg-white border-0 rounded-4 p-3 h-100 shadow-sm text-decoration-none transition-all hover-translate-y border-top border-4 border-danger">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div class="rounded-circle bg-danger bg-opacity-10 text-danger d-flex align-items-center justify-content-center"
+                            style="width: 38px; height: 38px;">
+                            <i class="bi bi-people fs-5"></i>
+                        </div>
+                    </div>
+                    <div class="text-secondary xx-small fw-bold text-uppercase tracking-widest mb-1 text-truncate">Customers</div>
+                    <h4 class="fw-black mb-0 text-dark">{{ number_format($users) }}</h4>
+                </a>
+            </div>
+        @endif
+
+        <!-- Seller Inquiries -->
+        @if($isAdmin || ($subAdmin && $subAdmin->hasPermission('seller_inquiries_view')))
+            <div class="col-6 col-sm-4 col-md-3 col-xl-2">
+                <a href="{{ route('admin.seller-inquiries.index') }}"
+                    class="card bg-white border-0 rounded-4 p-3 h-100 shadow-sm text-decoration-none transition-all hover-translate-y border-top border-4 border-info">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div class="rounded-circle bg-info bg-opacity-10 text-info d-flex align-items-center justify-content-center"
+                            style="width: 38px; height: 38px;">
+                            <i class="bi bi-shop fs-5"></i>
+                        </div>
+                    </div>
+                    <div class="text-secondary xx-small fw-bold text-uppercase tracking-widest mb-1 text-truncate">Seller Inquiries</div>
+                    <h4 class="fw-black mb-0 text-dark">{{ number_format($totalSellerInquiries) }}</h4>
+                </a>
+            </div>
+        @endif
+
+        <!-- Complaints -->
+        @if($isAdmin || ($subAdmin && $subAdmin->hasPermission('complaints_view')))
+            <div class="col-6 col-sm-4 col-md-3 col-xl-2">
+                <a href="{{ route('admin.complaints.index') }}"
+                    class="card bg-white border-0 rounded-4 p-3 h-100 shadow-sm text-decoration-none transition-all hover-translate-y border-top border-4 border-danger">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div class="rounded-circle bg-danger bg-opacity-10 text-danger d-flex align-items-center justify-content-center"
+                            style="width: 38px; height: 38px;">
+                            <i class="bi bi-chat-left-text fs-5"></i>
+                        </div>
+                    </div>
+                    <div class="text-secondary xx-small fw-bold text-uppercase tracking-widest mb-1 text-truncate">Complaints</div>
+                    <h4 class="fw-black mb-0 text-dark">{{ number_format($totalComplaints) }}</h4>
+                </a>
+            </div>
+        @endif
+
+        <!-- Contact Inquiries -->
+        @if($isAdmin || ($subAdmin && $subAdmin->hasPermission('contacts_view')))
+            <div class="col-6 col-sm-4 col-md-3 col-xl-2">
+                <a href="{{ route('admin.contacts.index') }}"
+                    class="card bg-white border-0 rounded-4 p-3 h-100 shadow-sm text-decoration-none transition-all hover-translate-y border-top border-4 border-primary">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div class="rounded-circle text-primary d-flex align-items-center justify-content-center"
+                            style="width: 38px; height: 38px; background-color: rgba(255, 184, 0, 0.1) !important;">
+                            <i class="bi bi-envelope fs-5"></i>
+                        </div>
+                    </div>
+                    <div class="text-secondary xx-small fw-bold text-uppercase tracking-widest mb-1 text-truncate">Contacts</div>
+                    <h4 class="fw-black mb-0 text-dark">{{ number_format($totalContacts) }}</h4>
+                </a>
+            </div>
+        @endif
+
+        <!-- Support Tickets -->
+        @if($isAdmin || ($subAdmin && $subAdmin->hasPermission('support_view')))
+            <div class="col-6 col-sm-4 col-md-3 col-xl-2">
+                <a href="{{ route('admin.support-tickets.index') }}"
+                    class="card bg-white border-0 rounded-4 p-3 h-100 shadow-sm text-decoration-none transition-all hover-translate-y border-top border-4 border-success">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div class="rounded-circle bg-success bg-opacity-10 text-success d-flex align-items-center justify-content-center"
+                            style="width: 38px; height: 38px;">
+                            <i class="bi bi-headset fs-5"></i>
+                        </div>
+                    </div>
+                    <div class="text-secondary xx-small fw-bold text-uppercase tracking-widest mb-1 text-truncate">Support Tickets</div>
+                    <h4 class="fw-black mb-0 text-dark">{{ number_format($totalSupportTickets) }}</h4>
+                </a>
+            </div>
+        @endif
+
+        <!-- Product Reviews -->
+        @if($isAdmin || ($subAdmin && $subAdmin->hasPermission('reviews_view')))
+            <div class="col-6 col-sm-4 col-md-3 col-xl-2">
+                <a href="{{ route('admin.reviews.index') }}"
+                    class="card bg-white border-0 rounded-4 p-3 h-100 shadow-sm text-decoration-none transition-all hover-translate-y border-top border-4 border-warning">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div class="rounded-circle bg-warning bg-opacity-10 text-warning d-flex align-items-center justify-content-center"
+                            style="width: 38px; height: 38px;">
+                            <i class="bi bi-star-half fs-5"></i>
+                        </div>
+                    </div>
+                    <div class="text-secondary xx-small fw-bold text-uppercase tracking-widest mb-1 text-truncate">Product Reviews</div>
+                    <h4 class="fw-black mb-0 text-dark">{{ number_format($totalReviews) }}</h4>
+                </a>
+            </div>
+        @endif
+
+        <!-- Refund & Cancellations -->
+        @if($isAdmin || ($subAdmin && $subAdmin->hasPermission('refunds_view')))
+            <div class="col-6 col-sm-4 col-md-3 col-xl-2">
+                <a href="{{ route('admin.refunds.index') }}"
+                    class="card bg-white border-0 rounded-4 p-3 h-100 shadow-sm text-decoration-none transition-all hover-translate-y border-top border-4 border-danger">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div class="rounded-circle bg-danger bg-opacity-10 text-danger d-flex align-items-center justify-content-center"
+                            style="width: 38px; height: 38px;">
+                            <i class="bi bi-arrow-counterclockwise fs-5"></i>
+                        </div>
+                    </div>
+                    <div class="text-secondary xx-small fw-bold text-uppercase tracking-widest mb-1 text-truncate">Refunds / Cancels</div>
+                    <h4 class="fw-black mb-0 text-dark">{{ number_format($totalRefunds) }}</h4>
+                </a>
+            </div>
+        @endif
+
+        <!-- Manage FAQs -->
+        @if($isAdmin || ($subAdmin && $subAdmin->hasPermission('faqs_view')))
+            <div class="col-6 col-sm-4 col-md-3 col-xl-2">
+                <a href="{{ route('admin.faqs.index') }}"
+                    class="card bg-white border-0 rounded-4 p-3 h-100 shadow-sm text-decoration-none transition-all hover-translate-y border-top border-4 border-info">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div class="rounded-circle bg-info bg-opacity-10 text-info d-flex align-items-center justify-content-center"
+                            style="width: 38px; height: 38px;">
+                            <i class="bi bi-question-circle fs-5"></i>
+                        </div>
+                    </div>
+                    <div class="text-secondary xx-small fw-bold text-uppercase tracking-widest mb-1 text-truncate">FAQs Base</div>
+                    <h4 class="fw-black mb-0 text-dark">{{ number_format($totalFaqs) }}</h4>
+                </a>
+            </div>
+        @endif
+
+        <!-- Manage Hero Sliders -->
+        @if($isAdmin || ($subAdmin && $subAdmin->hasPermission('home_sliders_view')))
+            <div class="col-6 col-sm-4 col-md-3 col-xl-2">
+                <a href="{{ route('admin.home-sliders.index') }}"
+                    class="card bg-white border-0 rounded-4 p-3 h-100 shadow-sm text-decoration-none transition-all hover-translate-y border-top border-4 border-primary">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div class="rounded-circle text-primary d-flex align-items-center justify-content-center"
+                            style="width: 38px; height: 38px; background-color: rgba(255, 184, 0, 0.1) !important;">
+                            <i class="bi bi-images fs-5"></i>
+                        </div>
+                    </div>
+                    <div class="text-secondary xx-small fw-bold text-uppercase tracking-widest mb-1 text-truncate">Hero Sliders</div>
+                    <h4 class="fw-black mb-0 text-dark">{{ number_format($totalSliders) }}</h4>
+                </a>
+            </div>
+        @endif
+
+        <!-- Sub Admin System -->
+        @if($isAdmin)
+            <div class="col-6 col-sm-4 col-md-3 col-xl-2">
+                <a href="{{ route('admin.subadmins.index') }}"
+                    class="card bg-white border-0 rounded-4 p-3 h-100 shadow-sm text-decoration-none transition-all hover-translate-y border-top border-4 border-dark">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div class="rounded-circle text-dark d-flex align-items-center justify-content-center"
+                            style="width: 38px; height: 38px; background-color: rgba(0, 0, 0, 0.08) !important;">
+                            <i class="bi bi-shield-lock fs-5"></i>
+                        </div>
+                    </div>
+                    <div class="text-secondary xx-small fw-bold text-uppercase tracking-widest mb-1 text-truncate">Sub Admins</div>
+                    <h4 class="fw-black mb-0 text-dark">{{ number_format($totalSubAdmins) }}</h4>
+                </a>
+            </div>
+        @endif
     </div>
 
     <!-- Analytics Chart & Modules -->
@@ -148,77 +518,25 @@
                         </h5>
                         <p class="text-secondary x-small mb-0 fw-medium">Sales trajectory over the last 6 months</p>
                     </div>
-                    <select
+                    <select id="chartFilter"
                         class="form-select bg-light border-0 text-dark small w-auto shadow-none rounded-pill px-4 py-2 fw-bold">
-                        <option>Last 6 Months</option>
-                        <option>This Year</option>
-                        <option>All Time</option>
+                        <option value="6months">Last 6 Months</option>
+                        <option value="thisyear">This Year</option>
+                        <option value="alltime">All Time</option>
                     </select>
                 </div>
                 <div class="flex-grow-1 position-relative" style="min-height: 340px;">
                     <canvas id="revenueChart"></canvas>
                 </div>
             </div>
-        </div>
-
-        <!-- System Hotlinks -->
+        </div>        <!-- Order Fulfillment Status Chart -->
         <div class="col-xl-4">
             <div class="card bg-white border-0 rounded-4 p-4 h-100 shadow-sm d-flex flex-column">
-                <h5 class="fw-bold mb-1 text-dark">System Modules</h5>
-                <p class="text-secondary x-small mb-4 fw-medium">Jump directly to your important modules.</p>
+                <h5 class="fw-bold mb-1 text-dark">Order Status Breakdown</h5>
+                <p class="text-secondary x-small mb-4 fw-medium">Distribution of all active orders</p>
 
-                <div class="d-flex flex-column gap-3 flex-grow-1">
-                    <a href="{{ route('admin.products.index') }}"
-                        class="card bg-light border-0 p-3 rounded-4 text-decoration-none transition-all hover-shadow-sm group">
-                        <div class="d-flex align-items-center justify-content-between">
-                            <div class="d-flex align-items-center gap-3">
-                                <div class="bg-white text-dark rounded-circle shadow-sm d-flex align-items-center justify-content-center"
-                                    style="width: 45px; height: 45px;"><i class="bi bi-cart fs-5 text-primary"></i></div>
-                                <div>
-                                    <h6 class="mb-0 fw-bold text-dark small">Products Database</h6>
-                                    <span class="text-secondary xx-small fw-bold text-uppercase tracking-widest">Manage
-                                        Inventory</span>
-                                </div>
-                            </div>
-                            <div class="bg-white rounded-circle d-flex align-items-center justify-content-center shadow-sm text-dark transition-all group-hover-bg-primary"
-                                style="width: 32px; height: 32px;"><i class="bi bi-chevron-right small"></i></div>
-                        </div>
-                    </a>
-
-                    <a href="{{ route('admin.categories.index') }}"
-                        class="card bg-light border-0 p-3 rounded-4 text-decoration-none transition-all hover-shadow-sm group">
-                        <div class="d-flex align-items-center justify-content-between">
-                            <div class="d-flex align-items-center gap-3">
-                                <div class="bg-white text-dark rounded-circle shadow-sm d-flex align-items-center justify-content-center"
-                                    style="width: 45px; height: 45px;"><i class="bi bi-grid fs-5 text-warning"></i></div>
-                                <div>
-                                    <h6 class="mb-0 fw-bold text-dark small">Category Structure</h6>
-                                    <span class="text-secondary xx-small fw-bold text-uppercase tracking-widest">Organize
-                                        Layout</span>
-                                </div>
-                            </div>
-                            <div class="bg-white rounded-circle d-flex align-items-center justify-content-center shadow-sm text-dark transition-all group-hover-bg-warning"
-                                style="width: 32px; height: 32px;"><i class="bi bi-chevron-right small"></i></div>
-                        </div>
-                    </a>
-
-                    <a href="{{ route('admin.orders.index') }}"
-                        class="card bg-light border-0 p-3 rounded-4 text-decoration-none transition-all hover-shadow-sm group">
-                        <div class="d-flex align-items-center justify-content-between">
-                            <div class="d-flex align-items-center gap-3">
-                                <div class="bg-white text-dark rounded-circle shadow-sm d-flex align-items-center justify-content-center"
-                                    style="width: 45px; height: 45px;"><i class="bi bi-receipt fs-5 text-success"></i></div>
-                                <div>
-                                    <h6 class="mb-0 fw-bold text-dark small">Live Order Book <span
-                                            class="badge bg-success ms-1 px-2 py-0 rounded-pill">{{ $pending }}</span></h6>
-                                    <span class="text-secondary xx-small fw-bold text-uppercase tracking-widest">Fulfill &
-                                        Track</span>
-                                </div>
-                            </div>
-                            <div class="bg-white rounded-circle d-flex align-items-center justify-content-center shadow-sm text-dark transition-all group-hover-bg-success"
-                                style="width: 32px; height: 32px;"><i class="bi bi-chevron-right small"></i></div>
-                        </div>
-                    </a>
+                <div class="flex-grow-1 d-flex align-items-center justify-content-center" style="min-height: 250px; position: relative;">
+                    <canvas id="orderStatusChart"></canvas>
                 </div>
             </div>
         </div>
@@ -262,9 +580,10 @@
                                     @php
                                         $colors = ['primary', 'success', 'warning', 'danger', 'info'];
                                         $scolor = $colors[abs(crc32($order->user->id)) % count($colors)];
+                                        $bgStyle = $scolor === 'primary' ? 'background-color: rgba(255, 122, 24, 0.1) !important;' : '';
                                     @endphp
                                     <div class="rounded-circle bg-{{ $scolor }} bg-opacity-10 text-{{ $scolor }} d-flex align-items-center justify-content-center fw-black shadow-sm"
-                                        style="width: 40px; height: 40px; font-size: 1.1rem;">
+                                        style="width: 40px; height: 40px; font-size: 1.1rem; {{ $bgStyle }}">
                                         {{ strtoupper(substr($order->user->name, 0, 1)) }}
                                     </div>
                                     <div>
@@ -326,13 +645,29 @@
             gradientFill.addColorStop(0, 'rgba(16, 185, 129, 0.25)'); // Success green at top
             gradientFill.addColorStop(1, 'rgba(255, 255, 255, 0)');     // Fade to white
 
-            new Chart(ctx2d, {
+            // Pre-loaded datasets for filter switching
+            const chartDataSets = {
+                '6months': {
+                    labels: {!! json_encode($months) !!},
+                    data: {!! json_encode($chartData) !!}
+                },
+                'thisyear': {
+                    labels: {!! json_encode($thisYearMonths) !!},
+                    data: {!! json_encode($thisYearData) !!}
+                },
+                'alltime': {
+                    labels: {!! json_encode($allTimeLabels) !!},
+                    data: {!! json_encode($allTimeData) !!}
+                }
+            };
+
+            const revenueChart = new Chart(ctx2d, {
                 type: 'line',
                 data: {
-                    labels: ['Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar'],
+                    labels: chartDataSets['6months'].labels,
                     datasets: [{
                         label: 'Revenue Tracker',
-                        data: [18000, 32000, 24500, 52000, 43000, 85500],
+                        data: chartDataSets['6months'].data,
                         borderColor: '#10b981', // Solid premium green
                         backgroundColor: gradientFill,
                         borderWidth: 4,
@@ -383,7 +718,12 @@
                             ticks: {
                                 color: '#6b7280',
                                 font: { size: 12, weight: '600' },
-                                callback: function (value) { return '₹' + (value / 1000) + 'k'; },
+                                callback: function (value) { 
+                                    if (value >= 1000) {
+                                        return '₹' + (value / 1000) + 'k'; 
+                                    }
+                                    return '₹' + value;
+                                },
                                 padding: 15
                             }
                         },
@@ -398,10 +738,82 @@
                     }
                 }
             });
+
+            // Listen to dropdown changes
+            const filterSelect = document.getElementById('chartFilter');
+            if (filterSelect) {
+                filterSelect.addEventListener('change', function () {
+                    const selectedVal = this.value;
+                    const selectedDataSet = chartDataSets[selectedVal];
+                    
+                    revenueChart.data.labels = selectedDataSet.labels;
+                    revenueChart.data.datasets[0].data = selectedDataSet.data;
+                    revenueChart.update();
+                });
+            }
+
+            // Order Fulfillment Status Doughnut Chart
+            const statusCtx = document.getElementById('orderStatusChart');
+            if (statusCtx) {
+                const statusCtx2d = statusCtx.getContext('2d');
+                new Chart(statusCtx2d, {
+                    type: 'doughnut',
+                    data: {
+                        labels: {!! json_encode($statusLabels) !!},
+                        datasets: [{
+                            data: {!! json_encode($statusCounts) !!},
+                            backgroundColor: [
+                                '#FFB800', // Saffron / Orange-Yellow
+                                '#0d6efd', // Blue
+                                '#198754', // Green
+                                '#0dcaf0', // Cyan
+                                '#6610f2', // Purple
+                                '#20c997', // Teal
+                                '#fd7e14', // Orange
+                                '#dc3545'  // Red
+                            ],
+                            borderWidth: 2,
+                            borderColor: '#ffffff',
+                            hoverOffset: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    boxWidth: 10,
+                                    padding: 10,
+                                    font: {
+                                        size: 10,
+                                        weight: '600'
+                                    },
+                                    color: '#4b5563'
+                                }
+                            },
+                            tooltip: {
+                                backgroundColor: '#111827',
+                                bodyColor: '#fff',
+                                padding: 12,
+                                cornerRadius: 8,
+                                displayColors: false
+                            }
+                        },
+                        cutout: '70%' // Sleek doughnut ring
+                    }
+                });
+            }
         });
     </script>
 
     <style>
+        .xx-small {
+            font-size: 0.68rem !important;
+            letter-spacing: 0.05em !important;
+        }
+
         /* Premium Utilities Extracted for Dashboard */
         .pulse-dot-container {
             display: inline-flex;

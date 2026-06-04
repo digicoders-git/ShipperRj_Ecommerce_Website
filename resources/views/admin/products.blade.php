@@ -722,38 +722,59 @@
 
         <!-- Script for sub-category filtering -->
         <script>
-            // Script for add-category-select
-            document.getElementById('category_select')?.addEventListener('change', function () {
-                const categoryId = this.value;
-                const subCategorySelect = document.getElementById('subcategory_select');
-                const options = subCategorySelect.querySelectorAll('option');
+            $(document).ready(function () {
+                // Store clone of original options for add product modal sub-category select
+                const $addSubSelect = $('#subcategory_select');
+                let addSubOptions = null;
+                if ($addSubSelect.length) {
+                    addSubOptions = $addSubSelect.find('option').clone();
+                }
 
-                subCategorySelect.value = '';
-                options.forEach(option => {
-                    if (option.getAttribute('data-category') === categoryId || option.value === '') {
-                        option.style.display = 'block';
-                    } else {
-                        option.style.display = 'none';
+                // Script for add-category-select
+                $('#category_select').on('change', function () {
+                    const categoryId = $(this).val();
+                    $addSubSelect.empty();
+                    
+                    if (addSubOptions) {
+                        addSubOptions.each(function () {
+                            const $opt = $(this);
+                            if ($opt.val() === '' || $opt.attr('data-category') === categoryId) {
+                                const $clone = $opt.clone().css('display', '').show();
+                                $addSubSelect.append($clone);
+                            }
+                        });
+                    }
+                    $addSubSelect.val('');
+                });
+
+                // Store clones of original options for edit product modal sub-category selects
+                const editSubOptionsMap = {};
+                $('.edit-category-select').each(function () {
+                    const productId = $(this).attr('data-product-id');
+                    const $subSelect = $(`.edit-subcategory-select-${productId}`);
+                    if ($subSelect.length) {
+                        editSubOptionsMap[productId] = $subSelect.find('option').clone();
                     }
                 });
-            });
 
-            // Script for edit-category-select
-            document.querySelectorAll('.edit-category-select').forEach(select => {
-                select.addEventListener('change', function () {
-                    const productId = this.getAttribute('data-product-id');
-                    const categoryId = this.value;
-                    const subCategorySelect = document.querySelector(`.edit-subcategory-select-${productId}`);
-                    const options = subCategorySelect.querySelectorAll('option');
+                // Script for edit-category-select
+                $('.edit-category-select').on('change', function () {
+                    const productId = $(this).attr('data-product-id');
+                    const categoryId = $(this).val();
+                    const $subSelect = $(`.edit-subcategory-select-${productId}`);
+                    const originalOptions = editSubOptionsMap[productId];
 
-                    subCategorySelect.value = '';
-                    options.forEach(option => {
-                        if (option.getAttribute('data-category') === categoryId || option.value === '') {
-                            option.style.display = 'block';
-                        } else {
-                            option.style.display = 'none';
-                        }
-                    });
+                    if ($subSelect.length && originalOptions) {
+                        $subSelect.empty();
+                        originalOptions.each(function () {
+                            const $opt = $(this);
+                            if ($opt.val() === '' || $opt.attr('data-category') === categoryId) {
+                                const $clone = $opt.clone().css('display', '').show();
+                                $subSelect.append($clone);
+                            }
+                        });
+                        $subSelect.val('');
+                    }
                 });
             });
             // Dynamic field addition

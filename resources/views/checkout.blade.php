@@ -376,7 +376,7 @@
                                                     <p class="xx-small text-secondary fw-bold mb-0">Apply {{ $coupon->code }} on shopping of ₹{{ number_format($coupon->min_spend) }}</p>
                                                 </div>
                                             @empty
-                                                <p class="xx-small text-secondary fw-bold mb-0 italic">No offers available at the moment.</p>
+                                                <p class="xx-small text-secondary fw-bold mb-0 italic">Check back soon for exciting deals and discounts.</p>
                                             @endforelse
                                         </div>
                                     </div>

@@ -304,7 +304,7 @@ class CheckoutController extends Controller
                 ->where('status', 1)
                 ->where('expiry_date', '>=', date('Y-m-d'))
                 ->first();
-            
+
             if ($coupon && $total >= $coupon->min_spend) {
                 // Double check if already used (extra safety)
                 $couponUsed = \App\Models\Order::where('user_id', $user->id)

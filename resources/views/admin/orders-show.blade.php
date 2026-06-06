@@ -149,7 +149,7 @@
                             <div class="d-flex justify-content-between mb-2">
                                 <span class="xx-small text-secondary fw-black uppercase tracking-widest">Net Amount</span>
                                 <span
-                                    class="small fw-bold text-dark">₹{{ number_format($order->total_amount - $order->shipping_amount + $order->coupon_discount, 2) }}</span>
+                                    class="small fw-bold text-dark">₹{{ number_format($order->total_amount - $order->shipping_amount - $order->gst_amount + $order->coupon_discount, 2) }}</span>
                             </div>
                             <div class="d-flex justify-content-between mb-2">
                                 <span class="xx-small text-secondary fw-black uppercase tracking-widest">Shipping
@@ -163,6 +163,13 @@
                                         ({{ $order->coupon_code }})</span>
                                     <span
                                         class="small fw-bold text-success">-₹{{ number_format($order->coupon_discount, 2) }}</span>
+                                </div>
+                            @endif
+                            @if($order->has_gst && $order->gst_amount > 0)
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="xx-small text-secondary fw-black uppercase tracking-widest">GST (18%)</span>
+                                    <span
+                                        class="small fw-bold text-dark">+₹{{ number_format($order->gst_amount, 2) }}</span>
                                 </div>
                             @endif
 
@@ -263,6 +270,24 @@
                             </div>
                         </div>
                     </div>
+                    @if($order->has_gst)
+                        <div class="mb-4">
+                            <h6 class="xx-small text-secondary fw-black uppercase tracking-widest mb-3 opacity-75">GST Invoice Details</h6>
+                            <div class="p-3 rounded-4 border border-warning border-opacity-20" style="background: rgba(255, 138, 0, 0.05);">
+                                @if($order->gst_company)
+                                    <h6 class="small fw-black text-dark mb-1">{{ $order->gst_company }}</h6>
+                                @endif
+                                <div class="d-flex align-items-center justify-content-between mt-2">
+                                    <span class="x-small fw-bold text-secondary">GSTIN</span>
+                                    <span class="small fw-black text-dark font-monospace">{{ $order->gst_number }}</span>
+                                </div>
+                                <div class="d-flex align-items-center justify-content-between mt-2">
+                                    <span class="x-small fw-bold text-secondary">GST Amount (18%)</span>
+                                    <span class="small fw-black text-primary">₹{{ number_format($order->gst_amount, 2) }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
                 </div>
             </div>
 

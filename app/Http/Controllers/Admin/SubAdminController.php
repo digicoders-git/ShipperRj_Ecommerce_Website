@@ -110,34 +110,5 @@ class SubAdminController extends Controller
         $subadmin->delete();
         return back()->with('success', 'Sub-admin deleted successfully.');
     }
-
-    public function showLogin()
-    {
-        return view('admin.auth.subadmin_login');
-    }
-
-    public function login(Request $request)
-    {
-        $credentials = $request->validate([
-            'login' => 'required', // can be email or username
-            'password' => 'required'
-        ]);
-
-        $loginField = filter_var($request->login, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
-
-        if (Auth::guard('subadmin')->attempt([$loginField => $request->login, 'password' => $request->password])) {
-            $user = Auth::guard('subadmin')->user();
-
-            if (!$user->status) {
-                Auth::guard('subadmin')->logout();
-                return back()->with('error', 'Your account is inactive.');
-            }
-
-            $user->update(['last_login_at' => now()]);
-            return redirect()->intended(route('admin.dashboard'));
-        }
-
-        return back()->with('error', 'Invalid credentials.');
-    }
 }
 

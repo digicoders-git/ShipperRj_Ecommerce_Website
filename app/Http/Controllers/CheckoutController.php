@@ -43,23 +43,27 @@ class CheckoutController extends Controller
             $item_online_ship_pct = ((float) $product->online_shipping_charges > 0) ? $product->online_shipping_charges : $global_online;
             $item_cod_ship_pct = ((float) $product->cod_shipping_charges > 0) ? $product->cod_shipping_charges : $global_cod;
 
-            $item_online_ship = ($product->selling_price * $item_online_ship_pct / 100);
-            $item_cod_ship = ($product->selling_price * $item_cod_ship_pct / 100);
+            $resolved_price = $product->getSellingPriceForQuantity($qty);
+            $item_online_ship = ($resolved_price * $item_online_ship_pct / 100);
+            $item_cod_ship = ($resolved_price * $item_cod_ship_pct / 100);
 
             $items[] = [
                 'id' => $product->id,
                 'name' => $product->name,
                 'image' => $product->image,
                 'qty' => $qty,
-                'price' => $product->selling_price,
+                'price' => $resolved_price,
+                'selling_price' => (float) $product->selling_price,
+                'wholesale_prices' => $product->wholesale_prices,
                 'advance_percent' => $item_adv,
                 'online_shipping' => $item_online_ship,
                 'cod_shipping' => $item_cod_ship,
                 'online_shipping_pct' => $item_online_ship_pct,
                 'cod_shipping_pct' => $item_cod_ship_pct,
-                'min_qty' => $product->minimum_order_quantity ?? 1
+                'min_qty' => $product->minimum_order_quantity ?? 1,
+                'stock' => $product->stock
             ];
-            $total = $product->selling_price * $qty;
+            $total = $resolved_price * $qty;
             $online_shipping += ($item_online_ship * $qty);
             $cod_shipping += ($item_cod_ship * $qty);
             $order_type = 'buy_now';
@@ -72,23 +76,28 @@ class CheckoutController extends Controller
                 $item_online_ship_pct = ((float) $cart->product->online_shipping_charges > 0) ? $cart->product->online_shipping_charges : $global_online;
                 $item_cod_ship_pct = ((float) $cart->product->cod_shipping_charges > 0) ? $cart->product->cod_shipping_charges : $global_cod;
 
-                $item_online_ship = ($cart->product->selling_price * $item_online_ship_pct / 100);
-                $item_cod_ship = ($cart->product->selling_price * $item_cod_ship_pct / 100);
+                $resolved_price = $cart->product->getSellingPriceForQuantity($cart->quantity);
+                $item_online_ship = ($resolved_price * $item_online_ship_pct / 100);
+                $item_cod_ship = ($resolved_price * $item_cod_ship_pct / 100);
 
                 $items[] = [
                     'id' => $cart->product->id,
+                    'cart_id' => $cart->id,
                     'name' => $cart->product->name,
                     'image' => $cart->product->image,
                     'qty' => $cart->quantity,
-                    'price' => $cart->product->selling_price,
+                    'price' => $resolved_price,
+                    'selling_price' => (float) $cart->product->selling_price,
+                    'wholesale_prices' => $cart->product->wholesale_prices,
                     'advance_percent' => $item_adv,
                     'online_shipping' => $item_online_ship,
                     'cod_shipping' => $item_cod_ship,
                     'online_shipping_pct' => $item_online_ship_pct,
                     'cod_shipping_pct' => $item_cod_ship_pct,
-                    'min_qty' => $cart->product->minimum_order_quantity ?? 1
+                    'min_qty' => $cart->product->minimum_order_quantity ?? 1,
+                    'stock' => $cart->product->stock
                 ];
-                $total += ($cart->product->selling_price * $cart->quantity);
+                $total += ($resolved_price * $cart->quantity);
                 $online_shipping += ($item_online_ship * $cart->quantity);
                 $cod_shipping += ($item_cod_ship * $cart->quantity);
             }
@@ -240,17 +249,18 @@ class CheckoutController extends Controller
             $item_online_ship_pct = ((float) $product->online_shipping_charges > 0) ? $product->online_shipping_charges : $global_online;
             $item_cod_ship_pct = ((float) $product->cod_shipping_charges > 0) ? $product->cod_shipping_charges : $global_cod;
 
+            $resolved_price = $product->getSellingPriceForQuantity($request->qty);
             $items[] = [
                 'id' => $product->id,
                 'qty' => $request->qty,
-                'price' => $product->selling_price,
+                'price' => $resolved_price,
                 'advance_percent' => $item_adv
             ];
-            $total = $product->selling_price * $request->qty;
+            $total = $resolved_price * $request->qty;
 
             $calculated_shipping = ($request->payment_method == 'cod')
-                ? ($product->selling_price * $item_cod_ship_pct / 100)
-                : ($product->selling_price * $item_online_ship_pct / 100);
+                ? ($resolved_price * $item_cod_ship_pct / 100)
+                : ($resolved_price * $item_online_ship_pct / 100);
 
             $shipping = round($calculated_shipping * $request->qty, 2);
         } else {
@@ -266,17 +276,18 @@ class CheckoutController extends Controller
                 $item_online_ship_pct = ((float) $cart->product->online_shipping_charges > 0) ? $cart->product->online_shipping_charges : $global_online;
                 $item_cod_ship_pct = ((float) $cart->product->cod_shipping_charges > 0) ? $cart->product->cod_shipping_charges : $global_cod;
 
+                $resolved_price = $cart->product->getSellingPriceForQuantity($cart->quantity);
                 $items[] = [
                     'id' => $cart->product->id,
                     'qty' => $cart->quantity,
-                    'price' => $cart->product->selling_price,
+                    'price' => $resolved_price,
                     'advance_percent' => $item_adv
                 ];
-                $total += ($cart->product->selling_price * $cart->quantity);
+                $total += ($resolved_price * $cart->quantity);
 
                 $calculated_shipping = ($request->payment_method == 'cod')
-                    ? ($cart->product->selling_price * $item_cod_ship_pct / 100)
-                    : ($cart->product->selling_price * $item_online_ship_pct / 100);
+                    ? ($resolved_price * $item_cod_ship_pct / 100)
+                    : ($resolved_price * $item_online_ship_pct / 100);
 
                 $shipping += ($calculated_shipping * $cart->quantity);
             }
@@ -309,7 +320,19 @@ class CheckoutController extends Controller
             }
         }
 
-        $grand_total = round(($total + $shipping) - $discount, 2);
+        $has_gst = $request->has_gst ? 1 : 0;
+        $gst_number = $has_gst ? strtoupper($request->gst_number) : null;
+        $gst_company = $has_gst ? $request->gst_company : null;
+
+        if ($has_gst) {
+            $request->validate([
+                'gst_number' => ['required', 'string', 'regex:/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/'],
+                'gst_company' => ['nullable', 'string', 'max:255']
+            ]);
+        }
+
+        $gst_amount = $has_gst ? round(($total - $discount) * 18 / 100, 2) : 0;
+        $grand_total = round(($total + $shipping) - $discount + $gst_amount, 2);
 
         // RE-VALIDATE: Min Order Total Price during processing
         if ($min_order_val > 0 && $grand_total < $min_order_val) {
@@ -346,7 +369,11 @@ class CheckoutController extends Controller
             'cod_amount' => $grand_total - $prepaid_amount,
             'payment_method' => $request->payment_method,
             'payment_status' => 'pending',
-            'order_status' => 'placed'
+            'order_status' => 'placed',
+            'has_gst' => $has_gst,
+            'gst_number' => $gst_number,
+            'gst_company' => $gst_company,
+            'gst_amount' => $gst_amount
         ]);
 
         foreach ($items as $item) {

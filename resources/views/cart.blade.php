@@ -44,7 +44,7 @@
                                         @endphp
                                         @forelse($cartItems as $item)
                                             @php 
-                                                $prodPrice = $item->product->selling_price ?? 0; 
+                                                $prodPrice = $item->product->getSellingPriceForQuantity($item->quantity) ?? 0; 
                                                 $totalAmount += ($prodPrice * $item->quantity);
                                                 
                                                 // Shipping Calculation (Using Online Rate as default for Cart view)

@@ -14,11 +14,38 @@ class Product extends Model
         'sku', 'tags', 'stock_status', 'brand', 'manufacturer', 'seller_name',
         'featured', 'trending', 'return_policy', 'warranty', 'dimensions',
         'weight', 'shipping_charges', 'online_shipping_charges', 'cod_shipping_charges', 'mrp', 'selling_price', 'stock', 'minimum_order_quantity', 'size', 'color',
-        'cod_advance_percent', 'return_days'
+        'cod_advance_percent', 'return_days', 'wholesale_prices'
     ];
     protected $casts = [
-        'return_days' => 'integer'
+        'return_days' => 'integer',
+        'wholesale_prices' => 'array'
     ];
+
+    /**
+     * Get selling price based on quantity (wholesale tiered pricing)
+     */
+    public function getSellingPriceForQuantity($quantity = 1): float
+    {
+        $price = (float) $this->selling_price;
+        
+        if (empty($this->wholesale_prices) || !is_array($this->wholesale_prices)) {
+            return $price;
+        }
+
+        // Sort wholesale prices by min_qty descending to check highest tier first
+        $tiers = $this->wholesale_prices;
+        usort($tiers, function ($a, $b) {
+            return $b['min_qty'] <=> $a['min_qty'];
+        });
+
+        foreach ($tiers as $tier) {
+            if ($quantity >= (int)$tier['min_qty']) {
+                return (float)$tier['price'];
+            }
+        }
+
+        return $price;
+    }
 
     public function getTablePrefix()
     {

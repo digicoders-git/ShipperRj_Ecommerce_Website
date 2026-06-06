@@ -1317,6 +1317,24 @@
                                 @endif
                             </div>
                             <p class="tax-note">Inclusive of all taxes &amp; GST</p>
+
+                            <div id="dynamicSubtotal" class="mt-2 fw-bold text-muted small animate__animated animate__fadeIn" style="display: none;">
+                                Subtotal: <span class="text-dark fs-5">&#8377;<span id="subtotalVal">0</span></span>
+                            </div>
+
+                            @if(!empty($product->wholesale_prices) && count($product->wholesale_prices) > 0)
+                                <div class="wholesale-pricing-box mt-3 p-3 rounded-3" style="background: rgba(242, 112, 26, 0.05); border: 1px dashed rgba(242, 112, 26, 0.25);">
+                                    <h6 class="fw-bold mb-2 text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.05em; color: var(--brand);">Wholesale Bulk Pricing</h6>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        @foreach($product->wholesale_prices as $tier)
+                                            <div class="wholesale-tier-badge p-2 bg-white rounded border flex-fill text-center" data-min-qty="{{ $tier['min_qty'] }}" style="font-size: 0.8rem; border-color: rgba(13,13,13,0.05) !important; transition: all 0.3s ease;">
+                                                <div class="text-muted small fw-medium" style="font-size: 0.75rem;">{{ $tier['min_qty'] }}+ units</div>
+                                                <div class="fw-bold text-dark" style="font-size: 0.9rem;">&#8377;{{ number_format($tier['price']) }}<span class="small font-normal text-muted" style="font-weight: normal; font-size: 0.7rem;">/unit</span></div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @endif
                         </div>
 
                         <div class="meta-grid">
@@ -1333,11 +1351,16 @@
                             </div>
                         </div>
 
+                        <!-- Dynamic Qty Warning Message -->
+                        <div id="qtyWarningMessage" class="animate__animated animate__fadeIn py-2 px-3 mb-3 text-danger fw-bold" style="display: none; border-radius: 12px; font-size: 0.8rem; background: rgba(220, 38, 38, 0.05); border: 1px dashed rgba(220, 38, 38, 0.25); align-items: center; gap: 8px;">
+                            <i class="bi bi-exclamation-triangle-fill"></i>
+                            <span id="qtyWarningText"></span>
+                        </div>
+
                         <div class="actions-row mb-4">
                             <div class="qty-control">
                                 <button class="qty-btn" type="button" onclick="changeQty(-1)">&minus;</button>
-                                <input type="number" id="productQty" class="qty-input" value="1" min="1"
-                                    max="{{ $product->stock }}" readonly>
+                                <input type="number" id="productQty" class="qty-input" value="{{ $product->minimum_order_quantity ?? 1 }}" min="{{ $product->minimum_order_quantity ?? 1 }}" max="{{ $product->stock }}">
                                 <button class="qty-btn" type="button" onclick="changeQty(1)">+</button>
                             </div>
                             <form action="{{ url('/cart/add/' . $product->id) }}" method="POST" style="flex:1;">
@@ -1610,6 +1633,94 @@
     </div>
 
     <script>
+        const baseSellingPrice = {{ $product->selling_price }};
+        const mrpPrice = {{ $product->mrp ?? 0 }};
+        const wholesalePrices = @json($product->wholesale_prices ?? []);
+
+        let warningTimeout = null;
+        function showQtyWarning(msg) {
+            const warningEl = document.getElementById('qtyWarningMessage');
+            const warningTextEl = document.getElementById('qtyWarningText');
+            if (warningEl && warningTextEl) {
+                warningTextEl.innerText = msg;
+                warningEl.style.display = 'flex';
+                
+                if (warningTimeout) clearTimeout(warningTimeout);
+                warningTimeout = setTimeout(() => {
+                    warningEl.style.display = 'none';
+                }, 5000);
+            }
+        }
+        function hideQtyWarning() {
+            const warningEl = document.getElementById('qtyWarningMessage');
+            if (warningEl) {
+                warningEl.style.display = 'none';
+            }
+        }
+
+        function updateDynamicPrices(val) {
+            let unitPrice = baseSellingPrice;
+            const sortedTiers = [...wholesalePrices].sort((a, b) => b.min_qty - a.min_qty);
+            let activeTierMinQty = 0;
+
+            for (let tier of sortedTiers) {
+                if (val >= tier.min_qty) {
+                    unitPrice = tier.price;
+                    activeTierMinQty = tier.min_qty;
+                    break;
+                }
+            }
+
+            // Update unit price text
+            const sellPriceEl = document.querySelector('.sell-price');
+            if (sellPriceEl) {
+                sellPriceEl.innerHTML = '&#8377;' + unitPrice.toLocaleString('en-IN');
+            }
+
+            // Update discount chip
+            const saveChipEl = document.querySelector('.save-chip');
+            if (saveChipEl && mrpPrice > unitPrice) {
+                const discountPct = Math.round(((mrpPrice - unitPrice) / mrpPrice) * 100);
+                saveChipEl.innerHTML = '<i class="bi bi-arrow-down-short"></i> ' + discountPct + '% off';
+                saveChipEl.style.display = 'inline-flex';
+            } else if (saveChipEl) {
+                saveChipEl.style.display = 'none';
+            }
+
+            // Update subtotal display
+            const subtotalEl = document.getElementById('dynamicSubtotal');
+            const subtotalValEl = document.getElementById('subtotalVal');
+            if (subtotalEl && subtotalValEl) {
+                if (val > 1) {
+                    const subtotal = unitPrice * val;
+                    subtotalValEl.innerText = subtotal.toLocaleString('en-IN');
+                    subtotalEl.style.display = 'block';
+                } else {
+                    subtotalEl.style.display = 'none';
+                }
+            }
+
+            // Highlight active wholesale tier in the grid
+            document.querySelectorAll('.wholesale-tier-badge').forEach(badge => {
+                const tierQty = parseInt(badge.dataset.minQty);
+                if (tierQty === activeTierMinQty) {
+                    badge.style.background = 'rgba(242, 112, 26, 0.1)';
+                    badge.style.borderColor = 'var(--brand)';
+                    badge.style.boxShadow = '0 0 0 2px var(--brand-glow)';
+                } else {
+                    badge.style.background = '#ffffff';
+                    badge.style.borderColor = 'rgba(13,13,13,0.05)';
+                    badge.style.boxShadow = 'none';
+                }
+            });
+        }
+
+        function syncQty(val) {
+            document.getElementById('cartQtyInput').value = val;
+            document.getElementById('buyNowQtyInput').value = val;
+            document.querySelectorAll('.mob-qty-sync').forEach(s => s.value = val);
+            updateDynamicPrices(val);
+        }
         function updateDisplayImage(url, el) {
             document.getElementById('mainDisplayImage').src = url;
             document.querySelectorAll('.thumb-item').forEach(t => t.classList.remove('active'));
@@ -1617,13 +1728,21 @@
         }
         function changeQty(delta) {
             const input = document.getElementById('productQty');
-            let val = parseInt(input.value) + delta;
-            if (val < 1) val = 1;
-            if (val > parseInt(input.max)) val = parseInt(input.max);
+            let val = (parseInt(input.value) || 1) + delta;
+            const minLimit = parseInt(input.min) || 1;
+            if (val < minLimit) {
+                val = minLimit;
+                showQtyWarning("MOQ Error for " + "{{ $product->name }}" + ": Minimum order quantity is " + minLimit + ".");
+            } else {
+                hideQtyWarning();
+            }
+            const maxLimit = parseInt(input.max) || 999999;
+            if (val > maxLimit) {
+                val = maxLimit;
+                showQtyWarning("Only " + maxLimit + " units are available in stock.");
+            }
             input.value = val;
-            document.getElementById('cartQtyInput').value = val;
-            document.getElementById('buyNowQtyInput').value = val;
-            document.querySelectorAll('.mob-qty-sync').forEach(s => s.value = val);
+            syncQty(val);
         }
         document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.addEventListener('click', function () {
@@ -1635,10 +1754,70 @@
             });
         });
         document.addEventListener('DOMContentLoaded', () => {
-            const qty = document.getElementById('productQty').value;
-            document.getElementById('cartQtyInput').value = qty;
-            document.getElementById('buyNowQtyInput').value = qty;
-            document.querySelectorAll('.mob-qty-sync').forEach(s => s.value = qty);
+            const qtyInput = document.getElementById('productQty');
+            const qty = qtyInput ? (parseInt(qtyInput.value) || 1) : 1;
+            
+            if (qtyInput) {
+                document.getElementById('cartQtyInput').value = qty;
+                document.getElementById('buyNowQtyInput').value = qty;
+                document.querySelectorAll('.mob-qty-sync').forEach(s => s.value = qty);
+                updateDynamicPrices(qty);
+
+                qtyInput.addEventListener('input', function() {
+                    let val = parseInt(this.value);
+                    if (isNaN(val)) {
+                        return;
+                    }
+                    const maxLimit = parseInt(this.max);
+                    if (!isNaN(maxLimit) && val > maxLimit) {
+                        val = maxLimit;
+                        this.value = val;
+                        showQtyWarning("Only " + maxLimit + " units are available in stock.");
+                    } else {
+                        const minLimit = parseInt(this.min) || 1;
+                        if (val >= minLimit) {
+                            hideQtyWarning();
+                        }
+                    }
+                    syncQty(val);
+                });
+
+                qtyInput.addEventListener('blur', function() {
+                    let val = parseInt(this.value);
+                    const minLimit = parseInt(this.min) || 1;
+                    if (isNaN(val) || val < minLimit) {
+                        val = minLimit;
+                        this.value = val;
+                        showQtyWarning("MOQ Error for " + "{{ $product->name }}" + ": Minimum order quantity is " + minLimit + ".");
+                    } else {
+                        hideQtyWarning();
+                    }
+                    syncQty(val);
+                });
+
+                // Enforce MOQ on form submission clicks
+                const btnCart = document.querySelector('.btn-cart');
+                const btnBuyNow = document.querySelector('.btn-buynow');
+                const mobBtnCart = document.querySelector('.mob-btn-cart');
+                const mobBtnBuy = document.querySelector('.mob-btn-buy');
+
+                const moqCheck = (e) => {
+                    const val = parseInt(qtyInput.value) || 0;
+                    const minLimit = parseInt(qtyInput.min) || 1;
+                    if (val < minLimit) {
+                        e.preventDefault();
+                        showQtyWarning("MOQ Error for " + "{{ $product->name }}" + ": Minimum order quantity is " + minLimit + ".");
+                        qtyInput.value = minLimit;
+                        syncQty(minLimit);
+                        qtyInput.focus();
+                    }
+                };
+
+                if (btnCart) btnCart.addEventListener('click', moqCheck);
+                if (btnBuyNow) btnBuyNow.addEventListener('click', moqCheck);
+                if (mobBtnCart) mobBtnCart.addEventListener('click', moqCheck);
+                if (mobBtnBuy) mobBtnBuy.addEventListener('click', moqCheck);
+            }
 
             // Interactive Star Rating
             document.querySelectorAll('.star-btn').forEach(star => {

@@ -244,6 +244,38 @@
                     <!-- Wallet Actions -->
                     <div class="tab-pane fade p-4" id="wallet-pane" role="tabpanel">
                         <h6 class="fw-bold text-dark mb-4">Wallet History & Deals</h6>
+
+                        <!-- Add/Deduct Wallet Form -->
+                        <div class="card border-0 bg-light rounded-4 p-4 mb-4 shadow-sm">
+                            <h6 class="fw-bold text-dark mb-3"><i class="bi bi-wallet2 text-primary me-2"></i>Adjust Wallet Balance</h6>
+                            <form action="{{ route('admin.users.adjust-wallet', $user->id) }}" method="POST">
+                                @csrf
+                                <div class="row g-3">
+                                    <div class="col-md-3">
+                                        <label class="form-label small fw-bold text-secondary">Action Type</label>
+                                        <select name="type" class="form-select rounded-pill text-dark border-light-subtle shadow-sm" required>
+                                            <option value="" disabled selected>Select Type</option>
+                                            <option value="credit">Add Money (Credit)</option>
+                                            <option value="debit">Deduct Money (Debit)</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label small fw-bold text-secondary">Amount (₹)</label>
+                                        <input type="number" name="amount" step="0.01" min="0.01" class="form-control rounded-pill text-dark  border-light-subtle shadow-sm" placeholder="e.g. 500" required>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label small fw-bold text-secondary">Reason / Description</label>
+                                        <input type="text" name="description" class="form-control rounded-pill text-dark border-light-subtle shadow-sm" placeholder="Reason for adjustment" required>
+                                    </div>
+                                    <div class="col-md-2 d-flex align-items-end">
+                                        <button type="submit" class="btn btn-primary w-100 py-2 rounded-pill fw-bold border-0 transition-all hover-scale shadow-sm" style="background: #f2701a !important;">
+                                            Apply
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+
                         @if($user->walletTransactions->count() > 0)
                             <div class="table-responsive">
                                 <table class="table table-hover align-middle">

@@ -241,6 +241,10 @@
                         class="nav-link-admin {{ request()->routeIs('admin.subadmins.*') ? 'active' : '' }}">
                         <i class="bi bi-shield-lock"></i> <span>Sub Admin System</span>
                     </a>
+                @endif
+
+                @if($isAdmin || $subAdmin)
+                    <div class="sidebar-section-title">My Account</div>
                     <a href="{{ route('admin.profile') }}"
                         class="nav-link-admin {{ request()->routeIs('admin.profile') ? 'active' : '' }}">
                         <i class="bi bi-person-circle"></i> <span>My Profile</span>
@@ -309,7 +313,7 @@
                         </div>
                         <ul class="dropdown-menu dropdown-menu-end shadow-lg rounded-4 mt-3"
                             style="background: #ffffff; min-width: 220px; padding: 10px; border: 1px solid rgba(0,0,0,0.08) !important; box-shadow: 0 10px 30px rgba(0,0,0,0.1) !important;">
-                            @if($isAdmin)
+                            @if($isAdmin || $subAdmin)
                                 <li>
                                     <a class="d-flex align-items-center rounded-3 text-dark text-decoration-none py-2 px-3 fw-bold small transition-all"
                                         href="{{ url('admin/profile') }}"

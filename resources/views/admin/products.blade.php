@@ -259,6 +259,41 @@
                                                                 </div>
                                                             </div> -->
 
+                                                <!-- Wholesale Pricing Section -->
+                                                <div class="col-12 mt-3">
+                                                    <label class="form-label text-primary x-small fw-bold d-block"><i class="bi bi-tags-fill me-2"></i> WHOLESALE / BULK PRICING TIERS</label>
+                                                    <div id="wholesale-container-{{ $product->id }}" class="border rounded-4 p-3 bg-light bg-opacity-25">
+                                                        <div class="row g-2 mb-2 align-items-center">
+                                                            <div class="col-5">
+                                                                <span class="x-small text-muted fw-bold">MINIMUM QUANTITY</span>
+                                                            </div>
+                                                            <div class="col-5">
+                                                                <span class="x-small text-muted fw-bold">DISCOUNTED UNIT PRICE (₹)</span>
+                                                            </div>
+                                                            <div class="col-2">
+                                                                <button type="button" class="btn btn-premium btn-sm w-100 py-2 rounded-pill fw-bold text-nowrap x-small text-dark animate-pulse" onclick="addWholesaleField('wholesale-container-{{ $product->id }}')">
+                                                                    <i class="bi bi-plus-lg me-1"></i> Add Tier
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                        @if(!empty($product->wholesale_prices) && is_array($product->wholesale_prices))
+                                                            @foreach($product->wholesale_prices as $tier)
+                                                                <div class="row g-2 mb-2 align-items-center">
+                                                                    <div class="col-5">
+                                                                        <input type="number" name="wholesale_min_qty[]" class="form-control glass-input x-small" value="{{ $tier['min_qty'] }}" placeholder="e.g. 50" required>
+                                                                    </div>
+                                                                    <div class="col-5">
+                                                                        <input type="number" step="0.01" name="wholesale_price[]" class="form-control glass-input x-small" value="{{ $tier['price'] }}" placeholder="e.g. 95.00" required>
+                                                                    </div>
+                                                                    <div class="col-2">
+                                                                        <button type="button" class="btn btn-danger btn-sm w-100 rounded-pill py-2 fw-bold x-small" onclick="this.parentElement.parentElement.remove()"><i class="bi bi-trash"></i></button>
+                                                                    </div>
+                                                                </div>
+                                                            @endforeach
+                                                        @endif
+                                                    </div>
+                                                </div>
+
                                             </div>
                                         </div>
 
@@ -620,6 +655,25 @@
                                             </div>
                                         </div>
 
+                                        @if(!empty($product->wholesale_prices) && count($product->wholesale_prices) > 0)
+                                            <!-- Wholesale Pricing Tiers -->
+                                            <div class="glass-card p-3 rounded-4 mb-3 border border-warning border-opacity-20" style="background: rgba(255, 122, 24, 0.03);">
+                                                <h6 class="text-primary xx-small fw-black mb-2 uppercase tracking-widest d-flex align-items-center gap-2">
+                                                    <i class="bi bi-tag-fill text-primary"></i> WHOLESALE BULK PRICING TIER
+                                                </h6>
+                                                <div class="row g-2">
+                                                    @foreach($product->wholesale_prices as $tier)
+                                                        <div class="col-6 col-sm-4">
+                                                            <div class="p-2 bg-white rounded border text-center" style="border-color: rgba(13,13,13,0.05) !important;">
+                                                                <div class="text-secondary opacity-75 xx-small fw-bold uppercase" style="font-size: 0.65rem;">{{ $tier['min_qty'] }}+ units</div>
+                                                                <div class="fw-bold text-dark mt-1" style="font-size: 0.85rem;">₹{{ number_format($tier['price'], 2) }}<span class="text-secondary small" style="font-size: 0.7rem; font-weight: normal;">/unit</span></div>
+                                                            </div>
+                                                        </div>
+                                                    @endforeach
+                                                </div>
+                                            </div>
+                                        @endif
+
                                         <!-- Data Grid: Tightened -->
                                         <div class="row g-2 mb-3">
                                             <div class="col-md-6">
@@ -789,6 +843,24 @@
                 container.appendChild(inputGroup);
             }
 
+            function addWholesaleField(containerId) {
+                const container = document.getElementById(containerId);
+                const row = document.createElement('div');
+                row.className = 'row g-2 mb-2 align-items-center';
+                row.innerHTML = `
+                    <div class="col-5">
+                        <input type="number" name="wholesale_min_qty[]" class="form-control glass-input x-small" placeholder="e.g. 50" required>
+                    </div>
+                    <div class="col-5">
+                        <input type="number" step="0.01" name="wholesale_price[]" class="form-control glass-input x-small" placeholder="e.g. 95.00" required>
+                    </div>
+                    <div class="col-2">
+                        <button type="button" class="btn btn-danger btn-sm w-100 rounded-pill py-2 fw-bold x-small" onclick="this.parentElement.parentElement.remove()"><i class="bi bi-trash"></i></button>
+                    </div>
+                `;
+                container.appendChild(row);
+            }
+
             // Gallery Image Delete
             function deleteGalleryImage(id) {
                 if (confirm('Are you sure you want to delete this gallery image?')) {
@@ -928,7 +1000,7 @@
                                                             class="form-control glass-input x-small" step="0.01" placeholder="Global %">
                                                     </div> -->
                                             <div class="col-md-3">
-                                                <label class="form-label text-secondary x-small fw-bold">MIN QTY</label>
+                                                <label class="form-label text-secondary x-small fw-bold">MIN QTY for Orders</label>
                                                 <input type="number" name="minimum_order_quantity"
                                                     class="form-control glass-input x-small" value="1">
                                             </div>
@@ -937,6 +1009,26 @@
                                                         <input type="number" name="cod_advance_percent"
                                                             class="form-control glass-input x-small" placeholder="0.00" step="0.01">
                                                     </div> -->
+
+                                            <!-- Wholesale Pricing Section -->
+                                            <div class="col-12 mt-3">
+                                                <label class="form-label text-primary x-small fw-bold d-block"><i class="bi bi-tags-fill me-2"></i> WHOLESALE / BULK PRICING TIERS</label>
+                                                <div id="add-wholesale-container" class="border rounded-4 p-3 bg-light bg-opacity-25">
+                                                    <div class="row g-2 mb-2 align-items-center">
+                                                        <div class="col-5">
+                                                            <span class="x-small text-muted fw-bold">MINIMUM QUANTITY</span>
+                                                        </div>
+                                                        <div class="col-5">
+                                                            <span class="x-small text-muted fw-bold">DISCOUNTED UNIT PRICE (₹)</span>
+                                                        </div>
+                                                        <div class="col-2">
+                                                            <button type="button" class="btn btn-premium btn-sm w-100 py-2 rounded-pill fw-bold text-nowrap x-small text-dark animate-pulse" onclick="addWholesaleField('add-wholesale-container')">
+                                                                <i class="bi bi-plus-lg me-1"></i> Add Tier
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
 

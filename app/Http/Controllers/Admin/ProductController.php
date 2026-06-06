@@ -87,6 +87,22 @@ class ProductController extends Controller implements HasMiddleware
         $product->size = is_array($request->size) ? implode(',', $request->size) : $request->size;
         $product->color = is_array($request->color) ? implode(',', $request->color) : $request->color;
 
+        // Process Wholesale Prices
+        $wholesale_prices = [];
+        if ($request->has('wholesale_min_qty') && $request->has('wholesale_price')) {
+            $min_qties = $request->wholesale_min_qty;
+            $prices = $request->wholesale_price;
+            foreach ($min_qties as $index => $min_qty) {
+                if ($min_qty !== null && $min_qty !== '' && isset($prices[$index]) && $prices[$index] !== null && $prices[$index] !== '') {
+                    $wholesale_prices[] = [
+                        'min_qty' => (int) $min_qty,
+                        'price' => (float) $prices[$index]
+                    ];
+                }
+            }
+        }
+        $product->wholesale_prices = $wholesale_prices;
+
         if ($request->hasFile('image')) {
             $imageName = time() . '.' . $request->image->extension();
             $request->image->move(public_path('uploads/products'), $imageName);
@@ -166,6 +182,22 @@ class ProductController extends Controller implements HasMiddleware
         $product->selling_price = $request->selling_price;
         $product->size = is_array($request->size) ? implode(',', $request->size) : $request->size;
         $product->color = is_array($request->color) ? implode(',', $request->color) : $request->color;
+
+        // Process Wholesale Prices
+        $wholesale_prices = [];
+        if ($request->has('wholesale_min_qty') && $request->has('wholesale_price')) {
+            $min_qties = $request->wholesale_min_qty;
+            $prices = $request->wholesale_price;
+            foreach ($min_qties as $index => $min_qty) {
+                if ($min_qty !== null && $min_qty !== '' && isset($prices[$index]) && $prices[$index] !== null && $prices[$index] !== '') {
+                    $wholesale_prices[] = [
+                        'min_qty' => (int) $min_qty,
+                        'price' => (float) $prices[$index]
+                    ];
+                }
+            }
+        }
+        $product->wholesale_prices = $wholesale_prices;
 
         $product->save();
 

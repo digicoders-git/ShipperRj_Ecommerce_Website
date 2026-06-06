@@ -109,8 +109,18 @@
         }
     @endphp
 
+    @php
+        $showRevenue = $isAdmin || ($subAdmin && $subAdmin->hasPermission('transactions_view'));
+        $showOrders = $isAdmin || ($subAdmin && $subAdmin->hasPermission('orders_view'));
+        $showUsers = $isAdmin || ($subAdmin && $subAdmin->hasPermission('users_view'));
+        $showProducts = $isAdmin || ($subAdmin && $subAdmin->hasPermission('products_view'));
+        $showExecutiveOverview = $showRevenue || $showOrders || $showUsers || $showProducts;
+    @endphp
+
+    @if($showExecutiveOverview)
     <!-- Executive Status Cards Row -->
     <div class="row g-4 mb-5">
+        @if($showRevenue)
         <!-- Revenue Card -->
         <div class="col-sm-6 col-xl-3">
             <a href="{{ route('admin.transactions.index') }}"
@@ -130,7 +140,9 @@
                     ₹{{ number_format($rev, 2) }}</h2>
             </a>
         </div>
+        @endif
 
+        @if($showOrders)
         <!-- Orders Card -->
         <div class="col-sm-6 col-xl-3">
             <a href="{{ route('admin.orders.index') }}"
@@ -157,7 +169,9 @@
                 </h2>
             </a>
         </div>
+        @endif
 
+        @if($showUsers)
         <!-- Users Card -->
         <div class="col-sm-6 col-xl-3">
             <a href="{{ route('admin.users.index') }}"
@@ -178,7 +192,9 @@
                 </h2>
             </a>
         </div>
+        @endif
 
+        @if($showProducts)
         <!-- Inventory Card -->
         <div class="col-sm-6 col-xl-3">
             <a href="{{ route('admin.products.index') }}"
@@ -199,8 +215,30 @@
                 </h2>
             </a>
         </div>
+        @endif
     </div>
+    @endif
 
+    @php
+        $showQuickStats = $isAdmin || ($subAdmin && (
+            $subAdmin->hasPermission('categories_view') ||
+            $subAdmin->hasPermission('sub_categories_view') ||
+            $subAdmin->hasPermission('coupons_view') ||
+            $subAdmin->hasPermission('transactions_view') ||
+            $subAdmin->hasPermission('wallet_deals_view') ||
+            $subAdmin->hasPermission('users_view') ||
+            $subAdmin->hasPermission('seller_inquiries_view') ||
+            $subAdmin->hasPermission('complaints_view') ||
+            $subAdmin->hasPermission('contacts_view') ||
+            $subAdmin->hasPermission('support_view') ||
+            $subAdmin->hasPermission('reviews_view') ||
+            $subAdmin->hasPermission('refunds_view') ||
+            $subAdmin->hasPermission('faqs_view') ||
+            $subAdmin->hasPermission('home_sliders_view')
+        ));
+    @endphp
+
+    @if($showQuickStats)
     <!-- Module Status Cards Grid -->
     <div class="mb-4">
         <h4 class="fw-black mb-1 text-dark d-flex align-items-center gap-2" style="letter-spacing: -0.5px;">
@@ -505,11 +543,19 @@
             </div>
         @endif
     </div>
+    @endif
 
+    @php
+        $showRevenueChart = $isAdmin || ($subAdmin && ($subAdmin->hasPermission('transactions_view') || $subAdmin->hasPermission('orders_view')));
+        $showOrderStatusChart = $isAdmin || ($subAdmin && $subAdmin->hasPermission('orders_view'));
+    @endphp
+
+    @if($showRevenueChart || $showOrderStatusChart)
     <!-- Analytics Chart & Modules -->
     <div class="row g-4 mb-5">
+        @if($showRevenueChart)
         <!-- Chart Area -->
-        <div class="col-xl-8">
+        <div class="{{ $showOrderStatusChart ? 'col-xl-8' : 'col-xl-12' }}">
             <div class="card bg-white border-0 rounded-4 p-4 h-100 shadow-sm">
                 <div class="d-flex justify-content-between align-items-end mb-4 flex-wrap gap-3">
                     <div>
@@ -529,8 +575,12 @@
                     <canvas id="revenueChart"></canvas>
                 </div>
             </div>
-        </div>        <!-- Order Fulfillment Status Chart -->
-        <div class="col-xl-4">
+        </div>
+        @endif
+
+        @if($showOrderStatusChart)
+        <!-- Order Fulfillment Status Chart -->
+        <div class="{{ $showRevenueChart ? 'col-xl-4' : 'col-xl-12' }}">
             <div class="card bg-white border-0 rounded-4 p-4 h-100 shadow-sm d-flex flex-column">
                 <h5 class="fw-bold mb-1 text-dark">Order Status Breakdown</h5>
                 <p class="text-secondary x-small mb-4 fw-medium">Distribution of all active orders</p>
@@ -540,8 +590,11 @@
                 </div>
             </div>
         </div>
+        @endif
     </div>
+    @endif
 
+    @if($isAdmin || ($subAdmin && ($subAdmin->hasPermission('orders_view') || $subAdmin->hasPermission('transactions_view'))))
     <!-- Recent Transactions Table -->
     <div class="card bg-white border-0 rounded-4 shadow-sm overflow-hidden mb-4 p-0">
         <div
@@ -628,6 +681,7 @@
             </table>
         </div>
     </div>
+    @endif
 @endsection
 
 @push('scripts')

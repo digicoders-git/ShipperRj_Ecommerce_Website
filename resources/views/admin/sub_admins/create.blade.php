@@ -1,5 +1,7 @@
 @extends('layouts.admin')
 
+@section('title', 'Add New Sub Admin')
+
 @section('admin_content')
 <div class="container py-5">
     <div class="d-flex justify-content-between align-items-center mb-4">

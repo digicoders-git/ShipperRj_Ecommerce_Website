@@ -15,7 +15,7 @@ class UserController extends Controller implements HasMiddleware
     {
         return [
             new Middleware('check.subadmin:users_view', only: ['index', 'show']),
-            new Middleware('check.subadmin:users_edit', only: ['update']),
+            new Middleware('check.subadmin:users_edit', only: ['update', 'adjustWallet']),
             new Middleware('check.subadmin:users_delete', only: ['destroy']),
             new Middleware('check.subadmin:users_block', only: ['toggleBlock']),
         ];
@@ -82,6 +82,43 @@ class UserController extends Controller implements HasMiddleware
     {
         User::findOrFail($id)->delete();
         return back()->with('success', 'User deleted successfully.');
+    }
+
+    /**
+     * Adjust the wallet balance of a user.
+     */
+    public function adjustWallet(Request $request, string $id)
+    {
+        $request->validate([
+            'amount' => 'required|numeric|min:0.01',
+            'type' => 'required|in:credit,debit',
+            'description' => 'required|string|max:255',
+        ]);
+
+        $user = User::findOrFail($id);
+        $amount = (float) $request->amount;
+        $type = $request->type;
+        $description = $request->description;
+
+        if ($type === 'debit' && $user->wallet_balance < $amount) {
+            return back()->with('error', 'Insufficient wallet balance. User current balance is ₹' . number_format($user->wallet_balance, 2));
+        }
+
+        if ($type === 'credit') {
+            $user->increment('wallet_balance', $amount);
+        } else {
+            $user->decrement('wallet_balance', $amount);
+        }
+
+        \App\Models\WalletTransaction::create([
+            'user_id' => $user->id,
+            'amount' => $amount,
+            'type' => $type === 'credit' ? 1 : 2, // 1 for Credit, 2 for Debit
+            'description' => $description,
+        ]);
+
+        $actionWord = $type === 'credit' ? 'credited with' : 'debited by';
+        return back()->with('success', "Wallet has been successfully $actionWord ₹" . number_format($amount, 2));
     }
 }
 

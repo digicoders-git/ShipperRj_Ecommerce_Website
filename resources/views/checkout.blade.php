@@ -256,9 +256,12 @@
                                                 <div class="flex-grow-1">
                                                     <h6 class="fw-black text-dark mb-1">{{ $item['name'] }}</h6>
                                                     <div class="d-flex align-items-center gap-3 mb-2">
-                                                        <span
-                                                            class="fw-black text-primary">₹{{ number_format($item['price']) }}</span>
-                                                        <span class="text-muted small">Qty: {{ $item['qty'] }}</span>
+                                                        <span class="fw-black text-primary product-unit-price" data-id="{{ $item['id'] }}">₹{{ number_format($item['price']) }}</span>
+                                                        <div class="d-flex align-items-center bg-light border rounded-pill px-2" style="width: fit-content; gap: 8px; height: 32px;">
+                                                            <button type="button" class="btn btn-sm btn-link p-0 text-dark fw-bold text-decoration-none" style="font-size: 1.1rem; line-height: 1;" onclick="changeCheckoutQty('{{ $item['id'] }}', '{{ $item['cart_id'] ?? '' }}', -1, '{{ $order_type }}', {{ $item['min_qty'] }}, {{ $item['stock'] }}, this)">&minus;</button>
+                                                            <input type="number" class="text-center fw-bold border-0 bg-transparent checkout-qty-input" value="{{ $item['qty'] }}" min="{{ $item['min_qty'] }}" max="{{ $item['stock'] }}" style="width: 40px; font-size: 0.9rem;" onchange="handleCheckoutQtyType(this, '{{ $item['id'] }}', '{{ $item['cart_id'] ?? '' }}', '{{ $order_type }}', {{ $item['min_qty'] }}, {{ $item['stock'] }})">
+                                                            <button type="button" class="btn btn-sm btn-link p-0 text-dark fw-bold text-decoration-none" style="font-size: 1.1rem; line-height: 1;" onclick="changeCheckoutQty('{{ $item['id'] }}', '{{ $item['cart_id'] ?? '' }}', 1, '{{ $order_type }}', {{ $item['min_qty'] }}, {{ $item['stock'] }}, this)">+</button>
+                                                        </div>
                                                     </div>
                                                     <div class="d-flex gap-2 flex-wrap">
                                                         <div
@@ -313,7 +316,7 @@
                                                             $advanceTotal += ($item['price'] * $item['qty'] * $item['advance_percent'] / 100);
                                                         }
                                                     @endphp
-                                                    <p class="text-secondary small mb-3 lh-sm">Pay <b class="text-dark">₹{{ number_format($base_advance + $cod_shipping, 2) }}</b> now and rest <b class="text-dark">₹{{ number_format($total - $base_advance, 2) }}</b> on delivery.</p>
+                                                    <p class="text-secondary small mb-3 lh-sm">Pay <b class="text-dark">₹<span id="codAdvancePlusShippingDisplay">{{ number_format($base_advance + $cod_shipping, 2) }}</span></b> now and rest <b class="text-dark">₹<span id="codRestDisplay">{{ number_format($total - $base_advance, 2) }}</span></b> on delivery.</p>
                                                     <div class="d-flex align-items-center gap-2">
                                                         <i class="bi bi-truck text-primary"></i>
                                                         <span class="xx-small text-primary fw-bold uppercase">Advance Required</span>
@@ -322,14 +325,12 @@
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="payment-card p-4 rounded-4 border" onclick="selectPayment('online', this)">
-                                                     @if($shipping_savings_amount > 0)
-                                                <div class="p-2 rounded-3 bg-success bg-opacity-10 border border-success border-opacity-10 mb-3 animate-pulse-light">
+                                                <div id="shippingSavingsAlert" class="p-2 rounded-3 bg-success bg-opacity-10 border border-success border-opacity-10 mb-3 animate-pulse-light" style="{{ $shipping_savings_amount > 0 ? '' : 'display: none !important;' }}">
                                                     <div class="d-flex align-items-center gap-2">
                                                         <i class="bi bi-lightning-charge-fill text-success x-small"></i>
-                                                        <span class="xx-small text-success fw-black uppercase tracking-tighter">Save ₹{{ number_format($shipping_savings_amount) }} ({{ round($shipping_savings_pct, 1) }}%) by paying online</span>
+                                                        <span class="xx-small text-success fw-black uppercase tracking-tighter">Save ₹<span id="shippingSavingsAmountDisplay">{{ number_format($shipping_savings_amount) }}</span> (<span id="shippingSavingsPctDisplay">{{ round($shipping_savings_pct, 1) }}</span>%) by paying online</span>
                                                     </div>
                                                 </div>
-                                            @endif
                                                     <div class="d-flex justify-content-between align-items-center mb-3">
                                                         
                                                         <h6 class="fw-black mb-0">Full Online</h6>
@@ -337,7 +338,7 @@
                                                             <i class="bi bi-check-circle-fill"></i>
                                                         </div>
                                                     </div>
-                                                    <p class="text-secondary small mb-3 lh-sm">Pay full <b>₹{{ number_format($total) }}</b> online for faster processing & priority delivery.</p>
+                                                    <p class="text-secondary small mb-3 lh-sm">Pay full <b>₹<span id="onlineTotalDisplay">{{ number_format($total, 2) }}</span></b> online for faster processing & priority delivery.</p>
                                                     <div class="d-flex align-items-center gap-2">
                                                         <i class="bi bi-shield-check text-success"></i>
                                                         <span class="xx-small text-success fw-bold uppercase">Safe & Secure</span>
@@ -393,22 +394,17 @@
                                                     foreach ($items as $item)
                                                         $total_qty += $item['qty']; 
                                                 @endphp
-                                                <span class="text-muted fw-medium">Price ({{ $total_qty }} items)</span>
+                                                <span class="text-muted fw-medium" id="totalQtyDisplay">Price ({{ $total_qty }} items)</span>
                                                 <span class="fw-black text-dark">₹<span id="subtotalDisplay">{{ number_format($total, 2) }}</span></span>
                                             </div>
                                             <div class="d-flex justify-content-between mb-2 align-items-center">
                                                 <span class="text-muted fw-medium" id="shippingMethodLabel">Shipping Charges</span>
                                                 <span class="text-dark fw-bold" id="shippingDisplay">--</span>
                                             </div>
-
-                                            <!-- @if($shipping_savings_amount > 0)
-                                                <div class="p-2 rounded-3 bg-success bg-opacity-10 border border-success border-opacity-10 mb-3 animate-pulse-light">
-                                                    <div class="d-flex align-items-center gap-2">
-                                                        <i class="bi bi-lightning-charge-fill text-success x-small"></i>
-                                                        <span class="xx-small text-success fw-black uppercase tracking-tighter">Save ₹{{ number_format($shipping_savings_amount, 2) }} ({{ round($shipping_savings_pct, 1) }}%) by paying online</span>
-                                                    </div>
-                                                </div>
-                                            @endif -->
+                                            <div class="d-flex justify-content-between mb-2 align-items-center d-none" id="gstRow">
+                                                 <span class="text-muted fw-medium">GST (18%)</span>
+                                                 <span class="text-dark fw-bold">+₹<span id="gstDisplay">0.00</span></span>
+                                            </div>
 
                                             <div id="couponSection" class="mt-4 mb-3">
                                                 <div class="luxury-input-wrapper mb-2">
@@ -417,6 +413,26 @@
                                                     <button type="button" onclick="applyCoupon()" class="btn btn-sm btn-primary position-absolute end-0 top-50 translate-middle-y me-2 rounded-pill px-3 py-1 fw-bold" style="font-size: 0.65rem;">APPLY</button>
                                                 </div>
                                                 <p id="couponMsg" class="xx-small fw-bold mb-0 mt-1"></p>
+                                            </div>
+
+                                            <!-- GST Option Section -->
+                                            <div id="gstSection" class="mb-4">
+                                                 <div class="form-check form-switch mb-2">
+                                                     <input class="form-check-input" type="checkbox" name="has_gst" id="gstCheckbox" value="1" onchange="toggleGst(this)">
+                                                     <label class="form-check-label small fw-bold text-dark" for="gstCheckbox">
+                                                         Add GST (18%) / GST Invoice
+                                                     </label>
+                                                 </div>
+                                                 <div id="gstDetailsForm" style="display: none;" class="mt-2">
+                                                     <div class="luxury-input-wrapper mb-2">
+                                                         <i class="bi bi-building luxury-input-icon"></i>
+                                                         <input type="text" name="gst_company" id="gstCompanyInput" class="luxury-input" placeholder="Company Name">
+                                                     </div>
+                                                     <div class="luxury-input-wrapper mb-2">
+                                                         <i class="bi bi-hash luxury-input-icon"></i>
+                                                         <input type="text" name="gst_number" id="gstNumberInput" class="luxury-input" placeholder="GSTIN (15 Digits)" minlength="15" maxlength="15">
+                                                     </div>
+                                                 </div>
                                             </div>
 
                                             @php
@@ -461,6 +477,14 @@
                     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
                     <style>
+                        .checkout-qty-input::-webkit-outer-spin-button,
+                        .checkout-qty-input::-webkit-inner-spin-button {
+                            -webkit-appearance: none;
+                            margin: 0;
+                        }
+                        .checkout-qty-input {
+                            -moz-appearance: textfield;
+                        }
                         :root {
                             --luxury-primary: #f2701a;
                             --luxury-accent: #ff4d00;
@@ -834,14 +858,15 @@
                             }
                         };
 
-                        const baseSubtotal = {{ $total }};
-                        const baseAdvance = {{ $base_advance }};
+                        let baseSubtotal = {{ $total }};
+                        let baseAdvance = {{ $base_advance }};
                         const minOrderVal = {{ $min_order_val ?? 0 }};
                         const orderItems = @json($items);
                         let currentShipping = 0;
                         let currentDiscount = 0;
-                        const onlineShipping = {{ $online_shipping }};
-                        const codShipping = {{ $cod_shipping }};
+                        let currentGstAmount = 0;
+                        let onlineShipping = {{ $online_shipping }};
+                        let codShipping = {{ $cod_shipping }};
 
                         function formatMoney(amount) {
                             return amount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -851,6 +876,30 @@
                             e.preventDefault();
                             const form = e.currentTarget || e.target;
  
+                            const gstCheckbox = document.getElementById('gstCheckbox');
+                            if (gstCheckbox && gstCheckbox.checked) {
+                                const gstNum = document.getElementById('gstNumberInput').value.trim();
+                                if (!gstNum) {
+                                    Swal.fire({
+                                        icon: 'warning',
+                                        title: 'GST NUMBER REQUIRED',
+                                        text: 'Please enter your 15-digit GST number.',
+                                        confirmButtonColor: '#f2701a'
+                                    });
+                                    return false;
+                                }
+                                const gstRegex = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
+                                if (!gstRegex.test(gstNum.toUpperCase())) {
+                                    Swal.fire({
+                                        icon: 'warning',
+                                        title: 'INVALID GST FORMAT',
+                                        text: 'Please enter a valid 15-digit GSTIN (e.g. 07AAAAA1111A1Z1).',
+                                        confirmButtonColor: '#f2701a'
+                                    });
+                                    return false;
+                                }
+                            }
+
                             for (const item of orderItems) {
                                 if (item.qty < item.min_qty) {
                                     Swal.fire({
@@ -906,9 +955,32 @@
                             updateGrandTotal();
                         }
 
+                        window.toggleGst = function(checkbox) {
+                            const detailsForm = document.getElementById('gstDetailsForm');
+                            if (checkbox.checked) {
+                                detailsForm.style.display = 'block';
+                            } else {
+                                detailsForm.style.display = 'none';
+                                document.getElementById('gstCompanyInput').value = '';
+                                document.getElementById('gstNumberInput').value = '';
+                            }
+                            updateGrandTotal();
+                        }
+
                         function updateGrandTotal() {
                             document.getElementById('shippingDisplay').innerText = '₹' + formatMoney(currentShipping);
-                            const grandTotal = (baseSubtotal + currentShipping) - currentDiscount;
+                            
+                            const gstCheckbox = document.getElementById('gstCheckbox');
+                            if (gstCheckbox && gstCheckbox.checked) {
+                                currentGstAmount = Math.round((baseSubtotal - currentDiscount) * 18) / 100;
+                                document.getElementById('gstRow').classList.remove('d-none');
+                                document.getElementById('gstDisplay').innerText = formatMoney(currentGstAmount);
+                            } else {
+                                currentGstAmount = 0;
+                                document.getElementById('gstRow').classList.add('d-none');
+                            }
+                            
+                            const grandTotal = (baseSubtotal + currentShipping + currentGstAmount) - currentDiscount;
                             document.getElementById('grandTotalDisplay').innerText = formatMoney(grandTotal);
 
                             let payableNow = 0;
@@ -961,6 +1033,210 @@
                                 }
                             } catch(err) {
                                 console.error('Coupon Error:', err);
+                            }
+                        }
+
+                        window.changeCheckoutQty = function(productId, cartId, delta, orderType, minQty, maxStock, btnEl) {
+                            const input = btnEl.parentElement.querySelector('input');
+                            let val = (parseInt(input.value) || 1) + delta;
+                            if (val < minQty) {
+                                Swal.fire({
+                                    icon: 'warning',
+                                    title: 'MINIMUM QUANTITY ERROR',
+                                    text: `Minimum order quantity is ${minQty} units.`,
+                                    confirmButtonColor: '#f2701a'
+                                });
+                                return;
+                            }
+                            if (val > maxStock) {
+                                Swal.fire({
+                                    icon: 'warning',
+                                    title: 'STOCK LIMIT ERROR',
+                                    text: `Only ${maxStock} units are available in stock.`,
+                                    confirmButtonColor: '#f2701a'
+                                });
+                                return;
+                            }
+                            input.value = val;
+                            processCheckoutQtyUpdate(productId, cartId, val, orderType);
+                        }
+
+                        window.handleCheckoutQtyType = function(inputEl, productId, cartId, orderType, minQty, maxStock) {
+                            let val = parseInt(inputEl.value);
+                            if (isNaN(val) || val < minQty) {
+                                Swal.fire({
+                                    icon: 'warning',
+                                    title: 'MINIMUM QUANTITY ERROR',
+                                    text: `Minimum order quantity is ${minQty} units.`,
+                                    confirmButtonColor: '#f2701a'
+                                });
+                                inputEl.value = minQty;
+                                val = minQty;
+                            } else if (val > maxStock) {
+                                Swal.fire({
+                                    icon: 'warning',
+                                    title: 'STOCK LIMIT ERROR',
+                                    text: `Only ${maxStock} units are available in stock.`,
+                                    confirmButtonColor: '#f2701a'
+                                });
+                                inputEl.value = maxStock;
+                                val = maxStock;
+                            }
+                            processCheckoutQtyUpdate(productId, cartId, val, orderType);
+                        }
+
+                        async function processCheckoutQtyUpdate(productId, cartId, newQty, orderType) {
+                            // Find the item in local orderItems array and update its quantity
+                            let item = orderItems.find(i => i.id == productId);
+                            if (item) {
+                                item.qty = newQty;
+                                
+                                // Recalculate price using wholesale tiered pricing
+                                let price = parseFloat(item.selling_price);
+                                if (item.wholesale_prices && Array.isArray(item.wholesale_prices)) {
+                                    let sortedTiers = [...item.wholesale_prices].sort((a, b) => parseInt(b.min_qty) - parseInt(a.min_qty));
+                                    for (let tier of sortedTiers) {
+                                        if (newQty >= parseInt(tier.min_qty)) {
+                                            price = parseFloat(tier.price);
+                                            break;
+                                        }
+                                    }
+                                }
+                                item.price = price;
+                                item.online_shipping = price * parseFloat(item.online_shipping_pct) / 100;
+                                item.cod_shipping = price * parseFloat(item.cod_shipping_pct) / 100;
+                                
+                                // Update item's price display in the UI list
+                                const priceSpan = document.querySelector(`.product-unit-price[data-id="${productId}"]`);
+                                if (priceSpan) {
+                                    priceSpan.innerText = '₹' + formatMoney(price);
+                                }
+                            }
+
+                            // Update the hidden quantity input for Buy Now
+                            const hiddenQtyInput = document.querySelector('input[name="qty"]');
+                            if (hiddenQtyInput) {
+                                hiddenQtyInput.value = newQty;
+                            }
+
+                            // Update all price details and coupon values instantly in place
+                            updatePricesAndTotals();
+
+                            if (orderType === 'cart') {
+                                // Background DB update for cart
+                                const placeBtn = document.getElementById('placeOrderBtn');
+                                const originalPlaceHtml = placeBtn ? placeBtn.innerHTML : '';
+                                if (placeBtn) {
+                                    placeBtn.disabled = true;
+                                    placeBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> SAVING...';
+                                }
+
+                                const data = {};
+                                data['quantities'] = {};
+                                data['quantities'][cartId] = newQty;
+
+                                try {
+                                    const freshToken = await window.getFreshCsrfToken();
+                                    await fetch('/cart/update', {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                            'X-CSRF-TOKEN': freshToken,
+                                            'Accept': 'application/json'
+                                        },
+                                        body: JSON.stringify(data)
+                                    });
+                                } catch (error) {
+                                    console.error('Error updating cart in database:', error);
+                                } finally {
+                                    if (placeBtn) {
+                                        const paymentMethod = document.getElementById('paymentMethodInput').value;
+                                        placeBtn.disabled = !paymentMethod;
+                                        placeBtn.innerHTML = originalPlaceHtml;
+                                    }
+                                }
+                            }
+                        }
+
+                        function updatePricesAndTotals() {
+                            let newSubtotal = 0;
+                            let newAdvance = 0;
+                            let newOnlineShipping = 0;
+                            let newCodShipping = 0;
+                            let totalQty = 0;
+                            
+                            orderItems.forEach(i => {
+                                totalQty += i.qty;
+                                newSubtotal += i.price * i.qty;
+                                newAdvance += i.price * i.qty * parseFloat(i.advance_percent) / 100;
+                                newOnlineShipping += i.online_shipping * i.qty;
+                                newCodShipping += i.cod_shipping * i.qty;
+                            });
+                            
+                            baseSubtotal = newSubtotal;
+                            baseAdvance = newAdvance;
+                            onlineShipping = newOnlineShipping;
+                            codShipping = newCodShipping;
+                            
+                            // Update display elements
+                            const qtyDisplay = document.getElementById('totalQtyDisplay');
+                            if (qtyDisplay) {
+                                qtyDisplay.innerText = `Price (${totalQty} items)`;
+                            }
+                            const subtotalDisplay = document.getElementById('subtotalDisplay');
+                            if (subtotalDisplay) {
+                                subtotalDisplay.innerText = formatMoney(baseSubtotal);
+                            }
+                            
+                            const codAdvPlusShip = document.getElementById('codAdvancePlusShippingDisplay');
+                            if (codAdvPlusShip) {
+                                codAdvPlusShip.innerText = formatMoney(baseAdvance + codShipping);
+                            }
+                            const codRest = document.getElementById('codRestDisplay');
+                            if (codRest) {
+                                codRest.innerText = formatMoney(baseSubtotal - baseAdvance);
+                            }
+                            const onlineTotal = document.getElementById('onlineTotalDisplay');
+                            if (onlineTotal) {
+                                onlineTotal.innerText = formatMoney(baseSubtotal);
+                            }
+                            
+                            const savingsAmount = codShipping - onlineShipping;
+                            const savingsPct = baseSubtotal > 0 ? (savingsAmount / baseSubtotal * 100) : 0;
+                            
+                            const savingsAlert = document.getElementById('shippingSavingsAlert');
+                            if (savingsAlert) {
+                                if (savingsAmount > 0) {
+                                    savingsAlert.style.display = 'block';
+                                    const savingsAmtDisp = document.getElementById('shippingSavingsAmountDisplay');
+                                    if (savingsAmtDisp) {
+                                        savingsAmtDisp.innerText = formatMoney(savingsAmount);
+                                    }
+                                    const savingsPctDisp = document.getElementById('shippingSavingsPctDisplay');
+                                    if (savingsPctDisp) {
+                                        savingsPctDisp.innerText = savingsPct.toFixed(1);
+                                    }
+                                } else {
+                                    savingsAlert.style.display = 'none';
+                                }
+                            }
+                            
+                            // Update shipping based on current selected payment method
+                            const currentMethod = document.getElementById('paymentMethodInput').value;
+                            if (currentMethod) {
+                                currentShipping = (currentMethod === 'online') ? onlineShipping : codShipping;
+                                const label = document.getElementById('shippingMethodLabel');
+                                if (label) {
+                                    label.innerText = (currentMethod === 'online') ? 'Online Shipping Charges' : 'COD Shipping Charges';
+                                }
+                            }
+                            
+                            // Re-apply coupon or just update grand total
+                            const couponInput = document.getElementById('couponInput');
+                            if (couponInput && couponInput.value) {
+                                applyCoupon();
+                            } else {
+                                updateGrandTotal();
                             }
                         }
                     </script>

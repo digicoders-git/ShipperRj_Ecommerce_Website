@@ -1,5 +1,7 @@
 @extends('layouts.admin')
 
+@section('title', 'Sub Admin Management')
+
 @section('admin_content')
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h5 class="fw-bold mb-0">Sub Admin Management</h5>
@@ -106,73 +108,86 @@
     <div class="modal fade" id="subAdminViewModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content overflow-hidden border-0 shadow-lg rounded-4">
-                <div class="modal-header border-0 p-4"
-                    style="background: linear-gradient(135deg, #f0ca84ff 0%, #f7c048ff 100%);">
+                <div class="modal-header border-0 p-4 text-white"
+                    style="background: linear-gradient(135deg,  #efeae8ff 0%, #959392ff 100%); border-bottom: 3px solid var(--premium-orange);">
                     <div class="d-flex align-items-center">
-                        <div class="bg-primary bg-opacity-10 p-2 rounded-3 me-3">
-                            <i class="bi bi-shield-lock-fill text-light fs-4"></i>
+                        <div class="p-2 rounded-circle me-3 d-flex align-items-center justify-content-center"
+                            style="background: rgba(255, 255, 255, 0.1); width: 46px; height: 46px; border: 1px solid rgba(37, 37, 37, 0.15);">
+                            <i class="bi bi-shield-lock-fill text-warning fs-4"></i>
                         </div>
                         <div>
-                            <h5 class="modal-title fw-black text-white" id="modalSubAdminName">Account Details</h5>
-                            <p class="text-white opacity-50 small mb-0 font-monospace" id="modalSubAdminUsername">admin_user
-                            </p>
+                            <h5 class="modal-title fw-black text-white outfit" id="modalSubAdminName">Account Details</h5>
+                            <p class="text-white opacity-100 small mb-0 font-monospace" id="modalSubAdminUsername">admin_user</p>
                         </div>
                     </div>
-                    <button type="button" class="btn-close btn-close-white opacity-50" data-bs-dismiss="modal"
+                    <button type="button" class="btn-close btn-close-white opacity-75 shadow-none" data-bs-dismiss="modal"
                         aria-label="Close"></button>
                 </div>
                 <div class="modal-body p-4 bg-light">
                     <div class="row g-4">
                         <!-- Basic Info -->
                         <div class="col-md-6">
-                            <div class="p-4 bg-white rounded-4 shadow-sm h-100 border border-dark border-opacity-5">
-                                <h6 class="fw-black mb-3 border-bottom pb-2 text-uppercase small ls-1 opacity-75">
-                                    <i class="bi bi-person-lines-fill me-2 text-primary"></i> Personal Information
-                                </h6>
-                                <div class="mb-3">
-                                    <label class="xx-small text-muted fw-bold text-uppercase d-block mb-1">Full Name</label>
-                                    <span class="fw-bold text-dark fs-6" id="viewName"></span>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="xx-small text-muted fw-bold text-uppercase d-block mb-1">Email Id</label>
-                                    <span class="fw-bold text-dark font-monospace" id="viewEmail"></span>
-                                </div>
-                                <div class="mb-0">
-                                    <label
-                                        class="xx-small text-muted fw-bold text-uppercase d-block mb-1">Phone/Mobile</label>
-                                    <span class="fw-bold text-dark" id="viewPhone"></span>
+                            <div class="p-4 bg-white rounded-4 shadow-sm h-100 border border-dark border-opacity-5 d-flex flex-column justify-content-between">
+                                <div>
+                                    <h6 class="fw-black mb-4 border-bottom pb-2 text-uppercase small ls-1 text-dark" style="letter-spacing: 0.5px;">
+                                        <i class="bi bi-person-lines-fill me-2 text-primary"></i> Personal Information
+                                    </h6>
+                                    <div class="mb-3 d-flex align-items-start gap-3">
+                                        <div class="p-2 rounded-3 bg-light text-primary" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;"><i class="bi bi-person-fill"></i></div>
+                                        <div>
+                                            <label class="xx-small text-muted fw-bold text-uppercase d-block mb-0" style="font-size: 0.65rem;">Full Name</label>
+                                            <span class="fw-bold text-dark fs-6" id="viewName"></span>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3 d-flex align-items-start gap-3">
+                                        <div class="p-2 rounded-3 bg-light text-primary" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;"><i class="bi bi-envelope-fill"></i></div>
+                                        <div>
+                                            <label class="xx-small text-muted fw-bold text-uppercase d-block mb-0" style="font-size: 0.65rem;">Email Id</label>
+                                            <span class="fw-bold text-dark font-monospace" id="viewEmail"></span>
+                                        </div>
+                                    </div>
+                                    <div class="mb-0 d-flex align-items-start gap-3">
+                                        <div class="p-2 rounded-3 bg-light text-primary" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;"><i class="bi bi-telephone-fill"></i></div>
+                                        <div>
+                                            <label class="xx-small text-muted fw-bold text-uppercase d-block mb-0" style="font-size: 0.65rem;">Phone/Mobile</label>
+                                            <span class="fw-bold text-dark" id="viewPhone"></span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Security Info -->
                         <div class="col-md-6">
-                            <div class="p-4 bg-white rounded-4 shadow-sm h-100 border border-dark border-opacity-5">
-                                <h6 class="fw-black mb-3 border-bottom pb-2 text-uppercase small ls-1 opacity-75">
-                                    <i class="bi bi-key-fill me-2 text-warning"></i> Security & Access
-                                </h6>
-                                <div class="mb-3">
-                                    <label class="xx-small text-muted fw-bold text-uppercase d-block mb-1">Status</label>
-                                    <div id="viewStatus"></div>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="xx-small text-muted fw-bold text-uppercase d-block mb-1">Current
-                                        Password</label>
-                                    <div class="d-flex align-items-center">
-                                        <span
-                                            class="fw-bold text-dark font-monospace bg-light px-3 py-1 rounded small border"
-                                            id="viewPlainPassword">
-                                            ---
-                                        </span>
-                                        <span
-                                            class="badge bg-success-soft text-success border-0 ms-2 xx-small fw-black text-uppercase"
-                                            id="passLabel">Decrypted</span>
+                            <div class="p-4 bg-white rounded-4 shadow-sm h-100 border border-dark border-opacity-5 d-flex flex-column justify-content-between">
+                                <div>
+                                    <h6 class="fw-black mb-4 border-bottom pb-2 text-uppercase small ls-1 text-dark" style="letter-spacing: 0.5px;">
+                                        <i class="bi bi-key-fill me-2 text-warning"></i> Security & Access
+                                    </h6>
+                                    <div class="mb-3 d-flex align-items-start gap-3">
+                                        <div class="p-2 rounded-3 bg-light text-warning" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;"><i class="bi bi-activity"></i></div>
+                                        <div>
+                                            <label class="xx-small text-muted fw-bold text-uppercase d-block mb-1" style="font-size: 0.65rem;">Status</label>
+                                            <div id="viewStatus"></div>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="mb-0">
-                                    <label class="xx-small text-muted fw-bold text-uppercase d-block mb-1">Created
-                                        On</label>
-                                    <span class="fw-bold text-dark small" id="viewCreated"></span>
+                                    <div class="mb-3 d-flex align-items-start gap-3">
+                                        <div class="p-2 rounded-3 bg-light text-warning" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;"><i class="bi bi-shield-lock"></i></div>
+                                        <div>
+                                            <label class="xx-small text-muted fw-bold text-uppercase d-block mb-1" style="font-size: 0.65rem;">Current Password</label>
+                                            <div class="d-flex align-items-center">
+                                                <span class="fw-bold text-dark font-monospace bg-light px-3 py-1 rounded border small" id="viewPlainPassword">---</span>
+                                                <span class="badge bg-success bg-opacity-10 text-success border-0 ms-2 xx-small fw-black text-uppercase">Decrypted</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-0 d-flex align-items-start gap-3">
+                                        <div class="p-2 rounded-3 bg-light text-warning" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;"><i class="bi bi-calendar-check-fill"></i></div>
+                                        <div>
+                                            <label class="xx-small text-muted fw-bold text-uppercase d-block mb-0" style="font-size: 0.65rem;">Created On</label>
+                                            <span class="fw-bold text-dark small" id="viewCreated"></span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -180,10 +195,10 @@
                         <!-- Permissions Section -->
                         <div class="col-12">
                             <div class="p-4 bg-white rounded-4 shadow-sm border border-dark border-opacity-5">
-                                <h6 class="fw-black mb-3 border-bottom pb-2 text-uppercase small ls-1 opacity-75">
+                                <h6 class="fw-black mb-3 border-bottom pb-2 text-uppercase small ls-1 text-dark" style="letter-spacing: 0.5px;">
                                     <i class="bi bi-shield-check me-2 text-success"></i> Assigned System Permissions
                                 </h6>
-                                <div class="d-flex flex-wrap gap-2" id="viewPermissions">
+                                <div class="d-flex flex-wrap gap-2" id="viewPermissions" style="margin-top: 15px;">
                                     <!-- Populated dynamically -->
                                 </div>
                             </div>
@@ -191,8 +206,10 @@
                     </div>
                 </div>
                 <div class="modal-footer border-0 p-4 pt-0 bg-light">
-                    <button type="button" class="btn btn-secondary rounded-pill px-5 fw-bold" data-bs-dismiss="modal">Close
-                        Panel</button>
+                    <button type="button" class="btn btn-secondary rounded-pill px-5 py-2.5 fw-bold border-0 transition-all hover-scale" 
+                        data-bs-dismiss="modal" style="background: #475569 !important; box-shadow: 0 4px 6px rgba(71, 85, 105, 0.2);">
+                        Close Panel
+                    </button>
                 </div>
             </div>
         </div>
@@ -221,7 +238,7 @@
                 if (permissions && permissions.length > 0) {
                     permissions.forEach(p => {
                         const label = p.replace('_', ' ').toUpperCase();
-                        permHtml += `<span class="badge bg-primary-soft text-primary border-0 px-3 py-2 fw-bold xx-small ls-1 m-1"><i class="bi bi-patch-check-fill me-1 opacity-75"></i> ${label}</span>`;
+                        permHtml += `<span class="badge bg-warning bg-opacity-10 text-orange border border-warning border-opacity-25 px-3 py-2 fw-bold xx-small ls-1 m-1 d-inline-flex align-items-center gap-1 text-uppercase" style="color: #f2701a !important; background: rgba(242, 112, 26, 0.08) !important; border: 1px solid rgba(242, 112, 26, 0.2) !important;"><i class="bi bi-patch-check-fill" style="color: #f2701a;"></i> ${label}</span>`;
                     });
                 } else {
                     permHtml = '<span class="text-muted small fw-bold">No permissions assigned yet.</span>';

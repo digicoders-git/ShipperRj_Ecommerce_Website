@@ -32,7 +32,11 @@ class Order extends Model
         'cancel_reason',
         'return_status',
         'return_reason',
-        'delivered_at'
+        'delivered_at',
+        'has_gst',
+        'gst_number',
+        'gst_company',
+        'gst_amount'
     ];
 
     protected $casts = [

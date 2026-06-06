@@ -289,12 +289,13 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/login', [App\Http\Controllers\Admin\AuthController::class, 'showLoginForm'])->name('login');
     Route::post('/login', [App\Http\Controllers\Admin\AuthController::class, 'login'])->name('login.submit');
 
-    // Sub-Admin Specific Login
-    Route::get('/subadmin/login', [App\Http\Controllers\Admin\SubAdminController::class, 'showLogin'])->name('subadmin.login');
-    Route::post('/subadmin/login', [App\Http\Controllers\Admin\SubAdminController::class, 'login'])->name('subadmin.login.submit');
-
     Route::post('/logout', [App\Http\Controllers\Admin\AuthController::class, 'logout'])->name('logout');
 });
+
+// Sub-Admin Specific Login redirected to unified login
+Route::get('/subadmin/login', function () {
+    return redirect()->route('admin.login');
+})->name('admin.subadmin.login');
 
 // Protected Admin Panel Routes
 Route::prefix('admin')->name('admin.')->middleware('admin.auth')->group(function () {
@@ -310,6 +311,7 @@ Route::prefix('admin')->name('admin.')->middleware('admin.auth')->group(function
     Route::resource('/orders', App\Http\Controllers\Admin\OrderController::class);
     Route::resource('/users', App\Http\Controllers\Admin\UserController::class);
     Route::post('/users/{id}/toggle-block', [App\Http\Controllers\Admin\UserController::class, 'toggleBlock'])->name('users.toggle-block');
+    Route::post('/users/{id}/adjust-wallet', [App\Http\Controllers\Admin\UserController::class, 'adjustWallet'])->name('users.adjust-wallet');
     Route::resource('/complaints', App\Http\Controllers\Admin\ComplaintController::class);
     Route::resource('/contacts', App\Http\Controllers\Admin\ContactController::class);
     Route::resource('/order-tracking', App\Http\Controllers\Admin\OrderTrackingController::class);

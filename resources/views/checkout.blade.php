@@ -154,7 +154,7 @@
                                     </div>
 
                                     <button type="submit"
-                                        class="btn btn-luxury-primary w-100 py-3 rounded-pill fw-black shadow-premium border-0">
+                                        class="btn btn-luxury-primary w-100 py-3 rounded-3 fw-black shadow-premium border-0">
                                         COMPLETE PROFILE & SAVE
                                     </button>
                                 </form>
@@ -182,7 +182,7 @@
                         <div class="checkout-step-content active" id="step1-content">
                             <div class="d-flex justify-content-between align-items-center mb-4">
                                 <h4 class="fw-black mb-0">Select Delivery Address</h4>
-                                <button type="button" class="btn btn-outline-primary rounded-pill px-4"
+                                <button type="button" class="btn btn-outline-primary rounded-3 px-4"
                                     data-bs-toggle="modal" data-bs-target="#addAddressModal">
                                     <i class="bi bi-plus-lg me-2"></i> Add New Address
                                 </button>
@@ -222,7 +222,7 @@
                                             <h4 class="fw-black text-dark">Where should we deliver?</h4>
                                             <p class="text-muted small mb-4">Please add a shipping address to discover delivery
                                                 methods and estimated times for your items.</p>
-                                            <button type="button" class="btn btn-luxury-primary px-5 py-3 rounded-pill fw-black"
+                                            <button type="button" class="btn btn-luxury-primary px-5 py-3 rounded-3 fw-black"
                                                 data-bs-toggle="modal" data-bs-target="#addAddressModal">
                                                 <i class="bi bi-plus-lg me-2"></i> ADD SHIPPING ADDRESS
                                             </button>
@@ -233,7 +233,7 @@
 
                             <div class="text-end mt-5">
                                 <button type="button"
-                                    class="btn btn-primary bg-gradient-primary px-5 py-3 rounded-pill fw-black"
+                                    class="btn btn-primary bg-gradient-primary px-5 py-3 rounded-3 fw-black"
                                     onclick="goToStep(2)" {{ $addresses->isEmpty() ? 'disabled' : '' }}>
                                     CONTINUE <i class="bi bi-arrow-right ms-2"></i>
                                 </button>
@@ -257,7 +257,7 @@
                                                     <h6 class="fw-black text-dark mb-1">{{ $item['name'] }}</h6>
                                                     <div class="d-flex align-items-center gap-3 mb-2">
                                                         <span class="fw-black text-primary product-unit-price" data-id="{{ $item['id'] }}">₹{{ number_format($item['price']) }}</span>
-                                                        <div class="d-flex align-items-center bg-light border rounded-pill px-2" style="width: fit-content; gap: 8px; height: 32px;">
+                                                        <div class="d-flex align-items-center bg-light border rounded-3 px-2" style="width: fit-content; gap: 8px; height: 32px;">
                                                             <button type="button" class="btn btn-sm btn-link p-0 text-dark fw-bold text-decoration-none" style="font-size: 1.1rem; line-height: 1;" onclick="changeCheckoutQty('{{ $item['id'] }}', '{{ $item['cart_id'] ?? '' }}', -1, '{{ $order_type }}', {{ $item['min_qty'] }}, {{ $item['stock'] }}, this)">&minus;</button>
                                                             <input type="number" class="text-center fw-bold border-0 bg-transparent checkout-qty-input" value="{{ $item['qty'] }}" min="{{ $item['min_qty'] }}" max="{{ $item['stock'] }}" style="width: 40px; font-size: 0.9rem;" onchange="handleCheckoutQtyType(this, '{{ $item['id'] }}', '{{ $item['cart_id'] ?? '' }}', '{{ $order_type }}', {{ $item['min_qty'] }}, {{ $item['stock'] }})">
                                                             <button type="button" class="btn btn-sm btn-link p-0 text-dark fw-bold text-decoration-none" style="font-size: 1.1rem; line-height: 1;" onclick="changeCheckoutQty('{{ $item['id'] }}', '{{ $item['cart_id'] ?? '' }}', 1, '{{ $order_type }}', {{ $item['min_qty'] }}, {{ $item['stock'] }}, this)">+</button>
@@ -265,12 +265,12 @@
                                                     </div>
                                                     <div class="d-flex gap-2 flex-wrap">
                                                         <div
-                                                            class="xx-small text-secondary fw-bold uppercase px-2 py-1 bg-light d-inline-block rounded-pill">
+                                                            class="xx-small text-secondary fw-bold uppercase px-2 py-1 bg-light d-inline-block rounded-3">
                                                             DELIVERY IN 3-5 DAYS
                                                         </div>
                                                         @if($item['min_qty'] > 1)
                                                             <div
-                                                                class="xx-small text-danger fw-bold uppercase px-2 py-1 bg-danger bg-opacity-10 d-inline-block rounded-pill">
+                                                                class="xx-small text-danger fw-bold uppercase px-2 py-1 bg-danger bg-opacity-10 d-inline-block rounded-3">
                                                                 MOQ: {{ $item['min_qty'] }} Required
                                                             </div>
                                                         @endif
@@ -288,7 +288,7 @@
                                     <i class="bi bi-arrow-left me-2"></i> BACK TO ADDRESS
                                 </button>
                                 <button type="button"
-                                    class="btn btn-primary bg-gradient-primary px-5 py-3 rounded-pill fw-black"
+                                    class="btn btn-primary bg-gradient-primary px-5 py-3 rounded-3 fw-black"
                                     onclick="goToStep(3)">
                                     CONTINUE TO PAYMENT <i class="bi bi-arrow-right ms-2"></i>
                                 </button>
@@ -351,7 +351,7 @@
                                             <button type="button" class="btn btn-link text-dark text-decoration-none fw-bold" onclick="goToStep(2)">
                                                 <i class="bi bi-arrow-left me-2"></i> BACK TO SUMMARY
                                             </button>
-                                            <button type="submit" id="placeOrderBtn" class="btn btn-primary bg-gradient-primary px-5 py-3 rounded-pill fw-black" disabled>
+                                            <button type="submit" id="placeOrderBtn" class="btn btn-primary bg-gradient-primary px-5 py-3 rounded-3 fw-black" disabled>
                                                 PLACE ORDER <i class="bi bi-check-lg ms-2"></i>
                                             </button>
                                         </div>
@@ -410,7 +410,7 @@
                                                 <div class="luxury-input-wrapper mb-2">
                                                     <i class="bi bi-ticket-perforated luxury-input-icon"></i>
                                                     <input type="text" name="coupon_code" id="couponInput" class="luxury-input" placeholder="Enter Coupon Code">
-                                                    <button type="button" onclick="applyCoupon()" class="btn btn-sm btn-primary position-absolute end-0 top-50 translate-middle-y me-2 rounded-pill px-3 py-1 fw-bold" style="font-size: 0.65rem;">APPLY</button>
+                                                    <button type="button" onclick="applyCoupon()" class="btn btn-sm btn-primary position-absolute end-0 top-50 translate-middle-y me-2 rounded-3 px-3 py-1 fw-bold" style="font-size: 0.65rem;">APPLY</button>
                                                 </div>
                                                 <p id="couponMsg" class="xx-small fw-bold mb-0 mt-1"></p>
                                             </div>
@@ -452,13 +452,13 @@
                                                 </div>
                                             </div>
 
-                                            <div class="p-3 rounded-4 bg-primary bg-opacity-5 border border-primary border-opacity-10 mt-3 d-flex justify-content-between align-items-center">
+                                            <div class="p-3 rounded-4 mt-3 d-flex justify-content-between align-items-center glass-payable-box">
                                                 <div>
-                                                    <div class="xx-small text-light fw-black uppercase tracking-widest mb-1" id="payableNowLabel">Payable Now</div>
-                                                    <div class="x-small text-light fw-bold opacity-75 lh-sm">Total Payable Amount</div>
+                                                    <div class="xx-small fw-black uppercase tracking-widest mb-1" id="payableNowLabel" style="color: #e96715 !important;">Payable Now</div>
+                                                    <div class="x-small fw-bold opacity-75 lh-sm text-dark">Total Payable Amount</div>
                                                 </div>
                                                 <div class="text-end">
-                                                    <h5 class="fw-black text-white mb-0">₹<span id="payableNowDisplay">0.00</span></h5>
+                                                    <h5 class="fw-black mb-0" style="color: #e96715 !important;">₹<span id="payableNowDisplay">0.00</span></h5>
                                                 </div>
                                             </div>
                                         </div>
@@ -757,6 +757,13 @@
                             background: rgba(255, 255, 255, 0.85);
                             backdrop-filter: blur(20px);
                             border: 1px solid rgba(255, 255, 255, 0.5);
+                        }
+                        .glass-payable-box {
+                            background: rgba(242, 112, 26, 0.08) !important;
+                            backdrop-filter: blur(10px);
+                            -webkit-backdrop-filter: blur(10px);
+                            border: 1px solid rgba(242, 112, 26, 0.2) !important;
+                            box-shadow: 0 8px 32px 0 rgba(242, 112, 26, 0.03);
                         }
 
                         @keyframes slideInUp {

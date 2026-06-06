@@ -429,7 +429,7 @@
             align-items: center;
             background: var(--surface-2);
             border: 1px solid var(--border);
-            border-radius: var(--radius-pill);
+            border-radius: 12px;
             padding: 4px;
             gap: 0;
             height: 52px;
@@ -438,7 +438,7 @@
         .qty-btn {
             width: 40px;
             height: 40px;
-            border-radius: 50%;
+            border-radius: 10px;
             border: none;
             background: transparent;
             color: var(--ink);
@@ -472,7 +472,7 @@
             flex: 1;
             min-width: 100px;
             height: 48px;
-            border-radius: var(--radius-pill);
+            border-radius: 12px;
             border: 2px solid var(--brand);
             background: transparent;
             color: var(--brand);
@@ -521,7 +521,7 @@
             flex: 1;
             min-width: 100px;
             height: 48px;
-            border-radius: var(--radius-pill);
+            border-radius: 12px;
             border: none;
             background: linear-gradient(135deg, var(--brand) 0%, var(--brand-dark) 100%);
             color: var(--white);
@@ -1204,13 +1204,16 @@
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             cursor: pointer;
         }
+
         .star-btn.active {
             color: #ffb703;
             text-shadow: 0 0 10px rgba(255, 183, 3, 0.3);
         }
+
         .star-btn:hover {
             transform: scale(1.2) rotate(5deg);
         }
+
         .btn-submit-review:hover {
             opacity: 0.95;
             transform: translateY(-2px);
@@ -1318,18 +1321,29 @@
                             </div>
                             <p class="tax-note">Inclusive of all taxes &amp; GST</p>
 
-                            <div id="dynamicSubtotal" class="mt-2 fw-bold text-muted small animate__animated animate__fadeIn" style="display: none;">
+                            <div id="dynamicSubtotal"
+                                class="mt-2 fw-bold text-muted small animate__animated animate__fadeIn"
+                                style="display: none;">
                                 Subtotal: <span class="text-dark fs-5">&#8377;<span id="subtotalVal">0</span></span>
                             </div>
 
                             @if(!empty($product->wholesale_prices) && count($product->wholesale_prices) > 0)
-                                <div class="wholesale-pricing-box mt-3 p-3 rounded-3" style="background: rgba(242, 112, 26, 0.05); border: 1px dashed rgba(242, 112, 26, 0.25);">
-                                    <h6 class="fw-bold mb-2 text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.05em; color: var(--brand);">Wholesale Bulk Pricing</h6>
+                                <div class="wholesale-pricing-box mt-3 p-3 rounded-3"
+                                    style="background: rgba(242, 112, 26, 0.05); border: 1px dashed rgba(242, 112, 26, 0.25);">
+                                    <h6 class="fw-bold mb-2 text-uppercase"
+                                        style="font-size: 0.72rem; letter-spacing: 0.05em; color: var(--brand);">Wholesale Bulk
+                                        Pricing</h6>
                                     <div class="d-flex flex-wrap gap-2">
                                         @foreach($product->wholesale_prices as $tier)
-                                            <div class="wholesale-tier-badge p-2 bg-white rounded border flex-fill text-center" data-min-qty="{{ $tier['min_qty'] }}" style="font-size: 0.8rem; border-color: rgba(13,13,13,0.05) !important; transition: all 0.3s ease;">
-                                                <div class="text-muted small fw-medium" style="font-size: 0.75rem;">{{ $tier['min_qty'] }}+ units</div>
-                                                <div class="fw-bold text-dark" style="font-size: 0.9rem;">&#8377;{{ number_format($tier['price']) }}<span class="small font-normal text-muted" style="font-weight: normal; font-size: 0.7rem;">/unit</span></div>
+                                            <div class="wholesale-tier-badge p-2 bg-white rounded border flex-fill text-center"
+                                                data-min-qty="{{ $tier['min_qty'] }}"
+                                                style="font-size: 0.8rem; border-color: rgba(13,13,13,0.05) !important; transition: all 0.3s ease;">
+                                                <div class="text-muted small fw-medium" style="font-size: 0.75rem;">
+                                                    {{ $tier['min_qty'] }}+ units</div>
+                                                <div class="fw-bold text-dark" style="font-size: 0.9rem;">
+                                                    &#8377;{{ number_format($tier['price']) }}<span
+                                                        class="small font-normal text-muted"
+                                                        style="font-weight: normal; font-size: 0.7rem;">/unit</span></div>
                                             </div>
                                         @endforeach
                                     </div>
@@ -1352,7 +1366,9 @@
                         </div>
 
                         <!-- Dynamic Qty Warning Message -->
-                        <div id="qtyWarningMessage" class="animate__animated animate__fadeIn py-2 px-3 mb-3 text-danger fw-bold" style="display: none; border-radius: 12px; font-size: 0.8rem; background: rgba(220, 38, 38, 0.05); border: 1px dashed rgba(220, 38, 38, 0.25); align-items: center; gap: 8px;">
+                        <div id="qtyWarningMessage"
+                            class="animate__animated animate__fadeIn py-2 px-3 mb-3 text-danger fw-bold"
+                            style="display: none; border-radius: 12px; font-size: 0.8rem; background: rgba(220, 38, 38, 0.05); border: 1px dashed rgba(220, 38, 38, 0.25); align-items: center; gap: 8px;">
                             <i class="bi bi-exclamation-triangle-fill"></i>
                             <span id="qtyWarningText"></span>
                         </div>
@@ -1360,7 +1376,9 @@
                         <div class="actions-row mb-4">
                             <div class="qty-control">
                                 <button class="qty-btn" type="button" onclick="changeQty(-1)">&minus;</button>
-                                <input type="number" id="productQty" class="qty-input" value="{{ $product->minimum_order_quantity ?? 1 }}" min="{{ $product->minimum_order_quantity ?? 1 }}" max="{{ $product->stock }}">
+                                <input type="number" id="productQty" class="qty-input"
+                                    value="{{ $product->minimum_order_quantity ?? 1 }}"
+                                    min="{{ $product->minimum_order_quantity ?? 1 }}" max="{{ $product->stock }}">
                                 <button class="qty-btn" type="button" onclick="changeQty(1)">+</button>
                             </div>
                             <form action="{{ url('/cart/add/' . $product->id) }}" method="POST" style="flex:1;">
@@ -1469,7 +1487,8 @@
                                         <i class="bi bi-pencil-square"></i> Write a Review
                                     </button>
                                 @else
-                                    <a href="{{ route('login') }}?redirect={{ urlencode(request()->url() . '?write_review=1') }}" class="btn-review text-decoration-none d-inline-flex align-items-center">
+                                    <a href="{{ route('login') }}?redirect={{ urlencode(request()->url() . '?write_review=1') }}"
+                                        class="btn-review text-decoration-none d-inline-flex align-items-center">
                                         <i class="bi bi-pencil-square"></i> Write a Review
                                     </a>
                                 @endauth
@@ -1644,7 +1663,7 @@
             if (warningEl && warningTextEl) {
                 warningTextEl.innerText = msg;
                 warningEl.style.display = 'flex';
-                
+
                 if (warningTimeout) clearTimeout(warningTimeout);
                 warningTimeout = setTimeout(() => {
                     warningEl.style.display = 'none';
@@ -1756,14 +1775,14 @@
         document.addEventListener('DOMContentLoaded', () => {
             const qtyInput = document.getElementById('productQty');
             const qty = qtyInput ? (parseInt(qtyInput.value) || 1) : 1;
-            
+
             if (qtyInput) {
                 document.getElementById('cartQtyInput').value = qty;
                 document.getElementById('buyNowQtyInput').value = qty;
                 document.querySelectorAll('.mob-qty-sync').forEach(s => s.value = qty);
                 updateDynamicPrices(qty);
 
-                qtyInput.addEventListener('input', function() {
+                qtyInput.addEventListener('input', function () {
                     let val = parseInt(this.value);
                     if (isNaN(val)) {
                         return;
@@ -1782,7 +1801,7 @@
                     syncQty(val);
                 });
 
-                qtyInput.addEventListener('blur', function() {
+                qtyInput.addEventListener('blur', function () {
                     let val = parseInt(this.value);
                     const minLimit = parseInt(this.min) || 1;
                     if (isNaN(val) || val < minLimit) {
@@ -1821,7 +1840,7 @@
 
             // Interactive Star Rating
             document.querySelectorAll('.star-btn').forEach(star => {
-                star.addEventListener('click', function() {
+                star.addEventListener('click', function () {
                     const value = parseInt(this.dataset.value);
                     const ratingInput = document.getElementById('reviewRatingInput');
                     if (ratingInput) {
@@ -1851,7 +1870,7 @@
                         reviewTabBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     }, 300);
                 }
-                
+
                 // Open review modal
                 const reviewModalEl = document.getElementById('reviewModal');
                 if (reviewModalEl) {
@@ -1866,15 +1885,20 @@
         <!-- Write Review Modal -->
         <div class="modal fade" id="reviewModal" tabindex="-1" aria-labelledby="reviewModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content border-0 shadow-lg" style="border-radius: 24px; overflow: hidden; background: #ffffff;">
+                <div class="modal-content border-0 shadow-lg"
+                    style="border-radius: 24px; overflow: hidden; background: #ffffff;">
                     <div class="modal-header border-0 pb-0 pt-4 px-4 d-flex justify-content-between align-items-center">
-                        <h5 class="modal-title fw-black letter-spacing-n1 mb-0" id="reviewModalLabel" style="font-family:'Playfair Display', serif; font-weight:900; font-size:1.5rem;">Write a Review</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="background: transparent; border: 0; font-size: 1.25rem;"><i class="bi bi-x-lg text-dark"></i></button>
+                        <h5 class="modal-title fw-black letter-spacing-n1 mb-0" id="reviewModalLabel"
+                            style="font-family:'Playfair Display', serif; font-weight:900; font-size:1.5rem;">Write a Review
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                            style="background: transparent; border: 0; font-size: 1.25rem;"><i
+                                class="bi bi-x-lg text-dark"></i></button>
                     </div>
                     <form action="{{ route('product.review.store') }}" method="POST">
                         @csrf
                         <input type="hidden" name="product_id" value="{{ $product->id }}">
-                        
+
                         <div class="modal-body p-4">
                             <div class="text-center mb-4">
                                 <div class="small text-muted mb-2">How would you rate this product?</div>
@@ -1889,15 +1913,17 @@
                             </div>
 
                             <div class="mb-3">
-                                <label class="form-label small fw-bold text-uppercase opacity-75" style="letter-spacing: 0.05em; font-size: 0.75rem;">Your Feedback</label>
+                                <label class="form-label small fw-bold text-uppercase opacity-75"
+                                    style="letter-spacing: 0.05em; font-size: 0.75rem;">Your Feedback</label>
                                 <textarea name="comment" class="form-control border bg-light bg-opacity-50" rows="4"
                                     placeholder="Share your experience with this product..."
-                                    style="border-radius: 16px; padding: 15px; font-size: 0.9rem; resize: none; border-color: #e2e8f0 !important;" required></textarea>
+                                    style="border-radius: 16px; padding: 15px; font-size: 0.9rem; resize: none; border-color: #e2e8f0 !important;"
+                                    required></textarea>
                             </div>
                         </div>
-                        
+
                         <div class="modal-footer border-0 p-4 pt-0">
-                            <button type="submit" class="btn w-100 fw-bold rounded-pill py-3 text-uppercase btn-submit-review" 
+                            <button type="submit" class="btn w-100 fw-bold rounded-pill py-3 text-uppercase btn-submit-review"
                                 style="background: var(--brand, #ff6b35); color: #ffffff; letter-spacing: 0.1em; font-size: 0.85rem; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(255, 107, 53, 0.25);">
                                 Submit Review
                             </button>

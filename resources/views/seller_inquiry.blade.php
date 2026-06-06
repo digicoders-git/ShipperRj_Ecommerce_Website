@@ -7,7 +7,8 @@
                 <div class="glass-card p-5 overflow-hidden position-relative">
                     <div id="formSection">
                         <div class="text-center mb-5">
-                            <h1 class="display-5 fw-bold mb-3">Grow Your Business <span class="text-primary">With Us</span></h1>
+                            <h1 class="display-5 fw-bold mb-3">Grow Your Business <span class="text-primary">With Us</span>
+                            </h1>
                             <p class="text-secondary lead">Invest in your business and grow with our platform. Join
                                 thousands of successful sellers today.</p>
                         </div>
@@ -73,7 +74,8 @@
                                 <select name="business_type"
                                     class="form-select glass-input @error('business_type') is-invalid @enderror">
                                     <option value="" selected disabled>Select Business Type</option>
-                                    <option value="Interested To Start New Business">Interested To Start New Business</option>
+                                    <option value="Interested To Start New Business">Interested To Start New Business
+                                    </option>
                                     <option value="Retailer">Retailer</option>
                                     <option value="Wholesaler">Wholesaler</option>
                                     <option value="Manufacturer">Manufacturer</option>

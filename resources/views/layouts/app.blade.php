@@ -130,6 +130,17 @@
             border-color: #ff4747 !important;
             transform: scale(1.1);
         }
+
+        /* Global Modal layout shift fix */
+        html {
+            scrollbar-gutter: stable;
+        }
+        body.modal-open,
+        body.modal-open .sticky-top,
+        body.modal-open .fixed-top,
+        body.modal-open .main-header {
+            padding-right: 0 !important;
+        }
     </style>
     @stack('styles')
 </head>
@@ -145,7 +156,8 @@
             <div class="top-info d-flex gap-4 align-items-center">
                 <a href="tel:+917088213888"><i class="bi bi-telephone-fill me-1"></i> +91 70882 13888</a>
                 <div class="vr bg-secondary opacity-25" style="height: 15px;"></div>
-                <a href="mailto:shoppingclubindia1@gmail.com"><i class="bi bi-envelope-fill me-1"></i> shoppingclubindia1@gmail.com</a>
+                <a href="mailto:shoppingclubindia1@gmail.com"><i class="bi bi-envelope-fill me-1"></i>
+                    shoppingclubindia1@gmail.com</a>
             </div>
             <div class="top-links d-flex gap-4 align-items-center">
                 <a href="{{ route('orders') }}"><i class="bi bi-bag-heart-fill me-1"></i> My Orders</a>
@@ -283,10 +295,12 @@
     <!-- Mobile Navigation Offcanvas -->
     <div class="offcanvas offcanvas-start mobile-menu-offcanvas" tabindex="-1" id="mobileMenu"
         aria-labelledby="mobileMenuLabel">
-        <div class="offcanvas-header border-bottom py-4" style="background: #111827; border-color: rgba(255, 255, 255, 0.08) !important;">
+        <div class="offcanvas-header border-bottom py-4"
+            style="background: #111827; border-color: rgba(255, 255, 255, 0.08) !important;">
             <div class="d-flex align-items-center gap-3">
                 <img src="{{ asset('assets/images/logo1.png') }}" alt="Logo" height="50">
-                <h5 class="offcanvas-title fw-bold text-white mb-0" id="mobileMenuLabel" style="letter-spacing: -0.5px;">Menu</h5>
+                <h5 class="offcanvas-title fw-bold text-white mb-0" id="mobileMenuLabel"
+                    style="letter-spacing: -0.5px;">Menu</h5>
             </div>
             <button type="button" class="btn-close btn-close-white text-reset shadow-none" data-bs-dismiss="offcanvas"
                 aria-label="Close"></button>
@@ -299,10 +313,10 @@
                     @auth
                         @if(Auth::user()->profile_photo)
                             <img src="{{ asset('storage/' . Auth::user()->profile_photo) }}"
-                                 style="width: 100%; height: 100%; object-fit: cover;">
+                                style="width: 100%; height: 100%; object-fit: cover;">
                         @else
                             <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=FF7A18&color=fff&size=52&bold=true"
-                                 style="width: 100%; height: 100%; object-fit: cover;">
+                                style="width: 100%; height: 100%; object-fit: cover;">
                         @endif
                     @else
                         <i class="bi bi-person-fill fs-4"></i>
@@ -385,7 +399,8 @@
                         class="list-group-item list-group-item-action border-0 px-4 py-2 small {{ request()->routeIs('about') ? 'active' : '' }}">About
                         Us</a>
                     <a href="{{ route('seller.inquiry') }}"
-                        class="list-group-item list-group-item-action border-0 px-4 py-2 small {{ request()->routeIs('seller.inquiry') ? 'active' : '' }}">Become a Seller</a>
+                        class="list-group-item list-group-item-action border-0 px-4 py-2 small {{ request()->routeIs('seller.inquiry') ? 'active' : '' }}">Become
+                        a Seller</a>
                     <a href="{{ route('contact') }}"
                         class="list-group-item list-group-item-action border-0 px-4 py-2 small {{ request()->routeIs('contact') ? 'active' : '' }}">Contact
                         Us</a>
@@ -518,12 +533,13 @@
 
             <div class="promo-text-nav d-none d-xl-flex align-items-center gap-3">
                 <a href="{{ route('seller.inquiry') }}" class="text-decoration-none d-flex align-items-center gap-2">
-                    <span class="badge bg-primary-soft text-primary px-3 py-1 rounded-pill fw-bold xx-small uppercase tracking-widest">
+                    <span
+                        class="badge bg-primary-soft text-primary px-3 py-1 rounded-pill fw-bold xx-small uppercase tracking-widest">
                         Grow Your Business With Us 🚀
                     </span>
                 </a>
             </div>
-            
+
         </div>
     </nav>
     <main>
@@ -664,7 +680,8 @@
                             class="mb-4 brightness-110">
                         <p class="text-white-50 small fw-medium mb-4"
                             style="line-height: 1.8; opacity: 0.8 !important; text-align: justify;">
-                            Shopping Club India – Your trusted destination for premium electronics, trendy fashion, and lifestyle essentials. Quality products, fast delivery, and exceptional customer service
+                            Shopping Club India – Your trusted destination for premium electronics, trendy fashion, and
+                            lifestyle essentials. Quality products, fast delivery, and exceptional customer service
                         </p>
                     </div>
                 </div>
@@ -695,22 +712,29 @@
                 <!-- Column 4: Contact & Trust -->
                 <div class="col-lg-4 col-md-6">
                     <h6 class="footer-header">Get in Touch</h6>
-                    
+
                     <!-- Premium Contact Links -->
                     <ul class="list-unstyled mb-4">
-                        <li class="mb-3 d-flex justify-content-center justify-content-sm-start align-items-center gap-3">
-                            <div class="icon-box-sm flex-shrink-0" style="width: 32px; height: 32px; font-size: 0.95rem;">
+                        <li
+                            class="mb-3 d-flex justify-content-center justify-content-sm-start align-items-center gap-3">
+                            <div class="icon-box-sm flex-shrink-0"
+                                style="width: 32px; height: 32px; font-size: 0.95rem;">
                                 <i class="bi bi-telephone-fill"></i>
                             </div>
-                            <a href="tel:+917088213888" class="footer-link fs-8 text-white-50" style="text-decoration: none; text-transform: none !important; margin-bottom: 0 !important; display: inline-block;">+91 70882 13888</a>
+                            <a href="tel:+917088213888" class="footer-link fs-8 text-white-50"
+                                style="text-decoration: none; text-transform: none !important; margin-bottom: 0 !important; display: inline-block;">+91
+                                70882 13888</a>
                         </li>
-                        <li class="mb-3 d-flex justify-content-center justify-content-sm-start align-items-center gap-3">
-                            <div class="icon-box-sm flex-shrink-0" style="width: 32px; height: 32px; font-size: 0.95rem;">
+                        <li
+                            class="mb-3 d-flex justify-content-center justify-content-sm-start align-items-center gap-3">
+                            <div class="icon-box-sm flex-shrink-0"
+                                style="width: 32px; height: 32px; font-size: 0.95rem;">
                                 <i class="bi bi-envelope-fill"></i>
                             </div>
-                            <a href="mailto:shoppingclubindia1@gmail.com" class="footer-link fs-8 text-white-50" style="text-decoration: none; text-transform: none !important; margin-bottom: 0 !important; display: inline-block; word-break: break-all;">shoppingclubindia1@gmail.com</a>
+                            <a href="mailto:shoppingclubindia1@gmail.com" class="footer-link fs-8 text-white-50"
+                                style="text-decoration: none; text-transform: none !important; margin-bottom: 0 !important; display: inline-block; word-break: break-all;">shoppingclubindia1@gmail.com</a>
                         </li>
-                       
+
                     </ul>
 
                     <!-- Updated Premium Trust Badges -->
@@ -1146,16 +1170,16 @@
     <!-- Support & Feedback Modal (Premium Solid Design) -->
     <div class="modal fade" id="supportFeedbackModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content border-0 shadow-premium rounded-5 overflow-hidden shadow-lg h-auto">
+            <div class="modal-content border-0 shadow-premium overflow-hidden shadow-lg h-auto" style="border-radius: 20px;">
                 <!-- Branding Header -->
                 <div class="modal-header-premium p-4 pb-0 bg-white border-0">
                     <div class="d-flex align-items-center gap-3 w-100 position-relative">
-                        <div class="p-2 bg-primary bg-opacity-10 rounded-4">
-                            <i class="bi bi-headset text-white fs-3"></i>
+                        <div class="p-2 bg-primary rounded-4 d-flex align-items-center justify-content-center" style="width: 44px; height: 44px;">
+                            <i class="bi bi-headset text-white fs-4"></i>
                         </div>
                         <div class="flex-grow-1">
-                            <h4 class="fw-black mb-0 letter-spacing-n1 text-dark">Support & Feedback</h4>
-                            <p class="text-muted small mb-0 fw-medium">We're here to help you.</p>
+                            <h4 class="fw-black mb-0 text-dark" style="font-size: 1.35rem;">Support & Feedback</h4>
+                            <p class="text-muted small mb-0 fw-semibold" style="font-size: 0.8rem;">We're here to help you.</p>
                         </div>
                         <button type="button" class="btn-close-premium" data-bs-dismiss="modal" aria-label="Close">
                             <i class="bi bi-x-lg"></i>
@@ -1169,9 +1193,7 @@
                         <div class="row g-3">
                             <div class="col-6 slide-in-bottom" style="animation-delay: 0.1s">
                                 <div class="premium-field">
-                                    <label
-                                        class="small fw-black uppercase tracking-widest text-primary mb-2 d-block">Your
-                                        Name</label>
+                                    <label class="small fw-bold text-uppercase tracking-wider mb-2 d-block" style="font-size: 0.72rem; letter-spacing: 0.05em; color: #4a5568;">Your Name</label>
                                     <div class="input-wrapper-glass">
                                         <i class="bi bi-person ms-3 text-muted"></i>
                                         <input type="text" name="name" class="form-control-minimal"
@@ -1183,9 +1205,7 @@
 
                             <div class="col-6 slide-in-bottom" style="animation-delay: 0.2s">
                                 <div class="premium-field">
-                                    <label
-                                        class="small fw-black uppercase tracking-widest text-primary mb-2 d-block">Mobile
-                                        No.</label>
+                                    <label class="small fw-bold text-uppercase tracking-wider mb-2 d-block" style="font-size: 0.72rem; letter-spacing: 0.05em; color: #4a5568;">Mobile No.</label>
                                     <div class="input-wrapper-glass">
                                         <i class="bi bi-phone ms-3 text-muted"></i>
                                         <input type="tel" name="phone" class="form-control-minimal"
@@ -1200,9 +1220,7 @@
 
                             <div class="col-12 slide-in-bottom" style="animation-delay: 0.15s">
                                 <div class="premium-field">
-                                    <label
-                                        class="small fw-black uppercase tracking-widest text-primary mb-2 d-block">Email
-                                        Address</label>
+                                    <label class="small fw-bold text-uppercase tracking-wider mb-2 d-block" style="font-size: 0.72rem; letter-spacing: 0.05em; color: #4a5568;">Email Address</label>
                                     <div class="input-wrapper-glass">
                                         <i class="bi bi-envelope ms-3 text-muted"></i>
                                         <input type="email" name="email" class="form-control-minimal"
@@ -1214,9 +1232,7 @@
 
                             <div class="col-12 slide-in-bottom" style="animation-delay: 0.25s">
                                 <div class="premium-field">
-                                    <label
-                                        class="small fw-black uppercase tracking-widest text-primary mb-2 d-block">Your
-                                        Message</label>
+                                    <label class="small fw-bold text-uppercase tracking-wider mb-2 d-block" style="font-size: 0.72rem; letter-spacing: 0.05em; color: #4a5568;">Your Message</label>
                                     <div class="input-wrapper-glass align-items-start pt-2">
                                         <i class="bi bi-chat-left-dots ms-3 text-muted mt-2"></i>
                                         <textarea name="message" class="form-control-minimal" rows="2"
@@ -1227,11 +1243,8 @@
 
                             <div class="col-12 slide-in-bottom" style="animation-delay: 0.3s">
                                 <div class="premium-field">
-                                    <label
-                                        class="small fw-black uppercase tracking-widest text-success mb-2 d-block">Suggestions
-                                        (Optional)</label>
-                                    <div
-                                        class="input-wrapper-glass align-items-start pt-2 border-success border-opacity-10">
+                                    <label class="small fw-bold text-uppercase tracking-wider mb-2 d-block" style="font-size: 0.72rem; letter-spacing: 0.05em; color: #4a5568;">Suggestions (Optional)</label>
+                                    <div class="input-wrapper-glass align-items-start pt-2 border-success border-opacity-10">
                                         <i class="bi bi-stars ms-3 text-success opacity-50 mt-2"></i>
                                         <textarea name="suggestion" class="form-control-minimal" rows="2"
                                             placeholder="Any feedback for us?"></textarea>
@@ -1239,18 +1252,17 @@
                                 </div>
                             </div>
 
-                            <div class="col-12 mt-3 slide-in-bottom" style="animation-delay: 0.35s">
+                            <div class="col-12 mt-3 slide-in-bottom text-center" style="animation-delay: 0.35s">
                                 <button type="submit"
-                                    class="btn-transmit shadow-premium w-100 py-3 rounded-pill fw-black uppercase tracking-widest overflow-hidden position-relative">
+                                    class="btn-transmit shadow-premium fw-bold text-uppercase tracking-wider overflow-hidden position-relative"
+                                    style="border-radius: 8px; font-size: 0.85rem; width: 170px; height: 48px; display: inline-flex; justify-content: center; align-items: center; padding: 0;">
                                     <span
-                                        class="btn-label position-relative z-1 d-flex align-items-center justify-content-center gap-3">
-                                        Send Message <i class="bi bi-send-fill"></i>
+                                        class="btn-label position-relative z-1 d-flex align-items-center justify-content-center gap-2">
+                                        Send Message <i class="bi bi-send-fill" style="font-size: 0.95rem;"></i>
                                     </span>
                                     <div class="btn-shimmer"></div>
                                 </button>
-                                <p
-                                    class="xx-small text-center text-muted fw-bold uppercase tracking-widest mt-2 opacity-50 mb-0">
-                                    Direct support guaranteed</p>
+                               
                             </div>
                         </div>
                     </form>
@@ -1318,8 +1330,8 @@
                 showToast('Status', "{{ session('status') }}", 'primary');
             @endif
         });
- 
-        window.getFreshCsrfToken = async function() {
+
+        window.getFreshCsrfToken = async function () {
             try {
                 const res = await fetch('/fresh-csrf?_t=' + Date.now());
                 const data = await res.json();
@@ -1390,7 +1402,7 @@
         .input-wrapper-glass {
             background: #f8f9fa;
             border: 1px solid #eef0f2;
-            border-radius: 16px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             transition: all 0.3s ease;

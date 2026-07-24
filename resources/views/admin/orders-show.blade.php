@@ -308,13 +308,13 @@
                         </span>
                     </div>
 
-                    @if($order->razorpay_payment_id)
+                    @if($order->cashfree_payment_id || $order->razorpay_payment_id)
                         <div class="mb-3">
                             <span class="xx-small text-secondary fw-black uppercase tracking-widest d-block mb-1">Gateway
                                 Reference</span>
                             <div
                                 class="small fw-black text-light bg-primary bg-opacity-5 p-2 rounded border border-primary border-opacity-10 font-monospace">
-                                {{ $order->razorpay_payment_id }}
+                                {{ $order->cashfree_payment_id ?? $order->razorpay_payment_id }}
                             </div>
                         </div>
                     @endif

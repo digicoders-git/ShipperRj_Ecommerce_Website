@@ -9,7 +9,7 @@ use App\Models\OrderItem;
 use App\Models\UserAddress;
 use App\Models\Cart;
 use Illuminate\Support\Facades\Auth;
-use Razorpay\Api\Api;
+use App\Services\CashfreeService;
 
 class CheckoutController extends Controller
 {
@@ -399,20 +399,64 @@ class CheckoutController extends Controller
     {
         $order = Order::with('user')->findOrFail($order_id);
 
-        $api = new Api(config('services.razorpay.key'), config('services.razorpay.secret'));
-        $razorOrderData = [
-            'receipt' => $order->order_number,
-            'amount' => (int) round($order->prepaid_amount * 100),
-            'currency' => 'INR'
-        ];
+        if ($order->payment_status === 'paid') {
+            return redirect('/order-success?order_id=' . $order->id);
+        }
 
-        $razorOrder = $api->order->create($razorOrderData);
+        $cashfreeService = new CashfreeService();
+        $cashfreeSessionId = null;
 
-        $order->update(['razorpay_order_id' => $razorOrder['id']]);
+        // Generate unique Cashfree Order ID for each session attempt to prevent order_already_exists error
+        $cfOrderId = $order->cashfree_order_id;
+        if (empty($cfOrderId)) {
+            $cfOrderId = 'CF_' . $order->order_number . '_' . time();
+        }
 
-        $keyID = config('services.razorpay.key');
+        $returnUrl = route('checkout.payment.cashfree.callback') . '?order_id=' . $cfOrderId;
 
-        return view('checkout-payment', compact('order', 'razorOrder', 'keyID'));
+        $cfOrderResult = $cashfreeService->createOrder(
+            $cfOrderId,
+            (float) $order->prepaid_amount,
+            $order->user->name ?? 'Customer',
+            $order->user->email ?? 'customer@example.com',
+            $order->user->mobile ?? '9999999999',
+            $returnUrl
+        );
+
+        if ($cfOrderResult['success']) {
+            $cashfreeSessionId = $cfOrderResult['payment_session_id'];
+            $order->update([
+                'cashfree_order_id' => $cfOrderId,
+                'cashfree_session_id' => $cashfreeSessionId
+            ]);
+        } else {
+            // If creation failed (e.g. order_already_exists), retry with a new timestamped unique ID
+            $cfOrderId = 'CF_' . $order->order_number . '_' . time();
+            $returnUrl = route('checkout.payment.cashfree.callback') . '?order_id=' . $cfOrderId;
+
+            $cfOrderResult = $cashfreeService->createOrder(
+                $cfOrderId,
+                (float) $order->prepaid_amount,
+                $order->user->name ?? 'Customer',
+                $order->user->email ?? 'customer@example.com',
+                $order->user->mobile ?? '9999999999',
+                $returnUrl
+            );
+
+            if ($cfOrderResult['success']) {
+                $cashfreeSessionId = $cfOrderResult['payment_session_id'];
+                $order->update([
+                    'cashfree_order_id' => $cfOrderId,
+                    'cashfree_session_id' => $cashfreeSessionId
+                ]);
+            } else {
+                \Illuminate\Support\Facades\Log::error('Cashfree Session Creation Error: ' . json_encode($cfOrderResult));
+            }
+        }
+
+        $cashfreeMode = $cashfreeService->getMode();
+
+        return view('checkout-payment', compact('order', 'cashfreeSessionId', 'cashfreeMode'));
     }
 
     public function payByWallet(Request $request)
@@ -452,19 +496,44 @@ class CheckoutController extends Controller
 
     public function verifyPayment(Request $request)
     {
-        $api = new Api(config('services.razorpay.key'), config('services.razorpay.secret'));
-        $order = Order::where('razorpay_order_id', $request->razorpay_order_id)->firstOrFail();
+        return response()->json(['success' => false, 'message' => 'Razorpay is disabled. Use Cashfree.']);
+    }
 
-        try {
-            $attributes = [
-                'razorpay_order_id' => $request->razorpay_order_id,
-                'razorpay_payment_id' => $request->razorpay_payment_id,
-                'razorpay_signature' => $request->razorpay_signature
-            ];
-            $api->utility->verifyPaymentSignature($attributes);
+    public function verifyCashfreePayment(Request $request)
+    {
+        $cfOrderId = $request->order_id;
+        $order = Order::where('cashfree_order_id', $cfOrderId)
+            ->orWhere('order_number', $cfOrderId)
+            ->orWhere('id', $cfOrderId)
+            ->first();
+
+        if (!$order && str_contains($cfOrderId, '_')) {
+            $parts = explode('_', $cfOrderId);
+            $baseOrderNum = $parts[1] ?? $cfOrderId;
+            $order = Order::where('order_number', $baseOrderNum)->first();
+        }
+
+        if (!$order) {
+            return response()->json(['success' => false, 'error' => 'Order not found']);
+        }
+
+        $cashfreeService = new CashfreeService();
+        $status = $cashfreeService->getOrderStatus($order->cashfree_order_id ?? $cfOrderId);
+
+        if ($status['success'] && isset($status['data']['order_status']) && in_array($status['data']['order_status'], ['PAID', 'SUCCESS'])) {
+            $payments = $cashfreeService->getPayments($order->cashfree_order_id ?? $cfOrderId);
+            $cfPaymentId = null;
+            if ($payments['success'] && !empty($payments['payments'])) {
+                foreach ($payments['payments'] as $p) {
+                    if (isset($p['payment_status']) && $p['payment_status'] === 'SUCCESS') {
+                        $cfPaymentId = $p['cf_payment_id'] ?? null;
+                        break;
+                    }
+                }
+            }
 
             $order->update([
-                'razorpay_payment_id' => $request->razorpay_payment_id,
+                'cashfree_payment_id' => $cfPaymentId ?? ($status['data']['cf_order_id'] ?? 'CF_SUCCESS'),
                 'payment_status' => 'paid'
             ]);
 
@@ -472,8 +541,62 @@ class CheckoutController extends Controller
             Cart::where('user_id', $order->user_id)->delete();
 
             return response()->json(['success' => true]);
-        } catch (\Exception $e) {
-            return response()->json(['success' => false, 'error' => $e->getMessage()]);
         }
+
+        return response()->json([
+            'success' => false,
+            'error' => $status['message'] ?? 'Payment verification failed or payment is incomplete.'
+        ]);
+    }
+
+    public function cashfreeCallback(Request $request)
+    {
+        $cfOrderId = $request->get('order_id') ?? $request->get('order_number') ?? $request->get('cf_order_id');
+        if (!$cfOrderId) {
+            return redirect('/')->with('error', 'Invalid Cashfree callback parameters.');
+        }
+
+        $order = Order::where('cashfree_order_id', $cfOrderId)
+            ->orWhere('order_number', $cfOrderId)
+            ->orWhere('id', $cfOrderId)
+            ->first();
+
+        if (!$order && str_contains($cfOrderId, '_')) {
+            $parts = explode('_', $cfOrderId);
+            $baseOrderNum = $parts[1] ?? $cfOrderId;
+            $order = Order::where('order_number', $baseOrderNum)->first();
+        }
+
+        if (!$order) {
+            return redirect('/')->with('error', 'Order not found.');
+        }
+
+        $cashfreeService = new CashfreeService();
+        $status = $cashfreeService->getOrderStatus($order->cashfree_order_id ?? $cfOrderId);
+
+        if ($status['success'] && isset($status['data']['order_status']) && in_array($status['data']['order_status'], ['PAID', 'SUCCESS'])) {
+            $payments = $cashfreeService->getPayments($order->cashfree_order_id ?? $cfOrderId);
+            $cfPaymentId = null;
+            if ($payments['success'] && !empty($payments['payments'])) {
+                foreach ($payments['payments'] as $p) {
+                    if (isset($p['payment_status']) && $p['payment_status'] === 'SUCCESS') {
+                        $cfPaymentId = $p['cf_payment_id'] ?? null;
+                        break;
+                    }
+                }
+            }
+
+            $order->update([
+                'cashfree_payment_id' => $cfPaymentId ?? ($status['data']['cf_order_id'] ?? 'CF_SUCCESS'),
+                'payment_status' => 'paid'
+            ]);
+
+            // Clear cart for the user
+            Cart::where('user_id', $order->user_id)->delete();
+
+            return redirect('/order-success?order_id=' . $order->id);
+        }
+
+        return redirect()->route('checkout.payment', $order->id)->with('error', $status['message'] ?? 'Payment failed or incomplete.');
     }
 }

@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\WalletOffer;
 use App\Models\WalletTransaction;
 use Illuminate\Support\Facades\Auth;
-use Razorpay\Api\Api;
+use App\Services\CashfreeService;
 
 class WalletController extends Controller
 {
@@ -30,39 +30,44 @@ class WalletController extends Controller
     {
         $request->validate(['amount' => 'required|numeric|min:1']);
 
-        $api = new Api(config('services.razorpay.key'), config('services.razorpay.secret'));
-        $orderData = [
-            'receipt' => 'WLT_' . time() . '_' . Auth::id(),
-            'amount' => $request->amount * 100,
-            'currency' => 'INR'
-        ];
+        $user = Auth::user();
+        $orderId = 'WLT_' . time() . '_' . $user->id;
 
-        $razorOrder = $api->order->create($orderData);
+        $cashfreeService = new CashfreeService();
+        $cfResult = $cashfreeService->createOrder(
+            $orderId,
+            (float) $request->amount,
+            $user->name ?? 'Customer',
+            $user->email ?? 'customer@example.com',
+            $user->mobile ?? '9999999999'
+        );
+
+        if ($cfResult['success']) {
+            return response()->json([
+                'success' => true,
+                'payment_session_id' => $cfResult['payment_session_id'],
+                'order_id' => $orderId,
+                'amount' => $request->amount,
+                'mode' => $cashfreeService->getMode()
+            ]);
+        }
 
         return response()->json([
-            'success' => true,
-            'order_id' => $razorOrder['id'],
-            'amount' => $request->amount,
-            'key' => config('services.razorpay.key'),
-            'name' => Auth::user()->name,
-            'email' => Auth::user()->email
+            'success' => false,
+            'message' => $cfResult['message'] ?? 'Unable to initiate Cashfree payment.'
         ]);
     }
 
     public function verify(Request $request)
     {
-        $api = new Api(config('services.razorpay.key'), config('services.razorpay.secret'));
+        $orderId = $request->order_id;
+        $amount = (float) $request->amount;
 
-        try {
-            $attributes = [
-                'razorpay_order_id' => $request->razorpay_order_id,
-                'razorpay_payment_id' => $request->razorpay_payment_id,
-                'razorpay_signature' => $request->razorpay_signature
-            ];
-            $api->utility->verifyPaymentSignature($attributes);
+        $cashfreeService = new CashfreeService();
+        $status = $cashfreeService->getOrderStatus($orderId);
 
+        if ($status['success'] && isset($status['data']['order_status']) && in_array($status['data']['order_status'], ['PAID', 'SUCCESS'])) {
             $user = Auth::user();
-            $amount = $request->amount;
 
             // Calculate Bonus
             $bonus = 0;
@@ -82,7 +87,7 @@ class WalletController extends Controller
                 'user_id' => $user->id,
                 'amount' => $amount,
                 'type' => 1,
-                'description' => 'Wallet Recharge via Razorpay'
+                'description' => 'Wallet Recharge via Cashfree'
             ]);
 
             if ($bonus > 0) {
@@ -95,8 +100,8 @@ class WalletController extends Controller
             }
 
             return response()->json(['success' => true]);
-        } catch (\Exception $e) {
-            return response()->json(['success' => false, 'error' => $e->getMessage()]);
         }
+
+        return response()->json(['success' => false, 'error' => $status['message'] ?? 'Payment verification failed.']);
     }
 }

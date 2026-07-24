@@ -154,10 +154,10 @@
     <div class="top-bar d-none d-lg-block">
         <div class="container d-flex justify-content-between align-items-center">
             <div class="top-info d-flex gap-4 align-items-center">
-                <a href="tel:+917088213888"><i class="bi bi-telephone-fill me-1"></i> +91 70882 13888</a>
+                <a href="tel:{{ $global_settings['clean_phone'] }}"><i class="bi bi-telephone-fill me-1"></i> {{ $global_settings['support_phone'] }}</a>
                 <div class="vr bg-secondary opacity-25" style="height: 15px;"></div>
-                <a href="mailto:shoppingclubindia1@gmail.com"><i class="bi bi-envelope-fill me-1"></i>
-                    shoppingclubindia1@gmail.com</a>
+                <a href="mailto:{{ $global_settings['support_email'] }}"><i class="bi bi-envelope-fill me-1"></i>
+                    {{ $global_settings['support_email'] }}</a>
             </div>
             <div class="top-links d-flex gap-4 align-items-center">
                 <a href="{{ route('orders') }}"><i class="bi bi-bag-heart-fill me-1"></i> My Orders</a>
@@ -410,9 +410,9 @@
         </div>
         <div class="offcanvas-footer p-4 border-top">
             <div class="social-links d-flex gap-3">
-                <a href="#" class="text-secondary fs-5"><i class="bi bi-facebook"></i></a>
-                <a href="#" class="text-secondary fs-5"><i class="bi bi-instagram"></i></a>
-                <a href="#" class="text-secondary fs-5"><i class="bi bi-twitter-x"></i></a>
+                <a href="{{ $global_settings['facebook_link'] }}" target="_blank" class="text-secondary fs-5"><i class="bi bi-facebook"></i></a>
+                <a href="{{ $global_settings['instagram_link'] }}" target="_blank" class="text-secondary fs-5"><i class="bi bi-instagram"></i></a>
+                <a href="{{ $global_settings['twitter_link'] }}" target="_blank" class="text-secondary fs-5"><i class="bi bi-twitter-x"></i></a>
             </div>
         </div>
     </div>
@@ -721,9 +721,8 @@
                                 style="width: 32px; height: 32px; font-size: 0.95rem;">
                                 <i class="bi bi-telephone-fill"></i>
                             </div>
-                            <a href="tel:+917088213888" class="footer-link fs-8 text-white-50"
-                                style="text-decoration: none; text-transform: none !important; margin-bottom: 0 !important; display: inline-block;">+91
-                                70882 13888</a>
+                            <a href="tel:{{ $global_settings['clean_phone'] }}" class="footer-link fs-8 text-white-50"
+                                style="text-decoration: none; text-transform: none !important; margin-bottom: 0 !important; display: inline-block;">{{ $global_settings['support_phone'] }}</a>
                         </li>
                         <li
                             class="mb-3 d-flex justify-content-center justify-content-sm-start align-items-center gap-3">
@@ -731,8 +730,8 @@
                                 style="width: 32px; height: 32px; font-size: 0.95rem;">
                                 <i class="bi bi-envelope-fill"></i>
                             </div>
-                            <a href="mailto:shoppingclubindia1@gmail.com" class="footer-link fs-8 text-white-50"
-                                style="text-decoration: none; text-transform: none !important; margin-bottom: 0 !important; display: inline-block; word-break: break-all;">shoppingclubindia1@gmail.com</a>
+                            <a href="mailto:{{ $global_settings['support_email'] }}" class="footer-link fs-8 text-white-50"
+                                style="text-decoration: none; text-transform: none !important; margin-bottom: 0 !important; display: inline-block; word-break: break-all;">{{ $global_settings['support_email'] }}</a>
                         </li>
 
                     </ul>
@@ -768,10 +767,10 @@
                     <!-- Column 1: Social Hub (Left) -->
                     <div class="col-lg-3 col-md-12 text-center text-lg-start order-2 order-lg-1">
                         <div class="d-flex justify-content-center justify-content-lg-start gap-3">
-                            <a href="#" class="social-capsule" title="Facebook"><i class="bi bi-facebook"></i></a>
-                            <a href="#" class="social-capsule" title="Instagram"><i class="bi bi-instagram"></i></a>
-                            <a href="#" class="social-capsule" title="Twitter"><i class="bi bi-twitter-x"></i></a>
-                            <a href="#" class="social-capsule" title="Youtube"><i class="bi bi-youtube"></i></a>
+                            <a href="{{ $global_settings['facebook_link'] }}" target="_blank" class="social-capsule" title="Facebook"><i class="bi bi-facebook"></i></a>
+                            <a href="{{ $global_settings['instagram_link'] }}" target="_blank" class="social-capsule" title="Instagram"><i class="bi bi-instagram"></i></a>
+                            <a href="{{ $global_settings['twitter_link'] }}" target="_blank" class="social-capsule" title="Twitter"><i class="bi bi-twitter-x"></i></a>
+                            <a href="{{ $global_settings['youtube_link'] }}" target="_blank" class="social-capsule" title="Youtube"><i class="bi bi-youtube"></i></a>
                         </div>
                     </div>
 
@@ -1852,11 +1851,11 @@
     @stack('scripts')
     <!-- Floating Contact Icons -->
     <div class="floating-contact-container">
-        <a href="https://wa.me/917088213888" class="floating-btn whatsapp-btn shadow-lg" target="_blank"
+        <a href="https://wa.me/{{ $global_settings['clean_phone'] }}" class="floating-btn whatsapp-btn shadow-lg" target="_blank"
             title="Chat on WhatsApp">
             <i class="bi bi-whatsapp"></i>
         </a>
-        <a href="tel:+917088213888" class="floating-btn phone-btn shadow-lg" title="Call Us">
+        <a href="tel:{{ $global_settings['clean_phone'] }}" class="floating-btn phone-btn shadow-lg" title="Call Us">
             <i class="bi bi-telephone-fill"></i>
         </a>
     </div>

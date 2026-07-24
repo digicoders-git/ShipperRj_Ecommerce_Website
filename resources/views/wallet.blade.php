@@ -216,7 +216,7 @@
 @endpush
 
 @push('scripts')
-    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
     <script>
         document.getElementById('walletAddForm').onsubmit = async function (e) {
             e.preventDefault();
@@ -224,99 +224,75 @@
             const originalText = btn.innerHTML;
             btn.disabled = true;
             btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Connecting...';
- 
+
             const amount = document.getElementById('walletAmountInput').value;
- 
+
             try {
-                const freshToken = await window.getFreshCsrfToken();
-                fetch('{{ route("wallet.add", [], false) }}', {
+                const freshToken = window.getFreshCsrfToken ? await window.getFreshCsrfToken() : document.querySelector('meta[name="csrf-token"]').content;
+                const res = await fetch('{{ route("wallet.add", [], false) }}', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': freshToken
                     },
                     body: JSON.stringify({ amount: amount })
-                })
-                .then(res => {
-                    if (!res.ok) throw new Error('Server Error');
-                    return res.json();
-                })
-                .then(data => {
-                    if (data.success) {
-                        // Hide modal before opening Razorpay to avoid interaction issues
-                        const modalEl = document.getElementById('addMoneyModal');
-                        const modalInstance = bootstrap.Modal.getInstance(modalEl);
-                        if (modalInstance) modalInstance.hide();
+                });
 
-                        var options = {
-                            "key": data.key,
-                            "amount": data.amount * 100,
-                            "currency": "INR",
-                            "name": "Shopping Club India",
-                            "description": "Wallet Recharge",
-                            "image": "{{ asset('assets/images/logo.jpeg') }}",
-                            "order_id": data.order_id,
-                            "handler": async function (response) {
-                                // Success handler
-                                const freshToken = await window.getFreshCsrfToken();
-                                fetch('{{ route("wallet.verify", [], false) }}', {
-                                    method: 'POST',
-                                    headers: {
-                                        'Content-Type': 'application/json',
-                                        'X-CSRF-TOKEN': freshToken
-                                    },
-                                    body: JSON.stringify({
-                                        razorpay_payment_id: response.razorpay_payment_id,
-                                        razorpay_order_id: response.razorpay_order_id,
-                                        razorpay_signature: response.razorpay_signature,
-                                        amount: data.amount
-                                    })
+                const data = await res.json();
+                if (data.success) {
+                    const modalEl = document.getElementById('addMoneyModal');
+                    const modalInstance = bootstrap.Modal.getInstance(modalEl);
+                    if (modalInstance) modalInstance.hide();
+
+                    const cashfree = Cashfree({ mode: data.mode || 'sandbox' });
+                    cashfree.checkout({
+                        paymentSessionId: data.payment_session_id,
+                        redirectTarget: "_modal"
+                    }).then(async function(result) {
+                        if (result.error) {
+                            Swal.fire('Error', result.error.message || 'Payment cancelled or failed.', 'error');
+                            btn.disabled = false;
+                            btn.innerHTML = originalText;
+                        }
+                        if (result.paymentDetails) {
+                            const vToken = window.getFreshCsrfToken ? await window.getFreshCsrfToken() : document.querySelector('meta[name="csrf-token"]').content;
+                            fetch('{{ route("wallet.verify", [], false) }}', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': vToken
+                                },
+                                body: JSON.stringify({
+                                    order_id: data.order_id,
+                                    amount: data.amount
                                 })
-                                    .then(res => res.json())
-                                    .then(vData => {
-                                        if (vData.success) {
-                                            Swal.fire({
-                                                icon: 'success',
-                                                title: 'Recharge Successful!',
-                                                text: 'Your wallet has been credited.',
-                                                confirmButtonColor: '#3399cc'
-                                            }).then(() => {
-                                                window.location.reload();
-                                            });
-                                        } else {
-                                            Swal.fire('Error', 'Payment verification failed!', 'error');
-                                        }
-                                    })
-                                    .catch(err => Swal.fire('Error', 'Verification request failed.', 'error'));
-                            },
-                            "modal": {
-                                "ondismiss": function () {
-                                    btn.disabled = false;
-                                    btn.innerHTML = originalText;
+                            })
+                            .then(r => r.json())
+                            .then(vData => {
+                                if (vData.success) {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Recharge Successful!',
+                                        text: 'Your wallet has been credited.',
+                                        confirmButtonColor: '#7026ed'
+                                    }).then(() => {
+                                        window.location.reload();
+                                    });
+                                } else {
+                                    Swal.fire('Error', vData.error || 'Payment verification failed!', 'error');
                                 }
-                            },
-                            "prefill": {
-                                "name": data.name,
-                                "email": data.email
-                            },
-                            "theme": { "color": "#3399cc" }
-                        };
-                        var rzp1 = new Razorpay(options);
-                        rzp1.open();
-                    } else {
-                        Swal.fire('Error', data.message || 'Unable to initiate payment.', 'error');
-                    }
-                })
-                .catch(err => {
-                    console.error(err);
-                    Swal.fire('Error', 'Something went wrong while connecting to Razorpay.', 'error');
-                })
-                .finally(() => {
+                            })
+                            .catch(() => Swal.fire('Error', 'Verification request failed.', 'error'));
+                        }
+                    });
+                } else {
+                    Swal.fire('Error', data.message || 'Unable to initiate payment.', 'error');
                     btn.disabled = false;
                     btn.innerHTML = originalText;
-                });
+                }
             } catch (err) {
                 console.error(err);
+                Swal.fire('Error', 'Something went wrong while connecting to Cashfree.', 'error');
                 btn.disabled = false;
                 btn.innerHTML = originalText;
             }

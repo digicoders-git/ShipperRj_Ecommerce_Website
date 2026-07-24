@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Setting extends Model
 {
-    protected $fillable = ['key', 'value'];
+    protected $fillable = ['key', 'value', 'facebook_link', 'instagram_link', 'twitter_link', 'youtube_link', 'office_address'];
 
     public static function getAllCached()
     {

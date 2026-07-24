@@ -214,8 +214,8 @@
                     <img src="{{ asset('assets/images/logo1.png') }}" alt="Logo" class="mb-4" style="height: 65px;">
                     <div class="company-details small text-secondary">
                         <p class="mb-1 fw-bold text-dark">SHOPPING CLUB INDIA (P) LTD.</p>
-                        <p class="mb-0">Avenue 7, New Delhi, India 110001</p>
-                        <p class="mb-0">T: +91 70882 13888 | E: shoppingclubindia1@gmail.com</p>
+                        <p class="mb-0">{{ $global_settings['office_address'] }}</p>
+                        <p class="mb-0">T: {{ $global_settings['support_phone'] }} | E: {{ $global_settings['support_email'] }}</p>
                         <p class="mb-0 fw-medium mt-2">GSTIN: 07AAGCS1234A1Z1</p>
                     </div>
                 </div>

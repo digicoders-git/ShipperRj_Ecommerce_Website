@@ -283,7 +283,7 @@
                 </p>
                 <ul class="privacy-list">
                     <li>We do not store your raw credit card numbers, CVV codes, net banking passwords, or UPI pins on our servers.</li>
-                    <li>All payments are securely handled through PCI-DSS compliant payment gateways (such as <strong class="text-dark">Razorpay</strong>).</li>
+                    <li>All payments are securely handled through PCI-DSS compliant payment gateways (such as <strong class="text-dark">Cashfree</strong>).</li>
                     <li>Wallet balances and digital transactions are logged securely and can only be used by you for purchases or approved claims on SCIB2B.</li>
                 </ul>
             </div>
@@ -319,7 +319,7 @@
                 </p>
                 <ul class="privacy-list">
                     <li><strong class="text-dark">Logistics Partners:</strong> Your address and contact number are shared with third-party courier services to facilitate delivery.</li>
-                    <li><strong class="text-dark">Payment Gateways:</strong> Order tokens are shared with Razorpay for secure checkout verification.</li>
+                    <li><strong class="text-dark">Payment Gateways:</strong> Order tokens are shared with Cashfree for secure checkout verification.</li>
                     <li><strong class="text-dark">Legal Compliance:</strong> We may disclose information if required to do so by law or government regulatory authorities.</li>
                 </ul>
             </div>
@@ -375,18 +375,18 @@
                             <span class="d-block text-dark fw-bold small">scib2b.com</span>
                         </div>
                     </a>
-                    <a href="tel:+917088213888" class="contact-item-card">
+                    <a href="tel:{{ $global_settings['clean_phone'] }}" class="contact-item-card">
                         <i class="bi bi-telephone"></i>
                         <div>
                             <span class="d-block xx-small text-secondary fw-bold uppercase">Phone</span>
-                            <span class="d-block text-dark fw-bold small">+91 70882 13888</span>
+                            <span class="d-block text-dark fw-bold small">{{ $global_settings['support_phone'] }}</span>
                         </div>
                     </a>
-                    <a href="mailto:shoppingclubindia1@gmail.com" class="contact-item-card">
+                    <a href="mailto:{{ $global_settings['support_email'] }}" class="contact-item-card">
                         <i class="bi bi-envelope"></i>
                         <div>
                             <span class="d-block xx-small text-secondary fw-bold uppercase">Email Support</span>
-                            <span class="d-block text-dark fw-bold small text-truncate" style="max-width: 170px;">shoppingclubindia1@gmail.com</span>
+                            <span class="d-block text-dark fw-bold small text-truncate" style="max-width: 170px;">{{ $global_settings['support_email'] }}</span>
                         </div>
                     </a>
                 </div>

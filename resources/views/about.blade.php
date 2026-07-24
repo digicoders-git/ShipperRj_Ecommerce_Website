@@ -603,11 +603,11 @@
                 </div>
                 <div class="founder-info-row">
                     <i class="bi bi-telephone-fill"></i>
-                    <a href="tel:+917088213888">+91 70882 13888</a>
+                    <a href="tel:{{ $global_settings['clean_phone'] }}">{{ $global_settings['support_phone'] }}</a>
                 </div>
                 <div class="founder-info-row">
                     <i class="bi bi-envelope-fill"></i>
-                    <a href="mailto:shoppingclubindia1@gmail.com">shoppingclubindia1@gmail.com</a>
+                    <a href="mailto:{{ $global_settings['support_email'] }}">{{ $global_settings['support_email'] }}</a>
                 </div>
                 <div class="founder-info-row">
                     <i class="bi bi-calendar-check"></i>

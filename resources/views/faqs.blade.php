@@ -274,13 +274,13 @@
                     Our friendly customer service team is always here to assist you. Get in touch with us directly via phone, email or whatsapp.
                 </p>
                 <div class="d-flex flex-wrap justify-content-center gap-3">
-                    <a href="tel:+917088213888" class="btn btn-premium px-4 py-2 d-inline-flex align-items-center gap-2" style="border-radius: 10px !important;">
+                    <a href="tel:{{ $global_settings['clean_phone'] }}" class="btn btn-premium px-4 py-2 d-inline-flex align-items-center gap-2" style="border-radius: 10px !important;">
                         <i class="bi bi-telephone-fill"></i> Call Us
                     </a>
-                    <a href="mailto:shoppingclubindia1@gmail.com" class="btn btn-outline-light px-4 py-2 d-inline-flex align-items-center gap-2" style="font-weight: 700; border-radius: 10px !important; border-color: rgba(255, 255, 255, 0.25) !important;">
+                    <a href="mailto:{{ $global_settings['support_email'] }}" class="btn btn-outline-light px-4 py-2 d-inline-flex align-items-center gap-2" style="font-weight: 700; border-radius: 10px !important; border-color: rgba(255, 255, 255, 0.25) !important;">
                         <i class="bi bi-envelope-fill"></i> Email Us
                     </a>
-                    <a href="https://wa.me/917088213888" target="_blank" class="btn btn-success px-4 py-2 d-inline-flex align-items-center gap-2" style="background: #25d366; border: none; font-weight: 700; border-radius: 10px !important;">
+                    <a href="https://wa.me/{{ $global_settings['clean_phone'] }}" target="_blank" class="btn btn-success px-4 py-2 d-inline-flex align-items-center gap-2" style="background: #25d366; border: none; font-weight: 700; border-radius: 10px !important;">
                         <i class="bi bi-whatsapp"></i> WhatsApp
                     </a>
                 </div>

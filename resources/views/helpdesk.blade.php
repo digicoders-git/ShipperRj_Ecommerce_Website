@@ -50,7 +50,7 @@
                                     </div>
                                     <h6 class="fw-black text-dark mb-1">Email Archive</h6>
                                     <p class="xx-small text-muted fw-bold uppercase mb-3">24h Response Goal</p>
-                                    <a href="mailto:shoppingclubindia1@gmail.com"
+                                    <a href="mailto:{{ $global_settings['support_email'] }}"
                                         class="btn btn-sm btn-premium-outline rounded-pill px-4 w-100 fw-bold text-decoration-none">EMAIL US</a>
                                 </div>
                             </div>
@@ -61,8 +61,8 @@
                                         <i class="bi bi-telephone-outbound-fill fs-5"></i>
                                     </div>
                                     <h6 class="fw-black text-dark mb-1">Direct Hotline</h6>
-                                    <p class="xx-small text-muted fw-bold uppercase mb-3">+91 70882 13888</p>
-                                    <a href="tel:+917088213888"
+                                    <p class="xx-small text-muted fw-bold uppercase mb-3">{{ $global_settings['support_phone'] }}</p>
+                                    <a href="tel:{{ $global_settings['clean_phone'] }}"
                                         class="btn btn-sm btn-premium-outline rounded-pill px-4 w-100 fw-bold text-decoration-none">CALL NOW</a>
                                 </div>
                             </div>

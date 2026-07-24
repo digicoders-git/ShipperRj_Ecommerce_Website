@@ -187,6 +187,8 @@ Route::middleware(['auth', 'check.blocked'])->group(function () {
     Route::post('/checkout/coupon/check', [CheckoutController::class, 'checkCoupon'])->name('checkout.coupon.check');
     Route::get('/checkout/payment/{order_id}', [CheckoutController::class, 'paymentPage'])->name('checkout.payment');
     Route::post('/checkout/payment/verify', [CheckoutController::class, 'verifyPayment'])->name('checkout.payment.verify');
+    Route::match(['get', 'post'], '/checkout/payment/cashfree/callback', [CheckoutController::class, 'cashfreeCallback'])->name('checkout.payment.cashfree.callback');
+    Route::post('/checkout/payment/cashfree/verify', [CheckoutController::class, 'verifyCashfreePayment'])->name('checkout.payment.cashfree.verify');
     Route::post('/checkout/payment/wallet', [CheckoutController::class, 'payByWallet'])->name('checkout.payment.wallet');
     Route::get('/order/invoice/{order_id}', [CheckoutController::class, 'downloadInvoice'])->name('order.invoice');
 

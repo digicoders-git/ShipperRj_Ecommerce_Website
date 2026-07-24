@@ -36,11 +36,13 @@
                     </div>
 
                     <div class="d-grid gap-3">
-                        <button id="rzp-button1"
-                            class="btn btn-primary w-100 py-3 rounded-pill fw-black transform-transition hover-scale shadow-lg border-0"
-                            style="background-color: #3399cc !important;">
-                            <i class="bi bi-credit-card me-2"></i> PAY VIA RAZORPAY
-                        </button>
+                        @if(!empty($cashfreeSessionId))
+                            <button id="cashfreePayBtn"
+                                class="btn btn-primary w-100 py-3 rounded-pill fw-black transform-transition hover-scale shadow-lg border-0"
+                                style="background: linear-gradient(135deg, #7026ed 0%, #4b14b6 100%) !important; color: #fff !important;">
+                                <i class="bi bi-shield-check me-2"></i> PAY VIA CASHFREE
+                            </button>
+                        @endif
 
                         <button id="walletPayBtn"
                             class="btn btn-dark w-100 py-3 rounded-pill fw-black transform-transition hover-scale shadow-lg border-0"
@@ -58,101 +60,37 @@
         </div>
     </div>
 
-    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
     <script>
-        var options = {
-            "key": "{{ $keyID }}",
-            "amount": "{{ $razorOrder->amount }}",
-            "currency": "INR",
-            "name": "Shopping Club India",
-            "description": "Payment for Order #{{ $order->order_number }}",
-            "image": "{{ asset('assets/images/logo.jpeg') }}",
-            "order_id": "{{ $order->razorpay_order_id }}",
-            "handler": async function (response) {
-                // Success handler
-                const freshToken = await window.getFreshCsrfToken();
-                fetch('{{ route("checkout.payment.verify", [], false) }}', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': freshToken
-                    },
-                    body: JSON.stringify({
-                        razorpay_payment_id: response.razorpay_payment_id,
-                        razorpay_order_id: response.razorpay_order_id,
-                        razorpay_signature: response.razorpay_signature
-                    })
-                })
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data.success) {
-                            window.location.href = '/order-success?order_id={{ $order->id }}';
-                        } else {
-                            alert('Payment Verification Failed!');
-                        }
-                    });
-            },
-            "prefill": {
-                "name": "{{ Auth::user()->name }}",
-                "email": "{{ Auth::user()->email }}",
-                "contact": "{{ Auth::user()->mobile }}"
-            },
-
-            // "config": {
-            //     "display": {
-            //         "blocks": {
-            //             "vpa": {
-            //                 "name": "Pay via UPI",
-            //                 "instruments": [
-            //                     {
-            //                         "method": "upi"
-            //                     }
-            //                 ]
-            //             },
-            //             "wallets": {
-            //                 "name": "Wallets",
-            //                 "instruments": [
-            //                   {
-            //                     "method": "wallet"
-            //                   }
-            //                 ]
-            //             }
-            //         },
-            //         "sequence": [
-            //             "block.vpa",
-            //             "block.wallets"
-            //         ],
-            //         "preferences": {
-            //             "show_default_blocks": true
-            //         }
-            //     }
-            // },
-            "theme": {
-                "color": "#3399cc"
-            },
-            "modal": {
-                "ondismiss": function () {
-                    console.log('Checkout form closed');
-                }
-            }
-        };
-        var rzp1 = new Razorpay(options);
-        rzp1.on('payment.failed', function (response) {
-            alert(response.error.description);
+        @if(!empty($cashfreeSessionId))
+        const cashfree = Cashfree({
+            mode: "{{ $cashfreeMode ?? 'sandbox' }}"
         });
-        document.getElementById('rzp-button1').onclick = function (e) {
-            rzp1.open();
-            e.preventDefault();
+
+        const cashfreeBtn = document.getElementById('cashfreePayBtn');
+        if (cashfreeBtn) {
+            cashfreeBtn.onclick = function (e) {
+                e.preventDefault();
+                cashfree.checkout({
+                    paymentSessionId: "{{ $cashfreeSessionId }}",
+                    redirectTarget: "_self"
+                }).then(async function(result) {
+                    if (result.error) {
+                        alert(result.error.message || 'Cashfree payment was cancelled or failed.');
+                    }
+                });
+            };
         }
+        @endif
 
         document.getElementById('walletPayBtn').onclick = async function (e) {
             if (confirm('Are you sure you want to pay ₹{{ number_format($order->prepaid_amount, 2) }} from your wallet?')) {
                 const btn = this;
                 btn.disabled = true;
                 btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> PROCESSING...';
- 
+
                 try {
-                    const freshToken = await window.getFreshCsrfToken();
+                    const freshToken = window.getFreshCsrfToken ? await window.getFreshCsrfToken() : document.querySelector('meta[name="csrf-token"]').content;
                     const res = await fetch('{{ route("checkout.payment.wallet", [], false) }}', {
                         method: 'POST',
                         headers: {

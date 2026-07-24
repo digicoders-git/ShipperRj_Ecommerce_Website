@@ -73,7 +73,7 @@
                     <div class="mb-4 pt-3 border-top border-white border-opacity-10">
                         <h6 class="text-white fw-bold mb-3"><i class="bi bi-info-circle me-2 text-info"></i>Support &
                             Contact</h6>
-                        <div class="row g-3">
+                        <div class="row g-3 mb-3">
                             <div class="col-md-6">
                                 <label class="form-label text-secondary small">Support Email</label>
                                 <input type="email" name="support_email" class="form-control glass-input"
@@ -83,6 +83,40 @@
                                 <label class="form-label text-secondary small">Support Phone</label>
                                 <input type="text" name="support_phone" class="form-control glass-input"
                                     value="{{ $settings['support_phone'] ?? '+91 70882 13888' }}">
+                            </div>
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label text-secondary small">Office Address</label>
+                                <textarea name="office_address" class="form-control glass-input" rows="2" placeholder="Office Address">{{ $settings['office_address'] ?? 'Avenue 7, New Delhi, India 110001' }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4 pt-3 border-top border-white border-opacity-10">
+                        <h6 class="text-white fw-bold mb-3"><i class="bi bi-share me-2 text-info"></i>Social Media Links</h6>
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label text-secondary small">Facebook Link</label>
+                                <input type="url" name="facebook_link" class="form-control glass-input"
+                                    value="{{ $settings['facebook_link'] }}" placeholder="https://facebook.com/yourpage">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label text-secondary small">Instagram Link</label>
+                                <input type="url" name="instagram_link" class="form-control glass-input"
+                                    value="{{ $settings['instagram_link'] }}" placeholder="https://instagram.com/yourprofile">
+                            </div>
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label text-secondary small">Twitter/X Link</label>
+                                <input type="url" name="twitter_link" class="form-control glass-input"
+                                    value="{{ $settings['twitter_link'] }}" placeholder="https://twitter.com/yourprofile">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label text-secondary small">YouTube Link</label>
+                                <input type="url" name="youtube_link" class="form-control glass-input"
+                                    value="{{ $settings['youtube_link'] }}" placeholder="https://youtube.com/yourchannel">
                             </div>
                         </div>
                     </div>
@@ -119,9 +153,21 @@
                         <i class="bi bi-envelope-at text-info xx-small"></i>
                         <span class="x-small text-white opacity-75">{{ $settings['support_email'] ?? 'Not set' }}</span>
                     </div>
-                    <div class="d-flex align-items-center gap-2">
+                    <div class="d-flex align-items-center gap-2 mb-2">
                         <i class="bi bi-telephone text-warning xx-small"></i>
                         <span class="x-small text-white opacity-75">{{ $settings['support_phone'] ?? 'Not set' }}</span>
+                    </div>
+                    <div class="d-flex align-items-start gap-2 mb-3">
+                        <i class="bi bi-geo-alt text-danger xx-small mt-1"></i>
+                        <span class="x-small text-white opacity-75 text-wrap">{{ $settings['office_address'] ?? 'Not set' }}</span>
+                    </div>
+                    
+                    <div class="text-white x-small fw-bold mb-2">Social Connections</div>
+                    <div class="d-flex gap-2">
+                        <a href="{{ $settings['facebook_link'] ?? '#' }}" target="_blank" class="btn btn-sm btn-dark text-white p-1 rounded d-flex align-items-center justify-content-center" style="width: 28px; height: 28px;"><i class="bi bi-facebook"></i></a>
+                        <a href="{{ $settings['instagram_link'] ?? '#' }}" target="_blank" class="btn btn-sm btn-dark text-white p-1 rounded d-flex align-items-center justify-content-center" style="width: 28px; height: 28px;"><i class="bi bi-instagram"></i></a>
+                        <a href="{{ $settings['twitter_link'] ?? '#' }}" target="_blank" class="btn btn-sm btn-dark text-white p-1 rounded d-flex align-items-center justify-content-center" style="width: 28px; height: 28px;"><i class="bi bi-twitter-x"></i></a>
+                        <a href="{{ $settings['youtube_link'] ?? '#' }}" target="_blank" class="btn btn-sm btn-dark text-white p-1 rounded d-flex align-items-center justify-content-center" style="width: 28px; height: 28px;"><i class="bi bi-youtube"></i></a>
                     </div>
                 </div>
 

@@ -145,7 +145,7 @@
                     @if($isAdmin)
                         <a href="{{ route('admin.settings') }}"
                             class="nav-link-admin {{ request()->routeIs('admin.settings*') ? 'active' : '' }}">
-                            <i class="bi bi-funnel"></i> <span>Set Minimum Global Order Value</span>
+                            <i class="bi bi-gear"></i> <span>Settings</span>
                         </a>
                     @endif
                 @endif

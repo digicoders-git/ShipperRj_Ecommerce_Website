@@ -495,18 +495,18 @@
                             <span class="d-block text-dark fw-bold small">scib2b.com</span>
                         </div>
                     </a>
-                    <a href="tel:+917088213888" class="contact-item-card">
+                    <a href="tel:{{ $global_settings['clean_phone'] }}" class="contact-item-card">
                         <i class="bi bi-telephone"></i>
                         <div>
                             <span class="d-block xx-small text-secondary fw-bold uppercase">Phone</span>
-                            <span class="d-block text-dark fw-bold small">+91 70882 13888</span>
+                            <span class="d-block text-dark fw-bold small">{{ $global_settings['support_phone'] }}</span>
                         </div>
                     </a>
-                    <a href="mailto:shoppingclubindia1@gmail.com" class="contact-item-card">
+                    <a href="mailto:{{ $global_settings['support_email'] }}" class="contact-item-card">
                         <i class="bi bi-envelope"></i>
                         <div>
                             <span class="d-block xx-small text-secondary fw-bold uppercase">Email Support</span>
-                            <span class="d-block text-dark fw-bold small text-truncate" style="max-width: 170px;">shoppingclubindia1@gmail.com</span>
+                            <span class="d-block text-dark fw-bold small text-truncate" style="max-width: 170px;">{{ $global_settings['support_email'] }}</span>
                         </div>
                     </a>
                 </div>

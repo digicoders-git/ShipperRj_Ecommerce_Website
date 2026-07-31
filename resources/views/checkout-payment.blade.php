@@ -40,7 +40,7 @@
                             <button id="cashfreePayBtn"
                                 class="btn btn-primary w-100 py-3 rounded-pill fw-black transform-transition hover-scale shadow-lg border-0"
                                 style="background: linear-gradient(135deg, #7026ed 0%, #4b14b6 100%) !important; color: #fff !important;">
-                                <i class="bi bi-shield-check me-2"></i> PAY VIA CASHFREE
+                                <i class="bi bi-shield-check me-2"></i> PAY VIA UPI
                             </button>
                         @endif
 
@@ -76,7 +76,7 @@
                     redirectTarget: "_self"
                 }).then(async function(result) {
                     if (result.error) {
-                        alert(result.error.message || 'Cashfree payment was cancelled or failed.');
+                        alert(result.error.message || 'Payment was cancelled or failed.');
                     }
                 });
             };

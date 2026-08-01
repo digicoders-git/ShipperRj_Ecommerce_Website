@@ -122,7 +122,7 @@
                         <i class="bi bi-truck fs-1 text-primary"></i>
                         <div>
                             <h6 class="fw-bold mb-0">Fast Delivery</h6>
-                            <p class="small text-secondary mb-0">Within 1-3 Business days</p>
+                            <p class="small text-secondary mb-0">Within 3-7 Business days</p>
                         </div>
                     </div>
                 </div>

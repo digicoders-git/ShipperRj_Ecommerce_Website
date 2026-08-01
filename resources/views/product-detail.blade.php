@@ -1402,13 +1402,35 @@
                                 </button>
                             </form>
                         </div>
+                        @php
+                            $settingsData = \App\Models\Setting::getAllCached();
+                            $global_online = ($settingsData['global_online_shipping'] ?? '') !== '' ? (float) $settingsData['global_online_shipping'] : 0;
+                            $global_cod = ($settingsData['global_cod_shipping'] ?? '') !== '' ? (float) $settingsData['global_cod_shipping'] : 0;
+
+                            $online_ship_pct = ((float) $product->online_shipping_charges > 0) ? (float)$product->online_shipping_charges : (float)$global_online;
+                            $cod_ship_pct = ((float) $product->cod_shipping_charges > 0) ? (float)$product->cod_shipping_charges : (float)$global_cod;
+
+                            $price = (float) $product->selling_price;
+                            $online_shipping_amt = round(($price * $online_ship_pct / 100), 2);
+                            $cod_shipping_amt = round(($price * $cod_ship_pct / 100), 2);
+
+                            $display_shipping = ($product->shipping_charges > 0) ? (float)$product->shipping_charges : $online_shipping_amt;
+                        @endphp
 
                         <div class="trust-grid">
                             <div class="trust-card">
                                 <div class="trust-icon"><i class="bi bi-truck"></i></div>
                                 <div>
-                                    <div class="trust-title">Shipping</div>
-                                    <div class="trust-sub">&#8377;{{ number_format($product->shipping_charges) }} flat rate
+                                    <div class="trust-title">Shipping Charge</div>
+                                    <div class="trust-sub">
+                                        @if($display_shipping > 0)
+                                            &#8377;{{ number_format($display_shipping, 2) }}
+                                            @if($cod_shipping_amt > 0 && $cod_shipping_amt != $display_shipping)
+                                                <small class="text-muted">(COD: &#8377;{{ number_format($cod_shipping_amt, 2) }})</small>
+                                            @endif
+                                        @else
+                                            FREE Shipping (&#8377;0)
+                                        @endif
                                     </div>
                                 </div>
                             </div>
@@ -1420,7 +1442,6 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
                 </div>
             </div>
 

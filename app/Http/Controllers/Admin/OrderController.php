@@ -25,9 +25,17 @@ class OrderController extends Controller implements HasMiddleware
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $orders = Order::with(['user', 'orderItems.product', 'address'])->orderBy('created_at', 'desc')->paginate(15);
+        $query = Order::with(['user', 'orderItems.product', 'address']);
+
+        if ($request->has('status') && $request->status !== '') {
+            $query->where('order_status', $request->status);
+        } else {
+            $query->whereNotIn('order_status', ['payment_pending', 'payment_failed']);
+        }
+
+        $orders = $query->orderBy('created_at', 'desc')->paginate(15);
         return view('admin.orders', compact('orders'));
     }
 

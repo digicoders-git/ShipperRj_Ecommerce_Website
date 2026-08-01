@@ -357,6 +357,8 @@ class CheckoutController extends Controller
             $prepaid_amount = $grand_total;
         }
 
+        $initial_order_status = ($prepaid_amount > 0) ? 'payment_pending' : 'placed';
+
         $order = Order::create([
             'user_id' => $user->id,
             'address_id' => $request->address_id,
@@ -368,8 +370,8 @@ class CheckoutController extends Controller
             'prepaid_amount' => $prepaid_amount,
             'cod_amount' => $grand_total - $prepaid_amount,
             'payment_method' => $request->payment_method,
-            'payment_status' => 'pending',
-            'order_status' => 'placed',
+            'payment_status' => ($prepaid_amount > 0) ? 'pending' : 'paid',
+            'order_status' => $initial_order_status,
             'has_gst' => $has_gst,
             'gst_number' => $gst_number,
             'gst_company' => $gst_company,
@@ -388,7 +390,7 @@ class CheckoutController extends Controller
         if ($prepaid_amount > 0) {
             return redirect()->route('checkout.payment', $order->id);
         } else {
-            $order->update(['payment_status' => 'paid']);
+            $order->update(['payment_status' => 'paid', 'order_status' => 'placed']);
             if ($request->order_type == 'cart')
                 Cart::where('user_id', $user->id)->delete();
             return redirect('/order-success?order_id=' . $order->id);
@@ -480,7 +482,7 @@ class CheckoutController extends Controller
             'description' => 'Payment for Order #' . $order->order_number
         ]);
 
-        $order->update(['payment_status' => 'paid']);
+        $order->update(['payment_status' => 'paid', 'order_status' => 'placed']);
 
         // Clear cart for the user
         Cart::where('user_id', $user->id)->delete();
@@ -534,7 +536,8 @@ class CheckoutController extends Controller
 
             $order->update([
                 'cashfree_payment_id' => $cfPaymentId ?? ($status['data']['cf_order_id'] ?? 'CF_SUCCESS'),
-                'payment_status' => 'paid'
+                'payment_status' => 'paid',
+                'order_status' => 'placed'
             ]);
 
             // Clear cart
@@ -588,7 +591,8 @@ class CheckoutController extends Controller
 
             $order->update([
                 'cashfree_payment_id' => $cfPaymentId ?? ($status['data']['cf_order_id'] ?? 'CF_SUCCESS'),
-                'payment_status' => 'paid'
+                'payment_status' => 'paid',
+                'order_status' => 'placed'
             ]);
 
             // Clear cart for the user

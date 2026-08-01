@@ -293,22 +293,22 @@
             <div class="row g-4">
                 <div class="col-md-6">
                     <div class="rounded-3 overflow-hidden position-relative shadow-sm hover-float" style="height: 300px;">
-                        <img src="{{asset('images/photo2.jpg')}}"
-                            class="img-fluid w-100 h-100 object-fit-cover transition-all" alt="Electronics" loading="lazy">
+                        <img src="{{ asset('images/mobile-promo-charger.jpg') }}?v=2"
+                            class="img-fluid w-100 h-100 object-fit-cover transition-all" alt="Fast Chargers Deal" loading="lazy">
                         <div class="position-absolute top-50 start-0 translate-middle-y ps-5 text-dark" style="z-index: 2;">
-                            <h6 class="text-primary fw-bold text-uppercase mb-2">SAVE UP TO 40% OFF</h6>
-                            <h3 class="fw-bold mb-2 text-white">Electronic <br>Mega Deal</h3>
+                            <h6 class="text-primary fw-bold text-uppercase mb-2">SAVE UP TO 50% OFF</h6>
+                            <h3 class="fw-bold mb-2 text-white">Ultra-Fast GaN <br>Charger Deal</h3>
                             <a href="{{ url('/products') }}" class="btn btn-premium px-4 mt-3">Shop Now</a>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="rounded-3 overflow-hidden position-relative shadow-sm hover-float" style="height: 300px;">
-                        <img src="{{asset('images/photo1.jpg')}}"
-                            class="img-fluid w-100 h-100 object-fit-cover transition-all" alt="Fashion Sale" loading="lazy">
+                        <img src="{{ asset('images/mobile-promo-cases.jpg') }}?v=2"
+                            class="img-fluid w-100 h-100 object-fit-cover transition-all" alt="Phone Cases Sale" loading="lazy">
                         <div class="position-absolute top-50 start-0 translate-middle-y ps-5 text-dark" style="z-index: 2;">
                             <h6 class="text-primary fw-bold text-uppercase mb-2">BUY 1 GET 1 FREE</h6>
-                            <h3 class="fw-bold mb-2 text-white">Fashion <br>Summer Sale</h3>
+                            <h3 class="fw-bold mb-2 text-white">Shockproof Covers <br>& Glass Sale</h3>
                             <a href="{{ url('/products') }}" class="btn btn-premium px-4 mt-3">Shop Now</a>
                         </div>
                     </div>
@@ -321,36 +321,36 @@
     <section class="py-5 bg-white">
         <div class="container py-4">
             <div class="section-header text-center mb-5">
-                <h2 class="display-5 fw-black mb-0">Highlights <span class="text-gradient-primary">Of The Week</span></h2>
+                <h2 class="display-5 fw-black mb-0">Mobile Accessories <span class="text-gradient-primary">Highlights</span></h2>
                 <div class="header-line mx-auto mt-2"
                     style="width: 80px; height: 4px; background: var(--primary-gradient); border-radius: 2px;"></div>
-                <p class="mt-3 opacity-75">Curated collections for your modern lifestyle</p>
+                <p class="mt-3 opacity-75">Curated gear engineered for your everyday smartphone life</p>
             </div>
             <div class="row g-3">
                 <div class="col-md-3">
                     <div class="rounded-3 overflow-hidden position-relative shadow-sm transition-all hover-scale"
                         style="height: 400px;">
-                        <img src="{{asset('images/photo3.jpg')}}" class="img-fluid h-100 w-100 object-fit-cover"
-                            alt="Highlights" loading="lazy">
+                        <img src="{{ asset('images/mobile-earbuds.png') }}?v=2" class="img-fluid h-100 w-100 object-fit-cover"
+                            alt="TWS Earbuds" loading="lazy">
                     </div>
                 </div>
                 <div class="col-md-5">
                     <div class="rounded-3 overflow-hidden position-relative shadow-sm transition-all hover-scale mb-3"
                         style="height: 190px;">
-                        <img src="{{asset('images/photo4.jpg')}}" class="img-fluid h-100 w-100 object-fit-cover"
-                            alt="Highlights" loading="lazy">
+                        <img src="{{ asset('images/mobile-promo-charger.jpg') }}?v=2" class="img-fluid h-100 w-100 object-fit-cover"
+                            alt="GaN Fast Charger" loading="lazy">
                     </div>
                     <div class="rounded-3 overflow-hidden position-relative shadow-sm transition-all hover-scale"
                         style="height: 194px;">
-                        <img src="{{asset('images/photo5.jpg')}}" class="img-fluid h-100 w-100 object-fit-cover"
-                            alt="Highlights" loading="lazy">
+                        <img src="{{ asset('images/mobile-promo-cases.jpg') }}?v=2" class="img-fluid h-100 w-100 object-fit-cover"
+                            alt="Phone Cases" loading="lazy">
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="rounded-3 overflow-hidden position-relative shadow-sm transition-all hover-scale"
                         style="height: 400px;">
-                        <img src="{{asset('images/photo6.jpg')}}" class="img-fluid h-100 w-100 object-fit-cover"
-                            alt="Highlights" loading="lazy">
+                        <img src="{{ asset('images/mobile-slider-2.png') }}?v=2" class="img-fluid h-100 w-100 object-fit-cover"
+                            alt="Wireless Audio & Power" loading="lazy">
                     </div>
                 </div>
             </div>

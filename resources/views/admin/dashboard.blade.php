@@ -27,7 +27,7 @@
         $subAdmin = auth('subadmin')->user();
 
         $rev = \App\Models\Order::where('payment_status', 'paid')->sum('total_amount') ?? 0;
-        $pending = \App\Models\Order::where('order_status', 'pending')->count() ?? 0;
+        $pending = \App\Models\Order::whereIn('order_status', ['placed', 'confirmed'])->count() ?? 0;
         $totalSubcategories = \App\Models\SubCategory::count() ?? 0;
         $users = $stats['total_users'] ?? 0;
         $orders = $stats['total_orders'] ?? 0;

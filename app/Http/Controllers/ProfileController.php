@@ -17,7 +17,7 @@ class ProfileController extends Controller
     public function dashboard()
     {
         $user = Auth::user();
-        $recent_orders = $user->orders()->orderBy('created_at', 'desc')->take(5)->get();
+        $recent_orders = $user->orders()->whereNotIn('order_status', ['payment_pending', 'payment_failed'])->orderBy('created_at', 'desc')->take(5)->get();
         return view('dashboard', compact('user', 'recent_orders'));
     }
 
@@ -31,7 +31,7 @@ class ProfileController extends Controller
     public function orders()
     {
         $user = Auth::user();
-        $orders = $user->orders()->with(['orderItems.product', 'orderTrackings', 'address'])->orderBy('created_at', 'desc')->paginate(10);
+        $orders = $user->orders()->with(['orderItems.product', 'orderTrackings', 'address'])->whereNotIn('order_status', ['payment_pending', 'payment_failed'])->orderBy('created_at', 'desc')->paginate(10);
         return view('orders', compact('user', 'orders'));
     }
 

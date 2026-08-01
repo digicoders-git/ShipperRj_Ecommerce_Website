@@ -17,9 +17,9 @@ class DashboardController extends Controller
         $stats = [
             'total_users' => User::count(),
             'total_products' => Product::count(),
-            'total_orders' => Order::count(),
+            'total_orders' => Order::whereNotIn('order_status', ['payment_pending', 'payment_failed', 'cancelled'])->count(),
             'total_categories' => Category::count(),
-            'recent_orders' => Order::with('user')->orderBy('created_at', 'desc')->limit(5)->get(),
+            'recent_orders' => Order::with('user')->whereNotIn('order_status', ['payment_pending', 'payment_failed', 'cancelled'])->orderBy('created_at', 'desc')->limit(5)->get(),
         ];
         return view('admin.dashboard', compact('stats'));
     }

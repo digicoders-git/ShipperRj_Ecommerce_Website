@@ -128,7 +128,6 @@
                 </form>
             </div>
         </div>
-
         <div class="col-md-4">
             <div class="glass-card p-4 h-100 shadow-premium">
                 <h6 class="text-white fw-bold mb-3 uppercase small tracking-widest"><i

@@ -45,7 +45,7 @@
                                 @if($slider->badge)
                                     <span class="badge bg-primary bg-opacity-20 text-primary-emphasis px-2 py-1 mb-1 small">{{ $slider->badge }}</span><br>
                                 @endif
-                                <span class="fw-bold text-white">{!! strip_tags($slider->title) !!}</span>
+                                <span class="fw-bold text-dark">{!! strip_tags($slider->title) !!}</span>
                             </td>
                             <td>
                                 <div class="d-flex align-items-center gap-2">
@@ -109,14 +109,16 @@
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label text-secondary small">Background Color (Hex code)</label>
                                     <div class="input-group">
-                                        <input type="color" class="form-control form-control-color glass-input border-end-0" style="max-width: 50px; padding: 6px; height: 100%;" value="{{ $slider->bg_color ?? '#F4F7F9' }}" onchange="document.getElementById('edit_bg_color_text{{ $slider->id }}').value = this.value">
-                                        <input type="text" name="bg_color" id="edit_bg_color_text{{ $slider->id }}" class="form-control glass-input" value="{{ $slider->bg_color ?? '#F4F7F9' }}" placeholder="#F4F7F9" required>
+                                        <span class="input-group-text bg-white border border-secondary border-opacity-25 border-end-0 px-2 py-1" style="border-top-left-radius: 10px; border-bottom-left-radius: 10px;">
+                                            <input type="color" class="form-control form-control-color p-0 border-0" style="width: 30px; height: 30px; cursor: pointer; background: transparent;" value="{{ $slider->bg_color ?? '#F4F7F9' }}" onchange="document.getElementById('edit_bg_color_text{{ $slider->id }}').value = this.value">
+                                        </span>
+                                        <input type="text" name="bg_color" id="edit_bg_color_text{{ $slider->id }}" class="form-control glass-input" style="border-top-left-radius: 0 !important; border-bottom-left-radius: 0 !important;" value="{{ $slider->bg_color ?? '#F4F7F9' }}" placeholder="#F4F7F9" oninput="if(this.value.length === 7 && this.value.startsWith('#')) { this.previousElementSibling.querySelector('input[type=color]').value = this.value; }" required>
                                     </div>
                                 </div>
                                 <div class="col-md-12 mb-3">
                                     <label class="form-label text-secondary small">Title</label>
                                     <textarea name="title" class="form-control glass-input" rows="2" required>{{ $slider->title }}</textarea>
-                                    <small class="text-white-50">Note: You can write HTML tags like &lt;br&gt;, &lt;span class="text-gradient-primary"&gt; to style selected words.</small>
+                                    <small class="text-secondary fw-semibold d-block mt-1">Note: You can write HTML tags like &lt;br&gt;, &lt;span class="text-gradient-primary"&gt; to style selected words.</small>
                                 </div>
                                 <div class="col-md-12 mb-3">
                                     <label class="form-label text-secondary small">Subtitle (Optional)</label>
@@ -186,14 +188,16 @@
                             <div class="col-md-6 mb-3">
                                 <label class="form-label text-secondary small">Background Color (Hex code)</label>
                                 <div class="input-group">
-                                    <input type="color" class="form-control form-control-color glass-input border-end-0" style="max-width: 50px; padding: 6px; height: 100%;" value="#F4F7F9" onchange="document.getElementById('add_bg_color_text').value = this.value">
-                                    <input type="text" name="bg_color" id="add_bg_color_text" class="form-control glass-input" value="#F4F7F9" placeholder="#F4F7F9" required>
+                                    <span class="input-group-text bg-white border border-secondary border-opacity-25 border-end-0 px-2 py-1" style="border-top-left-radius: 10px; border-bottom-left-radius: 10px;">
+                                        <input type="color" class="form-control form-control-color p-0 border-0" style="width: 30px; height: 30px; cursor: pointer; background: transparent;" value="#F4F7F9" onchange="document.getElementById('add_bg_color_text').value = this.value">
+                                    </span>
+                                    <input type="text" name="bg_color" id="add_bg_color_text" class="form-control glass-input" style="border-top-left-radius: 0 !important; border-bottom-left-radius: 0 !important;" value="#F4F7F9" placeholder="#F4F7F9" oninput="if(this.value.length === 7 && this.value.startsWith('#')) { this.previousElementSibling.querySelector('input[type=color]').value = this.value; }" required>
                                 </div>
                             </div>
                             <div class="col-md-12 mb-3">
                                 <label class="form-label text-secondary small">Title</label>
                                 <textarea name="title" class="form-control glass-input" rows="2" placeholder="Enter slider title" required></textarea>
-                                <small class="text-white-50">Note: You can write HTML tags like &lt;br&gt;, &lt;span class="text-gradient-primary"&gt; to style selected words.</small>
+                                <small class="text-secondary fw-semibold d-block mt-1">Note: You can write HTML tags like &lt;br&gt;, &lt;span class="text-gradient-primary"&gt; to style selected words.</small>
                             </div>
                             <div class="col-md-12 mb-3">
                                 <label class="form-label text-secondary small">Subtitle (Optional)</label>

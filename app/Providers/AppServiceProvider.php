@@ -57,8 +57,8 @@ class AppServiceProvider extends ServiceProvider
                 // Fallback to defaults if DB or table does not exist yet (e.g. during migrations)
                 $view->with('global_settings', [
                     'support_email' => 'shoppingclubindia1@gmail.com',
-                    'support_phone' => '+91 70882 13888',
-                    'clean_phone' => '917088213888',
+                    'support_phone' => '08069378060',
+                    'clean_phone' => '08069378060',
                     'facebook_link' => '#',
                     'instagram_link' => '#',
                     'twitter_link' => '#',

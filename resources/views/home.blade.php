@@ -132,7 +132,7 @@
                         <i class="bi bi-arrow-repeat fs-1 text-primary"></i>
                         <div>
                             <h6 class="fw-bold mb-0">Returns & Refund</h6>
-                            <p class="small text-secondary mb-0">30 days return policy</p>
+                            <p class="small text-secondary mb-0">7 days return policy</p>
                         </div>
                     </div>
                 </div>

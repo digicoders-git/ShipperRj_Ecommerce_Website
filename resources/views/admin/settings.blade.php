@@ -82,7 +82,7 @@
                             <div class="col-md-6">
                                 <label class="form-label text-secondary small">Support Phone</label>
                                 <input type="text" name="support_phone" class="form-control glass-input"
-                                    value="{{ $settings['support_phone'] ?? '+91 70882 13888' }}">
+                                    value="{{ $settings['support_phone'] ?? '08069378060' }}">
                             </div>
                         </div>
                         <div class="row g-3">
@@ -99,24 +99,24 @@
                             <div class="col-md-6">
                                 <label class="form-label text-secondary small">Facebook Link</label>
                                 <input type="url" name="facebook_link" class="form-control glass-input"
-                                    value="{{ $settings['facebook_link'] }}" placeholder="https://facebook.com/yourpage">
+                                    value="{{ $settings['facebook_link'] ?? '' }}" placeholder="https://facebook.com/yourpage">
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label text-secondary small">Instagram Link</label>
                                 <input type="url" name="instagram_link" class="form-control glass-input"
-                                    value="{{ $settings['instagram_link'] }}" placeholder="https://instagram.com/yourprofile">
+                                    value="{{ $settings['instagram_link'] ?? '' }}" placeholder="https://instagram.com/yourprofile">
                             </div>
                         </div>
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label class="form-label text-secondary small">Twitter/X Link</label>
                                 <input type="url" name="twitter_link" class="form-control glass-input"
-                                    value="{{ $settings['twitter_link'] }}" placeholder="https://twitter.com/yourprofile">
+                                    value="{{ $settings['twitter_link'] ?? '' }}" placeholder="https://twitter.com/yourprofile">
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label text-secondary small">YouTube Link</label>
                                 <input type="url" name="youtube_link" class="form-control glass-input"
-                                    value="{{ $settings['youtube_link'] }}" placeholder="https://youtube.com/yourchannel">
+                                    value="{{ $settings['youtube_link'] ?? '' }}" placeholder="https://youtube.com/yourchannel">
                             </div>
                         </div>
                     </div>

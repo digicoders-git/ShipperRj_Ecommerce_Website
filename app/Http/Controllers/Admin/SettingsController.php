@@ -10,7 +10,12 @@ class SettingsController extends Controller
 {
     public function index()
     {
-        $settings = Setting::all()->pluck('value', 'key')->toArray();
+        try {
+            $settings = Setting::all()->pluck('value', 'key')->toArray();
+        } catch (\Exception $e) {
+            \Log::error('Settings Fetch Error: ' . $e->getMessage());
+            $settings = [];
+        }
         return view('admin.settings', compact('settings'));
     }
 

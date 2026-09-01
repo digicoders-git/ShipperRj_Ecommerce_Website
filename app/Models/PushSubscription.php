@@ -5,18 +5,23 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use App\Traits\HasCustomId;
 
-class UserAddress extends Model
+class PushSubscription extends Model
 {
     use HasCustomId;
 
-    protected $fillable = [
-        'user_id', 'name', 'mobile', 'alt_mobile', 'address_line', 'landmark', 'city', 'state', 'pincode', 'type', 'is_default'
-    ];
-
     public function getTablePrefix()
     {
-        return 'ADR';
+        return 'SUB';
     }
+
+    protected $fillable = [
+        'user_id',
+        'endpoint',
+        'public_key',
+        'auth_token',
+        'content_encoding',
+        'user_agent'
+    ];
 
     public function user()
     {

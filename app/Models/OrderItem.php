@@ -3,10 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\HasCustomId;
 
 class OrderItem extends Model
 {
-    use \App\Traits\HasCustomId;
+    use HasCustomId;
 
     protected $fillable = ['order_id', 'product_id', 'quantity', 'price'];
 

@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Refund;
+use App\Models\OrderTracking;
+use App\Models\WalletTransaction;
 
 class RefundController extends Controller
 {
@@ -40,7 +42,7 @@ class RefundController extends Controller
             $user->increment('wallet_balance', $refund->amount);
 
             // Create Transaction Record
-            \App\Models\WalletTransaction::create([
+            WalletTransaction::create([
                 'user_id' => $user->id,
                 'amount' => $refund->amount,
                 'type' => 'credit',
@@ -58,7 +60,7 @@ class RefundController extends Controller
             $order->save();
 
             // Add Tracking
-            \App\Models\OrderTracking::create([
+            OrderTracking::create([
                 'order_id' => $order->id,
                 'status' => $order->order_status,
                 'message' => 'Refund of ₹' . number_format($refund->amount, 2) . ' approved and credited to your wallet.'
@@ -71,14 +73,13 @@ class RefundController extends Controller
             }
             $order->save();
 
-            \App\Models\OrderTracking::create([
+            OrderTracking::create([
                 'order_id' => $order->id,
                 'status' => $order->order_status,
-                'message' => 'Your refund request for Order #' . $order->order_number . ' was rejected by Admin.'
+                'message' => 'Refund request rejected by Admin.'
             ]);
         }
 
-        return redirect()->back()->with('success', 'Refund status updated and processed.');
+        return back()->with('success', 'Refund status updated successfully.');
     }
 }
-

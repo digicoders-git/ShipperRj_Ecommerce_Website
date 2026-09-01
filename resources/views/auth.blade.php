@@ -33,7 +33,25 @@
                     <div class="tab-pane fade show active" id="login" role="tabpanel" aria-labelledby="login-tab">
                         <form action="{{ route('login.post') }}" method="POST" class="d-flex flex-column gap-3">
                             @csrf
-                            @if(session('error'))
+                            @if(session('admin_phone_for_reset'))
+                                <div class="alert alert-warning border-0 rounded-4 p-3 shadow-sm mb-3">
+                                    <div class="d-flex align-items-start gap-2">
+                                        <i class="bi bi-exclamation-triangle-fill text-dark fs-5 flex-shrink-0 mt-1"></i>
+                                        <div>
+                                            <strong class="d-block text-dark mb-1"><i class="bi bi-key-fill me-1 text-primary"></i> Forgot Your Password?</strong>
+                                            <p class="small text-dark mb-2">You have entered an incorrect password <strong>{{ session('failed_attempts_count', 2) }} times</strong>. To reset your password, please contact Admin directly:</p>
+                                            <div class="d-flex flex-wrap gap-2 mt-2">
+                                                <a href="tel:{{ session('admin_phone_for_reset') }}" class="btn btn-dark btn-sm rounded-pill px-3 fw-bold">
+                                                    <i class="bi bi-telephone-fill me-1"></i> Call: {{ session('admin_phone_for_reset') }}
+                                                </a>
+                                                <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', session('admin_phone_for_reset')) }}?text={{ urlencode('Hello Admin, I forgot my password and need help resetting it.') }}" target="_blank" class="btn btn-success btn-sm rounded-pill px-3 fw-bold">
+                                                    <i class="bi bi-whatsapp me-1"></i> WhatsApp Admin
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @elseif(session('error'))
                                 <div class="alert alert-danger px-4 py-3 rounded-4 border-0 small m-0 mb-2">
                                     {{ session('error') }}
                                 </div>

@@ -191,7 +191,7 @@
                             <div class="modal-body p-4">
                                 @foreach($order->orderItems as $item)
                                     @php
-                                        $hasReviewed = \App\Models\ProductReview::where('user_id', Auth::id())->where('product_id', $item->product_id)->exists();
+                                        $hasReviewed = App\Models\ProductReview::where('user_id', Auth::id())->where('product_id', $item->product_id)->exists();
                                     @endphp
                                     <div class="card mb-3 border shadow-none rounded-4 p-3 bg-light bg-opacity-25">
                                         <div class="d-flex align-items-center gap-3 mb-3">

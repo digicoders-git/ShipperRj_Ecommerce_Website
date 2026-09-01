@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\Setting;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -48,6 +49,20 @@ class AuthController extends Controller
 
         // 3. Check password explicitly for specific error message
         if (!Hash::check($request->password, $user->password)) {
+            $failedKey = 'failed_pass_count_' . $user->id;
+            $failedAttempts = (session($failedKey, 0)) + 1;
+            session([$failedKey => $failedAttempts]);
+
+            if ($failedAttempts >= 2) {
+                $settings = Setting::getAllCached();
+                $adminPhone = $settings['contact_phone'] ?? $settings['support_phone'] ?? $settings['admin_phone'] ?? $settings['phone'] ?? '+91 9876543210';
+
+                return back()->withErrors([
+                    'email' => "Incorrect password! You have entered an incorrect password {$failedAttempts} times. If you forgot your password, please contact Admin at: {$adminPhone}",
+                ])->with('failed_attempts_count', $failedAttempts)
+                  ->with('admin_phone_for_reset', $adminPhone)
+                  ->onlyInput('email');
+            }
             return back()->withErrors([
                 'email' => 'Incorrect password. Please try again.',
             ])->onlyInput('email');
@@ -55,6 +70,7 @@ class AuthController extends Controller
 
         // 4. Attempt Login
         if (Auth::attempt([$loginField => $loginInput, 'password' => $request->password], $request->has('remember'))) {
+            session()->forget('failed_pass_count_' . $user->id);
             $request->session()->regenerate();
             return redirect()->intended('/dashboard')->with('success', 'Logged in successfully!');
         }

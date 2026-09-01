@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\WalletTransaction;
+use App\Models\Order;
 
 class TransactionController extends Controller
 {
@@ -16,7 +17,7 @@ class TransactionController extends Controller
             return $t;
         });
 
-        $orderPayments = \App\Models\Order::with('user')->where('payment_status', 'paid')->get()->map(function($o) {
+        $orderPayments = Order::with('user')->where('payment_status', 'paid')->get()->map(function($o) {
             return (object)[
                 'id' => $o->id,
                 'user' => $o->user,

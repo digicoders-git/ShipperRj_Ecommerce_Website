@@ -3,6 +3,13 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use App\Models\Category;
+use App\Models\Setting;
+use App\Models\Cart;
+use App\Models\Wishlist;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Cache;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -20,18 +27,29 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         // Global Categories for Header (Shared Across All Pages)
-        \Illuminate\Support\Facades\View::composer('layouts.app', function ($view) {
+        View::composer('layouts.app', function ($view) {
             // We use Cache here to avoid querying the DB on EVERY single page load.
-            $categories = \Illuminate\Support\Facades\Cache::remember('header_categories', 3600, function () {
-                return \App\Models\Category::with('subCategories')->get();
+            $categories = Cache::remember('header_categories', 3600, function () {
+                return Category::with('subCategories')->get();
             });
             $view->with('categories', $categories);
         });
 
-        // Global Settings Composer (Shared Across All Pages)
-        \Illuminate\Support\Facades\View::composer('*', function ($view) {
+        // Global Settings & Counts Composer (Shared Across All Pages)
+        View::composer('*', function ($view) {
+            $user_cart_count = 0;
+            $user_wishlist_count = 0;
+
+            if (Auth::check()) {
+                $user_cart_count = Cart::where('user_id', Auth::id())->count();
+                $user_wishlist_count = Wishlist::where('user_id', Auth::id())->count();
+            }
+
+            $view->with('user_cart_count', $user_cart_count);
+            $view->with('user_wishlist_count', $user_wishlist_count);
+
             try {
-                $settings = \App\Models\Setting::getAllCached();
+                $settings = Setting::getAllCached();
                 $phone = $settings['support_phone'];
                 $email = $settings['support_email'];
                 $facebook = $settings['facebook_link'];
@@ -39,10 +57,10 @@ class AppServiceProvider extends ServiceProvider
                 $twitter = $settings['twitter_link'];
                 $youtube = $settings['youtube_link'];
                 $officeAddress = $settings['office_address'] ?? 'Avenue 7, New Delhi, India 110001';
-                
+
                 // Remove spaces, brackets, dashes, plus sign for WhatsApp/telephone links
                 $cleanPhone = preg_replace('/[^0-9]/', '', $phone);
-                
+
                 $view->with('global_settings', [
                     'support_email' => $email,
                     'support_phone' => $phone,

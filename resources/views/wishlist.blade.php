@@ -25,7 +25,7 @@
                             @forelse($wishlistItems as $item)
                                 @php 
                                                                 $prodPrice = $item->product->selling_price ?? 0;
-                                    $imagePath = $item->product->image ? asset($item->product->image) : 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=400';
+                                    $imagePath = $item->product->image ? asset($item->product->image) : asset('images/placeholder.svg');
                                 @endphp
                                 <div class="col-md-6 col-xl-4">
                                     <div class="wishlist-item-card border rounded-4 p-3 h-100 position-relative transition">

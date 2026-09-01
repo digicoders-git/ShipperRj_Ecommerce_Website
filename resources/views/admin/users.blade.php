@@ -81,6 +81,10 @@
                                         title="View Details">
                                         <i class="bi bi-eye text-primary"></i>
                                     </a>
+                                    <button type="button" class="btn btn-sm btn-outline-light border-0 bg-white bg-opacity-5"
+                                        data-bs-toggle="modal" data-bs-target="#resetPassModal{{ $user->id }}" title="Reset User Password">
+                                        <i class="bi bi-key text-warning"></i>
+                                    </button>
                                     <form action="{{ route('admin.users.toggle-block', $user->id) }}" method="POST"
                                         class="d-inline">
                                         @csrf
@@ -104,6 +108,32 @@
                                             <i class="bi bi-trash text-danger"></i>
                                         </button>
                                     </form>
+                                </div>
+
+                                <!-- Reset Password Modal -->
+                                <div class="modal fade" id="resetPassModal{{ $user->id }}" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content rounded-4 border-0 shadow-lg bg-white text-dark">
+                                            <div class="modal-header border-0 pb-0">
+                                                <h5 class="fw-bold text-dark mb-0"><i class="bi bi-key-fill text-warning me-2"></i>Reset Password for {{ $user->name }}</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <form action="{{ route('admin.users.reset-password', $user->id) }}" method="POST">
+                                                @csrf
+                                                <div class="modal-body p-4 text-start">
+                                                    <p class="small text-muted mb-3">Set a new password for <strong>{{ $user->name }}</strong> ({{ $user->email ?? $user->mobile }}):</p>
+                                                    <div class="form-group mb-3">
+                                                        <label class="small fw-bold text-dark mb-1">New Password</label>
+                                                        <input type="text" name="password" class="form-control rounded-3 border bg-light text-dark" placeholder="Enter new password (min 6 characters)" minlength="6" required>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer border-0 pt-0">
+                                                    <button type="button" class="btn btn-secondary btn-sm rounded-pill" data-bs-dismiss="modal">Cancel</button>
+                                                    <button type="submit" class="btn btn-warning btn-sm rounded-pill px-4 fw-bold shadow-sm">Update Password</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
                                 </div>
                             </td>
                         </tr>

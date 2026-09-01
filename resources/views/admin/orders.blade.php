@@ -3,9 +3,22 @@
 @section('title', 'Orders')
 
 @section('admin_content')
-    <div class="mb-4">
-        <h5 class="fw-bold mb-0">Order Management</h5>
-        <p class="text-secondary small">Track and manage customer orders</p>
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+        <div>
+            <h5 class="fw-bold text-dark mb-1">Order & Invoice Management</h5>
+            <p class="text-secondary small mb-0">Track customer orders, filter by B2B (GST) vs B2C (Retail), and generate tax invoices.</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{{ route('admin.orders.index') }}" class="btn btn-sm {{ !request()->filled('gst_type') ? 'btn-dark' : 'btn-outline-dark' }} rounded-pill px-3 fw-bold">
+                <i class="bi bi-receipt me-1"></i> All Invoices ({{ $totalAllCount ?? 0 }})
+            </a>
+            <a href="{{ route('admin.orders.index', ['gst_type' => 'b2b']) }}" class="btn btn-sm {{ request('gst_type') == 'b2b' ? 'btn-warning text-dark' : 'btn-outline-warning text-dark' }} rounded-pill px-3 fw-bold">
+                <i class="bi bi-building me-1"></i> B2B (GST Invoices) ({{ $totalB2BCount ?? 0 }})
+            </a>
+            <a href="{{ route('admin.orders.index', ['gst_type' => 'b2c']) }}" class="btn btn-sm {{ request('gst_type') == 'b2c' ? 'btn-secondary' : 'btn-outline-secondary' }} rounded-pill px-3 fw-bold">
+                <i class="bi bi-person me-1"></i> B2C (Retail Invoices) ({{ $totalB2CCount ?? 0 }})
+            </a>
+        </div>
     </div>
 
     <div class="glass-card">
@@ -14,6 +27,7 @@
                 <thead>
                     <tr class="border-bottom border-white border-opacity-10">
                         <th class="small fw-bold py-3">Order #</th>
+                        <th class="small fw-bold py-3">Invoice Type</th>
                         <th class="small fw-bold py-3">Customer</th>
                         <th class="small fw-bold py-3">Amount</th>
                         <th class="small fw-bold py-3">Payment</th>
@@ -27,8 +41,22 @@
                         <tr class="border-bottom border-white border-opacity-5">
                             <td class="small fw-bold">#{{ $order->order_number }}</td>
                             <td>
-                                <div class="small text-white">{{ $order->user->name }}</div>
-                                <div class="x-small text-secondary">{{ $order->user->email }}</div>
+                                @if($order->has_gst || $order->gst_number)
+                                    <span class="badge bg-warning bg-opacity-20 text-dark border border-warning px-2 py-1 x-small fw-bold" title="GSTIN: {{ $order->gst_number }}">
+                                        <i class="bi bi-building me-1"></i> B2B (GST)
+                                    </span>
+                                    @if($order->gst_company)
+                                        <div class="x-small text-muted text-truncate" style="max-width: 120px;">{{ $order->gst_company }}</div>
+                                    @endif
+                                @else
+                                    <span class="badge bg-secondary bg-opacity-10 text-dark border px-2 py-1 x-small fw-bold">
+                                        <i class="bi bi-person me-1"></i> B2C (Retail)
+                                    </span>
+                                @endif
+                            </td>
+                            <td>
+                                <div class="small text-white">{{ $order->user->name ?? 'Guest' }}</div>
+                                <div class="x-small text-secondary">{{ $order->user->email ?? 'N/A' }}</div>
                             </td>
                             <td class="text-white fw-bold">₹{{ number_format($order->total_amount, 2) }}</td>
                             <td>
@@ -49,12 +77,13 @@
                             <td class="text-end">
                                 <div class="d-flex gap-1 justify-content-end">
                                     <a href="{{ route('admin.orders.show', $order->id) }}"
-                                        class="btn btn-sm btn-outline-light border-0 bg-white bg-opacity-5">
+                                        class="btn btn-sm btn-outline-light border-0 bg-white bg-opacity-5"
+                                        title="View Order Details">
                                         <i class="bi bi-eye text-primary"></i>
                                     </a>
                                     <a href="{{ route('admin.orders.invoice', $order->id) }}" target="_blank"
                                         class="btn btn-sm btn-outline-light border-0 bg-white bg-opacity-5"
-                                        title="Generate Invoice">
+                                        title="Generate {{ ($order->has_gst || $order->gst_number) ? 'B2B GST Tax Invoice' : 'B2C Retail Invoice' }}">
                                         <i class="bi bi-file-earmark-pdf text-info"></i>
                                     </a>
                                     <button class="btn btn-sm btn-outline-light border-0 bg-white bg-opacity-5"
@@ -67,6 +96,9 @@
                     @endforeach
                 </tbody>
             </table>
+        </div>
+        <div class="d-flex justify-content-end mt-3 p-3">
+            {{ $orders->appends(request()->query())->links('pagination::bootstrap-5') }}
         </div>
     </div>
 @endsection
@@ -112,7 +144,7 @@
                                     </select>
                                 </div>
                                 <div class="col-12 mt-3" id="trackingLinkContainer{{ $order->id }}"
-                                    style="{{ $order->order_status == 'confirmed' ? '' : 'display: none;' }}">
+                                    style="{{ $order->order_status == 'processing' ? '' : 'display: none;' }}">
                                     <label class="xx-small text-secondary fw-black uppercase tracking-widest mb-2 d-block">Live
                                         Tracking Link</label>
                                     <input type="url" name="tracking_link"
@@ -205,10 +237,12 @@
                 select.addEventListener('change', function () {
                     const orderId = this.getAttribute('data-order-id');
                     const container = document.getElementById(`trackingLinkContainer${orderId}`);
-                    if (this.value === 'confirmed') {
-                        container.style.display = 'block';
-                    } else {
-                        container.style.display = 'none';
+                    if (container) {
+                        if (this.value === 'processing') {
+                            container.style.display = 'block';
+                        } else {
+                            container.style.display = 'none';
+                        }
                     }
                 });
             });

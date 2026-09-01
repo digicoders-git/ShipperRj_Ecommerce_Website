@@ -391,7 +391,7 @@
                                 </select>
                             </div>
                             <div class="col-12 mt-3" id="trackingLinkContainer{{ $order->id }}"
-                                style="{{ $order->order_status == 'confirmed' ? '' : 'display: none;' }}">
+                                style="{{ $order->order_status == 'processing' ? '' : 'display: none;' }}">
                                 <label class="xx-small text-secondary fw-black uppercase tracking-widest mb-2 d-block">Live
                                     Tracking Link</label>
                                 <input type="url" name="tracking_link"
@@ -501,10 +501,12 @@
             select.addEventListener('change', function() {
                 const orderId = this.getAttribute('data-order-id');
                 const container = document.getElementById(`trackingLinkContainer${orderId}`);
-                if (this.value === 'confirmed') {
-                    container.style.display = 'block';
-                } else {
-                    container.style.display = 'none';
+                if (container) {
+                    if (this.value === 'processing') {
+                        container.style.display = 'block';
+                    } else {
+                        container.style.display = 'none';
+                    }
                 }
             });
         });

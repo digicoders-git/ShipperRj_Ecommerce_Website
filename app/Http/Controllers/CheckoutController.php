@@ -8,7 +8,11 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\UserAddress;
 use App\Models\Cart;
+use App\Models\Setting;
+use App\Models\Coupon;
+use App\Models\WalletTransaction;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use App\Services\CashfreeService;
 
 class CheckoutController extends Controller
@@ -28,7 +32,7 @@ class CheckoutController extends Controller
         $cod_shipping = 0;
 
         // Fetch Global Settings using Cache
-        $settingsData = \App\Models\Setting::getAllCached();
+        $settingsData = Setting::getAllCached();
         $global_online = ($settingsData['global_online_shipping'] ?? '') !== '' ? (float) $settingsData['global_online_shipping'] : 0;
         $global_cod = ($settingsData['global_cod_shipping'] ?? '') !== '' ? (float) $settingsData['global_cod_shipping'] : 0;
         $global_adv = ($settingsData['global_cod_advance_percent'] ?? '') !== '' ? (float) $settingsData['global_cod_advance_percent'] : 0;
@@ -39,11 +43,17 @@ class CheckoutController extends Controller
             // Calculation logic: use product value if not NULL/zero/empty, otherwise fallback to global
             $item_adv = ((float) $product->cod_advance_percent > 0) ? $product->cod_advance_percent : $global_adv;
 
-            // Treat these as percentages now
-            $item_online_ship_pct = ((float) $product->online_shipping_charges > 0) ? $product->online_shipping_charges : $global_online;
-            $item_cod_ship_pct = ((float) $product->cod_shipping_charges > 0) ? $product->cod_shipping_charges : $global_cod;
+            $resolved_price = $product->getEffectivePrice($qty);
 
-            $resolved_price = $product->getSellingPriceForQuantity($qty);
+            // Treat these as percentages calculated from exact tier matching (or product override)
+            $item_online_ship_pct = ((float) $product->online_shipping_charges > 0)
+                ? (float) $product->online_shipping_charges
+                : Setting::getTierShippingPercentage($resolved_price, 'online', $settingsData);
+
+            $item_cod_ship_pct = ((float) $product->cod_shipping_charges > 0)
+                ? (float) $product->cod_shipping_charges
+                : Setting::getTierShippingPercentage($resolved_price, 'cod', $settingsData);
+
             $item_online_ship = ($resolved_price * $item_online_ship_pct / 100);
             $item_cod_ship = ($resolved_price * $item_cod_ship_pct / 100);
 
@@ -73,10 +83,16 @@ class CheckoutController extends Controller
                 // Calculation logic for each cart item: favor global if product is empty/0
                 $item_adv = ((float) $cart->product->cod_advance_percent > 0) ? $cart->product->cod_advance_percent : $global_adv;
 
-                $item_online_ship_pct = ((float) $cart->product->online_shipping_charges > 0) ? $cart->product->online_shipping_charges : $global_online;
-                $item_cod_ship_pct = ((float) $cart->product->cod_shipping_charges > 0) ? $cart->product->cod_shipping_charges : $global_cod;
+                $resolved_price = $cart->product->getEffectivePrice($cart->quantity);
 
-                $resolved_price = $cart->product->getSellingPriceForQuantity($cart->quantity);
+                $item_online_ship_pct = ((float) $cart->product->online_shipping_charges > 0)
+                    ? (float) $cart->product->online_shipping_charges
+                    : Setting::getTierShippingPercentage($resolved_price, 'online', $settingsData);
+
+                $item_cod_ship_pct = ((float) $cart->product->cod_shipping_charges > 0)
+                    ? (float) $cart->product->cod_shipping_charges
+                    : Setting::getTierShippingPercentage($resolved_price, 'cod', $settingsData);
+
                 $item_online_ship = ($resolved_price * $item_online_ship_pct / 100);
                 $item_cod_ship = ($resolved_price * $item_cod_ship_pct / 100);
 
@@ -107,19 +123,21 @@ class CheckoutController extends Controller
             return redirect('/')->with('error', 'Your cart is empty.');
         }
 
+        $settingsData = Setting::getAllCached();
         $min_order_val = (isset($settingsData['min_order_price']) && $settingsData['min_order_price'] !== '') ? (float) $settingsData['min_order_price'] : 0;
         /* Min order validation moved to frontend Place Order button as per user request */
         // if($min_order_val > 0 && $total < $min_order_val) {
         //     return redirect()->back()->with('error', 'Minimum order amount to place order is ₹'.number_format($min_order_val));
         // }
 
-        $usedCouponCodes = \App\Models\Order::where('user_id', $user->id)
+        $usedCouponCodes = Order::where('user_id', $user->id)
             ->whereNotNull('coupon_code')
             ->where('order_status', '!=', 'cancelled')
             ->pluck('coupon_code')
             ->toArray();
 
-        $coupons = \App\Models\Coupon::where('status', 1)
+        $coupons = Coupon::where('status', 1)
+            ->where('is_visible', 1)
             ->where('expiry_date', '>=', date('Y-m-d'))
             ->whereNotIn('code', $usedCouponCodes)
             ->get();
@@ -134,6 +152,12 @@ class CheckoutController extends Controller
         $cod_shipping = (float) $cod_shipping;
         $shipping_savings_amount = $cod_shipping - $online_shipping;
         $shipping_savings_pct = ($total > 0) ? ($shipping_savings_amount / $total * 100) : 0;
+
+        $onlineTiersJson = $settingsData['shipping_tiers_online'] ?? null;
+        $online_tiers = $onlineTiersJson ? (is_array($onlineTiersJson) ? $onlineTiersJson : json_decode($onlineTiersJson, true)) : [];
+
+        $codTiersJson = $settingsData['shipping_tiers_cod'] ?? null;
+        $cod_tiers = $codTiersJson ? (is_array($codTiersJson) ? $codTiersJson : json_decode($codTiersJson, true)) : [];
 
         return view('checkout', compact(
             'addresses',
@@ -151,7 +175,9 @@ class CheckoutController extends Controller
             'global_adv',
             'min_order_val',
             'shipping_savings_pct',
-            'shipping_savings_amount'
+            'shipping_savings_amount',
+            'online_tiers',
+            'cod_tiers'
         ));
     }
 
@@ -160,7 +186,7 @@ class CheckoutController extends Controller
         $code = $request->coupon_code;
         $total = $request->total;
 
-        $coupon = \App\Models\Coupon::where('code', $code)
+        $coupon = Coupon::where('code', $code)
             ->where('status', 1)
             ->where('expiry_date', '>=', date('Y-m-d'))
             ->first();
@@ -230,7 +256,7 @@ class CheckoutController extends Controller
         $shipping = 0;
 
         // Fetch Global Settings for backend validation (using Cache)
-        $settingsData = \App\Models\Setting::getAllCached();
+        $settingsData = Setting::getAllCached();
         $global_online = ($settingsData['global_online_shipping'] ?? '') !== '' ? (float) $settingsData['global_online_shipping'] : 0;
         $global_cod = ($settingsData['global_cod_shipping'] ?? '') !== '' ? (float) $settingsData['global_cod_shipping'] : 0;
         $global_adv = ($settingsData['global_cod_advance_percent'] ?? '') !== '' ? (float) $settingsData['global_cod_advance_percent'] : 0;
@@ -244,12 +270,18 @@ class CheckoutController extends Controller
                 return redirect()->back()->with('error', 'MOQ Error for ' . $product->name);
             }
 
+            $resolved_price = $product->getEffectivePrice($request->qty);
+
             $item_adv = ((float) $product->cod_advance_percent > 0) ? $product->cod_advance_percent : $global_adv;
 
-            $item_online_ship_pct = ((float) $product->online_shipping_charges > 0) ? $product->online_shipping_charges : $global_online;
-            $item_cod_ship_pct = ((float) $product->cod_shipping_charges > 0) ? $product->cod_shipping_charges : $global_cod;
+            $item_online_ship_pct = ((float) $product->online_shipping_charges > 0)
+                ? (float) $product->online_shipping_charges
+                : Setting::getTierShippingPercentage($resolved_price, 'online', $settingsData);
 
-            $resolved_price = $product->getSellingPriceForQuantity($request->qty);
+            $item_cod_ship_pct = ((float) $product->cod_shipping_charges > 0)
+                ? (float) $product->cod_shipping_charges
+                : Setting::getTierShippingPercentage($resolved_price, 'cod', $settingsData);
+
             $items[] = [
                 'id' => $product->id,
                 'qty' => $request->qty,
@@ -271,12 +303,18 @@ class CheckoutController extends Controller
                     return redirect('/cart')->with('error', 'MOQ Error for ' . $cart->product->name);
                 }
 
+                $resolved_price = $cart->product->getEffectivePrice($cart->quantity);
+
                 $item_adv = ((float) $cart->product->cod_advance_percent > 0) ? $cart->product->cod_advance_percent : $global_adv;
 
-                $item_online_ship_pct = ((float) $cart->product->online_shipping_charges > 0) ? $cart->product->online_shipping_charges : $global_online;
-                $item_cod_ship_pct = ((float) $cart->product->cod_shipping_charges > 0) ? $cart->product->cod_shipping_charges : $global_cod;
+                $item_online_ship_pct = ((float) $cart->product->online_shipping_charges > 0)
+                    ? (float) $cart->product->online_shipping_charges
+                    : Setting::getTierShippingPercentage($resolved_price, 'online', $settingsData);
 
-                $resolved_price = $cart->product->getSellingPriceForQuantity($cart->quantity);
+                $item_cod_ship_pct = ((float) $cart->product->cod_shipping_charges > 0)
+                    ? (float) $cart->product->cod_shipping_charges
+                    : Setting::getTierShippingPercentage($resolved_price, 'cod', $settingsData);
+
                 $items[] = [
                     'id' => $cart->product->id,
                     'qty' => $cart->quantity,
@@ -294,20 +332,25 @@ class CheckoutController extends Controller
             $shipping = round($shipping, 2);
         }
 
+        // Min Order Value Backend Validation
+        if ($min_order_val > 0 && $total < $min_order_val) {
+            return redirect('/cart')->with('error', 'Minimum required order value is ₹' . number_format($min_order_val, 2) . '. Please add more items to your cart.');
+        }
+
 
 
         // Coupon Handling
         $discount = 0;
         $coupon_code = $request->coupon_code ? strtoupper($request->coupon_code) : null;
         if ($coupon_code) {
-            $coupon = \App\Models\Coupon::where('code', $coupon_code)
+            $coupon = Coupon::where('code', $coupon_code)
                 ->where('status', 1)
                 ->where('expiry_date', '>=', date('Y-m-d'))
                 ->first();
 
             if ($coupon && $total >= $coupon->min_spend) {
                 // Double check if already used (extra safety)
-                $couponUsed = \App\Models\Order::where('user_id', $user->id)
+                $couponUsed = Order::where('user_id', $user->id)
                     ->where('coupon_code', $coupon_code)
                     ->where('order_status', '!=', 'cancelled')
                     ->exists();
@@ -452,7 +495,7 @@ class CheckoutController extends Controller
                     'cashfree_session_id' => $cashfreeSessionId
                 ]);
             } else {
-                \Illuminate\Support\Facades\Log::error('Cashfree Session Creation Error: ' . json_encode($cfOrderResult));
+                Log::error('Cashfree Session Creation Error: ' . json_encode($cfOrderResult));
             }
         }
 
@@ -475,7 +518,7 @@ class CheckoutController extends Controller
         $user->save();
 
         // Create wallet transaction record
-        \App\Models\WalletTransaction::create([
+        WalletTransaction::create([
             'user_id' => $user->id,
             'amount' => $order->prepaid_amount,
             'type' => 2, // Debit

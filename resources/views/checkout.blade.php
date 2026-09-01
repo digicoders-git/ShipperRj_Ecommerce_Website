@@ -250,7 +250,7 @@
                                             <div class="d-flex gap-4">
                                                 <div class="product-img rounded-3 border overflow-hidden"
                                                     style="width: 100px; height: 100px; flex-shrink: 0;">
-                                                    <img src="{{ $item['image'] ? asset($item['image']) : 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=200' }}"
+                                                    <img src="{{ $item['image'] ? asset($item['image']) : asset('images/placeholder.svg') }}"
                                                         class="w-100 h-100 object-fit-contain p-2">
                                                 </div>
                                                 <div class="flex-grow-1">
@@ -347,6 +347,18 @@
                                             </div>
                                         </div>
 
+                                        <div id="cartValidationNotice" class="alert alert-warning border-0 rounded-4 p-3 mt-4 mb-0 shadow-sm" style="display: none; background-color: #fff8f0; border-left: 4px solid #f2701a !important;">
+                                            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <i class="bi bi-exclamation-triangle-fill text-warning fs-5"></i>
+                                                    <span class="small fw-bold text-dark" id="cartValidationNoticeMsg">Minimum requirements not met.</span>
+                                                </div>
+                                                <a href="/cart" class="btn btn-sm btn-warning text-dark fw-black rounded-pill px-3 xx-small uppercase">
+                                                    <i class="bi bi-cart-dash me-1"></i> Update Cart
+                                                </a>
+                                            </div>
+                                        </div>
+
                                         <div class="d-flex justify-content-between align-items-center mt-5">
                                             <button type="button" class="btn btn-link text-dark text-decoration-none fw-bold" onclick="goToStep(2)">
                                                 <i class="bi bi-arrow-left me-2"></i> BACK TO SUMMARY
@@ -397,9 +409,21 @@
                                                 <span class="text-muted fw-medium" id="totalQtyDisplay">Price ({{ $total_qty }} items)</span>
                                                 <span class="fw-black text-dark">₹<span id="subtotalDisplay">{{ number_format($total, 2) }}</span></span>
                                             </div>
-                                            <div class="d-flex justify-content-between mb-2 align-items-center">
+                                            <div class="d-flex justify-content-between mb-1 align-items-center">
                                                 <span class="text-muted fw-medium" id="shippingMethodLabel">Shipping Charges</span>
                                                 <span class="text-dark fw-bold" id="shippingDisplay">--</span>
+                                            </div>
+                                            <div class="p-2 rounded-3 bg-primary bg-opacity-10 border border-primary border-opacity-15 mb-2 mt-1">
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <i class="bi bi-info-circle-fill text-white xx-small"></i>
+                                                    <span class="xx-small text-white fw-bold">Shipping rates calculated automatically per price tier (%)</span>
+                                                </div>
+                                            </div>
+                                            <div id="tierNudgeAlert" class="p-2.5 rounded-3 bg-warning bg-opacity-15 border border-warning border-opacity-30 mb-3 shadow-sm" style="display: none;">
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <i class="bi bi-gift-fill text-warning fs-6"></i>
+                                                    <span class="xx-small text-dark fw-bold" id="tierNudgeText">Shop for more to get lower shipping rates!</span>
+                                                </div>
                                             </div>
                                             <div class="d-flex justify-content-between mb-2 align-items-center d-none" id="gstRow">
                                                  <span class="text-muted fw-medium">GST (18%)</span>
@@ -819,17 +843,75 @@
 
                     <script>
                         function goToStep(step) {
+                            if (step > 1) {
+                                const selectedAddr = document.getElementById('selectedAddressId') ? document.getElementById('selectedAddressId').value : '';
+                                if (!selectedAddr) {
+                                    Swal.fire({
+                                        icon: 'warning',
+                                        title: 'ADDRESS REQUIRED',
+                                        text: 'Please select or add a delivery address to proceed.',
+                                        confirmButtonColor: '#f2701a'
+                                    });
+                                    return false;
+                                }
+                            }
+
+                            if (step > 2) {
+                                for (const item of orderItems) {
+                                    if (item.qty < item.min_qty) {
+                                        Swal.fire({
+                                            icon: 'warning',
+                                            title: 'MINIMUM QUANTITY REQUIRED',
+                                            html: `<p class="mb-2">The minimum order quantity for <b>"${item.name}"</b> is <b>${item.min_qty}</b> units. (You currently have <b>${item.qty}</b>).</p><p class="text-secondary small mb-0">Please update your cart quantity before proceeding to payment.</p>`,
+                                            showCancelButton: true,
+                                            confirmButtonText: '<i class="bi bi-cart-fill me-1"></i> UPDATE CART NOW',
+                                            cancelButtonText: 'CANCEL',
+                                            confirmButtonColor: '#f2701a',
+                                            cancelButtonColor: '#6c757d'
+                                        }).then((result) => {
+                                            if (result.isConfirmed) {
+                                                window.location.href = '/cart';
+                                            }
+                                        });
+                                        return false;
+                                    }
+                                }
+
+                                if (minOrderVal > 0 && baseSubtotal < minOrderVal) {
+                                    let diff = minOrderVal - baseSubtotal;
+                                    Swal.fire({
+                                        icon: 'warning',
+                                        title: 'MINIMUM ORDER VALUE REQUIRED',
+                                        html: `<p class="mb-2">Your item subtotal is <b>₹${formatMoney(baseSubtotal)}</b>. A minimum shopping amount of <b>₹${formatMoney(minOrderVal)}</b> is required.</p><p class="text-secondary small mb-0">Please add items worth <b>₹${formatMoney(diff)}</b> more to your cart.</p>`,
+                                        showCancelButton: true,
+                                        confirmButtonText: '<i class="bi bi-cart-fill me-1"></i> UPDATE CART / SHOP MORE',
+                                        cancelButtonText: 'CANCEL',
+                                        confirmButtonColor: '#f2701a',
+                                        cancelButtonColor: '#6c757d'
+                                    }).then((result) => {
+                                        if (result.isConfirmed) {
+                                            window.location.href = '/cart';
+                                        }
+                                    });
+                                    return false;
+                                }
+                            }
+
                             document.querySelectorAll('.luxury-step').forEach(el => el.classList.remove('active', 'completed'));
                             for(let i=1; i<step; i++) {
-                                document.getElementById('step'+i+'-indicator').classList.add('completed');
+                                const ind = document.getElementById('step'+i+'-indicator');
+                                if (ind) ind.classList.add('completed');
                             }
-                            document.getElementById('step'+step+'-indicator').classList.add('active');
+                            const targetInd = document.getElementById('step'+step+'-indicator');
+                            if (targetInd) targetInd.classList.add('active');
 
                             const progress = (step - 1) / 2 * 100;
-                            document.getElementById('step-progress').style.width = progress + '%';
+                            const progBar = document.getElementById('step-progress');
+                            if (progBar) progBar.style.width = progress + '%';
 
                             document.querySelectorAll('.checkout-step-content').forEach(el => el.classList.remove('active'));
-                            document.getElementById('step'+step+'-content').classList.add('active');
+                            const targetContent = document.getElementById('step'+step+'-content');
+                            if (targetContent) targetContent.classList.add('active');
 
                             window.scrollTo({ top: 0, behavior: 'smooth' });
                         }
@@ -911,21 +993,37 @@
                                 if (item.qty < item.min_qty) {
                                     Swal.fire({
                                         icon: 'warning',
-                                        title: 'MINIMUM QUANTITY ERROR',
-                                        text: `The minimum order quantity for "${item.name}" is ${item.min_qty} units. You have chosen ${item.qty}.`,
-                                        confirmButtonColor: '#f2701a'
+                                        title: 'MINIMUM QUANTITY REQUIRED',
+                                        html: `<p class="mb-2">The minimum order quantity for <b>"${item.name}"</b> is <b>${item.min_qty}</b> units. (You currently have <b>${item.qty}</b>).</p><p class="text-secondary small mb-0">Please update your cart quantity before placing the order.</p>`,
+                                        showCancelButton: true,
+                                        confirmButtonText: '<i class="bi bi-cart-fill me-1"></i> UPDATE CART NOW',
+                                        cancelButtonText: 'CANCEL',
+                                        confirmButtonColor: '#f2701a',
+                                        cancelButtonColor: '#6c757d'
+                                    }).then((result) => {
+                                        if (result.isConfirmed) {
+                                            window.location.href = '/cart';
+                                        }
                                     });
                                     return false;
                                 }
                             }
  
-                            const currentGrandTotal = parseFloat(document.getElementById('grandTotalDisplay').innerText.replace(/,/g, ''));
-                            if (minOrderVal > 0 && currentGrandTotal < minOrderVal) {
+                            if (minOrderVal > 0 && baseSubtotal < minOrderVal) {
+                                let diff = minOrderVal - baseSubtotal;
                                 Swal.fire({
                                     icon: 'warning',
-                                    title: 'MINIMUM ORDER VALUE',
-                                    text: `Your current order total is ₹${currentGrandTotal.toLocaleString()}. A minimum order of ₹${minOrderVal.toLocaleString()} is required to place an order.`,
-                                    confirmButtonColor: '#f2701a'
+                                    title: 'MINIMUM ORDER VALUE REQUIRED',
+                                    html: `<p class="mb-2">Your item subtotal is <b>₹${formatMoney(baseSubtotal)}</b>. A minimum shopping amount of <b>₹${formatMoney(minOrderVal)}</b> is required.</p><p class="text-secondary small mb-0">Please add items worth <b>₹${formatMoney(diff)}</b> more to your cart.</p>`,
+                                    showCancelButton: true,
+                                    confirmButtonText: '<i class="bi bi-cart-fill me-1"></i> UPDATE CART / SHOP MORE',
+                                    cancelButtonText: 'CANCEL',
+                                    confirmButtonColor: '#f2701a',
+                                    cancelButtonColor: '#6c757d'
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        window.location.href = '/cart';
+                                    }
                                 });
                                 return false;
                             }
@@ -959,6 +1057,9 @@
                             currentShipping = (method === 'online') ? onlineShipping : codShipping;
                             const label = document.getElementById('shippingMethodLabel');
                             if(label) label.innerText = (method === 'online') ? 'Online Shipping Charges' : 'COD Shipping Charges';
+                            if (typeof updateTierNudge === 'function') {
+                                updateTierNudge(baseSubtotal, method);
+                            }
                             updateGrandTotal();
                         }
 
@@ -999,6 +1100,9 @@
                                 document.getElementById('payableNowLabel').innerText = 'Payable Now (Security Advance)';
                             }
                             document.getElementById('payableNowDisplay').innerText = formatMoney(payableNow);
+                            if (typeof checkCartValidationNotice === 'function') {
+                                checkCartValidationNotice();
+                            }
                         }
 
                         function selectCoupon(code) {
@@ -1238,6 +1342,10 @@
                                 }
                             }
                             
+                            // Update tier nudge alert
+                            const currentMethodForNudge = document.getElementById('paymentMethodInput').value || 'online';
+                            updateTierNudge(baseSubtotal, currentMethodForNudge);
+
                             // Re-apply coupon or just update grand total
                             const couponInput = document.getElementById('couponInput');
                             if (couponInput && couponInput.value) {
@@ -1246,5 +1354,75 @@
                                 updateGrandTotal();
                             }
                         }
+
+                        const onlineTiers = @json($online_tiers ?? []);
+                        const codTiers = @json($cod_tiers ?? []);
+
+                        function updateTierNudge(amount, method) {
+                            const tiers = (method === 'cod') ? codTiers : onlineTiers;
+                            const nudgeAlert = document.getElementById('tierNudgeAlert');
+                            const nudgeText = document.getElementById('tierNudgeText');
+
+                            if (!nudgeAlert || !nudgeText || !tiers || !Array.isArray(tiers) || tiers.length === 0) return;
+
+                            let currentTierIdx = -1;
+                            for (let i = 0; i < tiers.length; i++) {
+                                let min = parseFloat(tiers[i].min_price || 0);
+                                let max = (tiers[i].max_price !== null && tiers[i].max_price !== '') ? parseFloat(tiers[i].max_price) : null;
+                                if (amount >= min && (max === null || amount <= max)) {
+                                    currentTierIdx = i;
+                                    break;
+                                }
+                            }
+
+                            if (currentTierIdx !== -1 && currentTierIdx + 1 < tiers.length) {
+                                let currentPct = parseFloat(tiers[currentTierIdx].shipping_percent || 0);
+                                let nextTier = tiers[currentTierIdx + 1];
+                                let nextMin = parseFloat(nextTier.min_price || 0);
+                                let nextPct = parseFloat(nextTier.shipping_percent || 0);
+
+                                if (nextPct < currentPct && amount < nextMin) {
+                                    let needed = nextMin - amount;
+                                    nudgeText.innerHTML = `Shop for <b>₹${formatMoney(needed)}</b> more to lower shipping to <b>${nextPct}%</b> (currently ${currentPct}%)!`;
+                                    nudgeAlert.style.display = 'block';
+                                    return;
+                                }
+                            } else if (currentTierIdx !== -1 && currentTierIdx === tiers.length - 1 && tiers.length > 1) {
+                                let currentPct = parseFloat(tiers[currentTierIdx].shipping_percent || 0);
+                                nudgeText.innerHTML = `🎉 Unlocked lowest <b>${currentPct}%</b> shipping rate tier!`;
+                                nudgeAlert.style.display = 'block';
+                                return;
+                            }
+
+                            nudgeAlert.style.display = 'none';
+                        }
+
+                        function checkCartValidationNotice() {
+                            const notice = document.getElementById('cartValidationNotice');
+                            const noticeMsg = document.getElementById('cartValidationNoticeMsg');
+                            if (!notice || !noticeMsg) return;
+
+                            for (const item of orderItems) {
+                                if (item.qty < item.min_qty) {
+                                    noticeMsg.innerHTML = `Minimum quantity for <b>"${item.name}"</b> is <b>${item.min_qty}</b> units (You have ${item.qty}). Please update cart.`;
+                                    notice.style.display = 'block';
+                                    return;
+                                }
+                            }
+
+                            if (minOrderVal > 0 && baseSubtotal < minOrderVal) {
+                                let diff = minOrderVal - baseSubtotal;
+                                noticeMsg.innerHTML = `Minimum order value is <b>₹${formatMoney(minOrderVal)}</b>. Add <b>₹${formatMoney(diff)}</b> more to proceed.`;
+                                notice.style.display = 'block';
+                                return;
+                            }
+
+                            notice.style.display = 'none';
+                        }
+
+                        document.addEventListener('DOMContentLoaded', function () {
+                            updateTierNudge({{ $total }}, 'online');
+                            checkCartValidationNotice();
+                        });
                     </script>
 @endsection

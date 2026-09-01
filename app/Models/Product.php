@@ -47,6 +47,52 @@ class Product extends Model
         return $price;
     }
 
+    /**
+     * Get active live offer for the category this product belongs to
+     */
+    public function getActiveCategoryOffer()
+    {
+        $categoryId = $this->subCategory->category_id ?? null;
+        if (!$categoryId) {
+            return null;
+        }
+
+        $now = now();
+        return Offer::where('category_id', $categoryId)
+            ->where('status', 1)
+            ->where('start_date', '<=', $now)
+            ->where('end_date', '>=', $now)
+            ->latest()
+            ->first();
+    }
+
+    /**
+     * Get final effective selling price after applying quantity pricing AND active category offer
+     */
+    public function getEffectivePrice($quantity = 1): float
+    {
+        $basePrice = $this->getSellingPriceForQuantity($quantity);
+        $offer = $this->getActiveCategoryOffer();
+        if ($offer) {
+            $discount = $offer->calculateDiscount($basePrice);
+            return max(0, round($basePrice - $discount, 2));
+        }
+        return round($basePrice, 2);
+    }
+
+    /**
+     * Get discount amount saved via active category offer
+     */
+    public function getCategoryOfferDiscountAmount($quantity = 1): float
+    {
+        $basePrice = $this->getSellingPriceForQuantity($quantity);
+        $offer = $this->getActiveCategoryOffer();
+        if ($offer) {
+            return $offer->calculateDiscount($basePrice);
+        }
+        return 0;
+    }
+
     public function getTablePrefix()
     {
         return 'PRD';

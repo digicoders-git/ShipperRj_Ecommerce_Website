@@ -410,7 +410,7 @@
                                                                     <button type="button"
                                                                         class="btn btn-danger btn-sm position-absolute top-0 end-0 p-0 rounded-circle"
                                                                         style="width: 15px; height: 15px; font-size: 8px;"
-                                                                        onclick="deleteGalleryImage({{ $gal->id }})">&times;</button>
+                                                                        onclick="deleteGalleryImage('{{ $gal->id }}')">&times;</button>
                                                                 </div>
                                                             @endforeach
                                                         </div>

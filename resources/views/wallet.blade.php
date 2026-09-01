@@ -28,13 +28,13 @@
                                     <h1 class="fw-black display-4 mb-4 letter-spacing-n1">
                                         ₹{{ number_format(Auth::user()->wallet_balance ?? 0, 2) }}</h1>
                                     <div class="d-flex gap-2">
-                                        <button class="btn btn-white rounded-pill px-4 py-3 fw-bold shadow-premium"
+                                        <button class="btn btn-outline-light rounded-pill px-4 py-3 fw-bold shadow-premium"
                                             data-bs-toggle="modal" data-bs-target="#addMoneyModal">
                                             <i class="bi bi-plus-lg me-2"></i> Add Money
                                         </button>
-                                        <button class="btn btn-outline-light rounded-pill px-4 py-3 fw-bold border-2">
+                                        <!-- <button class="btn btn-outline-light rounded-pill px-4 py-3 fw-bold border-2">
                                             <i class="bi bi-arrow-down-circle me-2"></i> Withdraw
-                                        </button>
+                                        </button> -->
                                     </div>
                                 </div>
                             </div>
@@ -134,14 +134,14 @@
 
 @push('modals')
     <!-- Add Money Modal -->
-    <div class="modal fade" id="addMoneyModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content border-0 rounded-4 overflow-hidden shadow-lg">
+    <div class="modal fade" id="addMoneyModal" tabindex="-1" aria-hidden="true" style="z-index: 99999 !important;">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-height: 88vh;">
+            <div class="modal-content border-0 rounded-4 overflow-hidden shadow-lg" style="max-height: 88vh;">
                 <div class="modal-header border-0 bg-light p-4">
                     <h5 class="modal-title fw-black">Deposit Funds</h5>
                     <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body p-4">
+                <div class="modal-body p-4" style="max-height: calc(88vh - 75px); overflow-y: auto;">
                     <!-- Offers Section -->
                     @if($offers->count() > 0)
                         <div class="mb-4">

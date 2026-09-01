@@ -686,28 +686,36 @@ body.sidebar-collapsed .admin-sidebar:hover .sidebar-logo-img {
 }
 
 .glass-toast {
-    background: rgba(255, 255, 255, 0.25) !important;
-    /* Authentic premium transparent glass */
+    background: #0f172a !important;
     backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
-    border: 1px solid rgba(255, 255, 255, 0.4) !important;
-    color: #111827 !important;
-    padding: 16px 25px;
-    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    color: #ffffff !important;
+    padding: 14px 22px;
+    border-radius: 14px;
     display: flex;
     align-items: center;
-    gap: 15px;
-    font-weight: 700;
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.5);
-    animation: vibrateIn 0.6s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+    gap: 14px;
+    font-weight: 600;
+    font-size: 0.92rem;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    animation: vibrateIn 0.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
     letter-spacing: 0.3px;
     overflow: hidden;
+    max-width: 420px;
+}
+
+.glass-toast .toast-content {
+    color: #ffffff !important;
+    font-weight: 600;
+    line-height: 1.4;
 }
 
 /* Success / Green */
 .glass-toast.success {
     border-left: 6px solid #10b981 !important;
-    box-shadow: 0 12px 35px rgba(16, 185, 129, 0.15);
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, #0f172a 100%) !important;
+    box-shadow: 0 12px 35px rgba(16, 185, 129, 0.25), 0 20px 40px rgba(0, 0, 0, 0.6);
 }
 
 .glass-toast.success i {
@@ -718,7 +726,8 @@ body.sidebar-collapsed .admin-sidebar:hover .sidebar-logo-img {
 /* Error / Red */
 .glass-toast.error {
     border-left: 6px solid #ef4444 !important;
-    box-shadow: 0 12px 35px rgba(239, 68, 68, 0.15);
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.2) 0%, #0f172a 100%) !important;
+    box-shadow: 0 12px 35px rgba(239, 68, 68, 0.25), 0 20px 40px rgba(0, 0, 0, 0.6);
 }
 
 .glass-toast.error i {
@@ -726,10 +735,23 @@ body.sidebar-collapsed .admin-sidebar:hover .sidebar-logo-img {
     font-size: 1.4rem;
 }
 
+/* Warning / Amber */
+.glass-toast.warning {
+    border-left: 6px solid #f59e0b !important;
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, #0f172a 100%) !important;
+    box-shadow: 0 12px 35px rgba(245, 158, 11, 0.25), 0 20px 40px rgba(0, 0, 0, 0.6);
+}
+
+.glass-toast.warning i {
+    color: #f59e0b;
+    font-size: 1.4rem;
+}
+
 /* Info / Blue */
 .glass-toast.info {
     border-left: 6px solid #3b82f6 !important;
-    box-shadow: 0 12px 35px rgba(59, 130, 246, 0.15);
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, #0f172a 100%) !important;
+    box-shadow: 0 12px 35px rgba(59, 130, 246, 0.25), 0 20px 40px rgba(0, 0, 0, 0.6);
 }
 
 .glass-toast.info i {

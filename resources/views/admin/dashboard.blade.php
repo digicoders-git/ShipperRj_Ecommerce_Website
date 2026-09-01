@@ -26,87 +26,13 @@
         $isAdmin = auth('admin')->check();
         $subAdmin = auth('subadmin')->user();
 
-        $rev = \App\Models\Order::where('payment_status', 'paid')->sum('total_amount') ?? 0;
-        $pending = \App\Models\Order::whereIn('order_status', ['placed', 'confirmed'])->count() ?? 0;
-        $totalSubcategories = \App\Models\SubCategory::count() ?? 0;
         $users = $stats['total_users'] ?? 0;
         $orders = $stats['total_orders'] ?? 0;
         $products = $stats['total_products'] ?? 0;
         $categories = $stats['total_categories'] ?? 0;
 
-        // Dynamic metrics for the sidebar status cards
-        $totalCoupons = \App\Models\Coupon::count() ?? 0;
-        $totalOffers = \App\Models\Offer::count() ?? 0;
-        $totalOffersAndCoupons = $totalCoupons + $totalOffers;
-        
-        $totalWalletTransactions = \App\Models\WalletTransaction::count() ?? 0;
-        $totalOrderPayments = \App\Models\Order::where('payment_status', 'paid')->count() ?? 0;
-        $totalTransactions = $totalWalletTransactions + $totalOrderPayments;
-
-        $totalWalletOffers = \App\Models\WalletOffer::count() ?? 0;
-        $totalSellerInquiries = \App\Models\SellerInquiry::count() ?? 0;
-        $totalComplaints = \App\Models\Complaint::count() ?? 0;
-        $totalContacts = \App\Models\Contact::count() ?? 0;
-        $totalSupportTickets = \App\Models\SupportTicket::count() ?? 0;
-        $totalReviews = \App\Models\ProductReview::count() ?? 0;
-        $totalRefunds = \App\Models\Refund::count() ?? 0;
-        $totalFaqs = \App\Models\Faq::count() ?? 0;
-        $totalSliders = \App\Models\HomeSlider::count() ?? 0;
-        $totalSubAdmins = \App\Models\SubAdmin::count() ?? 0;
-
-        // Fetch revenue for last 6 months dynamically
-        $months = [];
-        $chartData = [];
-        for ($i = 5; $i >= 0; $i--) {
-            $date = now()->subMonths($i);
-            $months[] = $date->format('M');
-            $chartData[] = \App\Models\Order::where('payment_status', 'paid')
-                ->whereYear('created_at', $date->year)
-                ->whereMonth('created_at', $date->month)
-                ->sum('total_amount') ?? 0;
-        }
-
-        // Fetch revenue for this year dynamically
-        $thisYearMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-        $thisYearData = [];
-        $currentYear = now()->year;
-        for ($m = 1; $m <= 12; $m++) {
-            $thisYearData[] = \App\Models\Order::where('payment_status', 'paid')
-                ->whereYear('created_at', $currentYear)
-                ->whereMonth('created_at', $m)
-                ->sum('total_amount') ?? 0;
-        }
-
-        // Fetch revenue for all time dynamically (grouped by year)
-        $yearsData = \App\Models\Order::where('payment_status', 'paid')
-            ->selectRaw('YEAR(created_at) as year, sum(total_amount) as total')
-            ->groupBy('year')
-            ->orderBy('year', 'asc')
-            ->get();
-            
-        $allTimeLabels = [];
-        $allTimeData = [];
-        if ($yearsData->isEmpty()) {
-            $allTimeLabels = [now()->year];
-            $allTimeData = [0];
-        } else {
-            foreach ($yearsData as $yData) {
-                $allTimeLabels[] = (string)$yData->year;
-                $allTimeData[] = (float)$yData->total;
-            }
-        }
-
-        // Fetch order status breakdown dynamically
-        $orderStatuses = \App\Models\Order::selectRaw('order_status, count(*) as count')
-            ->groupBy('order_status')
-            ->get();
-            
-        $statusLabels = [];
-        $statusCounts = [];
-        foreach ($orderStatuses as $status) {
-            $statusLabels[] = ucfirst(str_replace('_', ' ', $status->order_status ?? 'unknown'));
-            $statusCounts[] = (int)$status->count;
-        }
+        $totalOffersAndCoupons = ($totalCoupons ?? 0) + ($totalOffers ?? 0);
+        $totalTransactions = ($totalWalletTransactions ?? 0) + ($totalOrderPayments ?? 0);
     @endphp
 
     @php
@@ -136,7 +62,7 @@
                 </div>
                 <div class="text-secondary x-small fw-bold text-uppercase tracking-widest mb-2 position-relative z-1">Total
                     Revenue</div>
-                <h2 class="fw-black mb-0 text-dark position-relative z-1" style="letter-spacing: -1px;">
+                <h2 class="fw-black mb-0 text-dark position-relative z-1 text-truncate" style="letter-spacing: -1px; font-size: clamp(1.2rem, 1.8vw, 1.8rem);" title="₹{{ number_format($rev, 2) }}">
                     ₹{{ number_format($rev, 2) }}</h2>
             </a>
         </div>
@@ -157,14 +83,15 @@
                     </div>
                     @if($pending > 0)
                         <span
-                            class="badge bg-warning bg-opacity-10 text-white rounded-pill fw-bold px-3 py-2 x-small border border-warning border-opacity-25 pulse-border"><span
-                                class="pulse-dot bg-warning d-inline-block me-2"
-                                style="width: 6px; height: 6px; border-radius: 50%;"></span>{{ $pending }} Pending</span>
+                            class="badge rounded-pill fw-bold px-3 py-2 x-small border pulse-border"
+                            style="color: #92400e !important; background-color: rgba(245, 158, 11, 0.18) !important; border-color: rgba(245, 158, 11, 0.4) !important;"><span
+                                class="pulse-dot d-inline-block me-2"
+                                style="width: 6px; height: 6px; border-radius: 50%; background-color: #d97706 !important;"></span>{{ $pending }} Pending</span>
                     @endif
                 </div>
                 <div class="text-secondary x-small fw-bold text-uppercase tracking-widest mb-2 position-relative z-1">Total
                     Orders</div>
-                <h2 class="fw-black mb-0 text-dark position-relative z-1" style="letter-spacing: -1px;">
+                <h2 class="fw-black mb-0 text-dark position-relative z-1 text-truncate" style="letter-spacing: -1px; font-size: clamp(1.2rem, 1.8vw, 1.8rem);">
                     {{ number_format($orders) }}
                 </h2>
             </a>
@@ -187,7 +114,7 @@
                 </div>
                 <div class="text-secondary x-small fw-bold text-uppercase tracking-widest mb-2 position-relative z-1">Active
                     Users</div>
-                <h2 class="fw-black mb-0 text-dark position-relative z-1" style="letter-spacing: -1px;">
+                <h2 class="fw-black mb-0 text-dark position-relative z-1 text-truncate" style="letter-spacing: -1px; font-size: clamp(1.2rem, 1.8vw, 1.8rem);">
                     {{ number_format($users) }}
                 </h2>
             </a>
@@ -210,7 +137,7 @@
                 </div>
                 <div class="text-secondary x-small fw-bold text-uppercase tracking-widest mb-2 position-relative z-1">
                     Products Base</div>
-                <h2 class="fw-black mb-0 text-dark position-relative z-1" style="letter-spacing: -1px;">
+                <h2 class="fw-black mb-0 text-dark position-relative z-1 text-truncate" style="letter-spacing: -1px; font-size: clamp(1.2rem, 1.8vw, 1.8rem);">
                     {{ number_format($products) }}
                 </h2>
             </a>

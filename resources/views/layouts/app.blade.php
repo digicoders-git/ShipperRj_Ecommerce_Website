@@ -27,6 +27,14 @@
     <link rel="stylesheet" href="{{ asset('css/style.css') }}?v=1.0.3">
 
     <style>
+        /* Ensure ALL Modals & Backdrops sit above sticky header, search bar, & floating elements */
+        .modal-backdrop {
+            z-index: 99990 !important;
+        }
+        .modal {
+            z-index: 99999 !important;
+        }
+
         /* Extra styles for the layout that might not be in style.css yet */
         .grayscale {
             filter: grayscale(1);
@@ -215,7 +223,7 @@
                     title="Wishlist">
                     <i class="bi bi-heart fs-4"></i>
                     @auth
-                        <span class="badge-count">{{ Auth::user()->wishlists()->count() }}</span>
+                        <span class="badge-count">{{ $user_wishlist_count ?? 0 }}</span>
                     @endauth
                 </a>
 
@@ -231,7 +239,7 @@
                     <div class="position-relative">
                         <i class="bi bi-handbag fs-4"></i>
                         @auth
-                            <span class="badge-count">{{ Auth::user()->carts()->count() }}</span>
+                            <span class="badge-count">{{ $user_cart_count ?? 0 }}</span>
                         @endauth
                     </div>
                 </a>
@@ -355,7 +363,7 @@
                         <i class="bi bi-heart fs-5 text-primary"></i> My Wishlist
                         @auth
                             <span
-                                class="badge rounded-pill bg-primary ms-auto">{{ Auth::user()->wishlists()->count() }}</span>
+                                class="badge rounded-pill bg-primary ms-auto">{{ $user_wishlist_count ?? 0 }}</span>
                         @endauth
                     </a>
                     <a href="{{ url('/dashboard') }}"
@@ -366,7 +374,7 @@
                         class="list-group-item list-group-item-action border-0 px-4 py-3 d-flex align-items-center gap-3 {{ request()->is('cart') ? 'active' : '' }}">
                         <i class="bi bi-handbag fs-5 text-primary"></i> Shopping Cart
                         @auth
-                            <span class="badge rounded-pill bg-primary ms-auto">{{ Auth::user()->carts()->count() }}</span>
+                            <span class="badge rounded-pill bg-primary ms-auto">{{ $user_cart_count ?? 0 }}</span>
                         @endauth
                     </a>
                 </div>
@@ -917,7 +925,7 @@
             fetch('/product/quickview/' + id)
                 .then(res => res.json())
                 .then(data => {
-                    let mainImg = data.image ? '/' + data.image : 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=400';
+                    let mainImg = data.image ? '/' + data.image : '/images/placeholder.svg';
                     let offPercent = data.mrp > data.selling_price ? Math.round(((data.mrp - data.selling_price) / data.mrp) * 100) : 0;
 
                     let galleryHtml = '';
@@ -1316,18 +1324,36 @@
 
         // Global Session Listeners
         window.addEventListener('DOMContentLoaded', () => {
-            @if(session('success'))
-                showToast('Success!', "{{ session('success') }}", 'success');
-            @endif
-            @if(session('error'))
-                showToast('Error!', "{{ session('error') }}", 'danger');
-            @endif
-            @if(session('info'))
-                showToast('Information', "{{ session('info') }}", 'info');
-            @endif
-            @if(session('status'))
-                showToast('Status', "{{ session('status') }}", 'primary');
-            @endif
+            const navEntries = performance.getEntriesByType("navigation");
+            const isBackForward = navEntries.length > 0 && navEntries[0].type === "back_forward";
+            
+            if (!isBackForward) {
+                @if(session('success'))
+                    showToast('Success!', "{{ session('success') }}", 'success');
+                @endif
+                @if(session('error'))
+                    showToast('Error!', "{{ session('error') }}", 'danger');
+                @endif
+                @if(session('warning'))
+                    showToast('Notice', "{{ session('warning') }}", 'warning');
+                @endif
+                @if(session('info'))
+                    showToast('Information', "{{ session('info') }}", 'info');
+                @endif
+                @if(session('status'))
+                    showToast('Status', "{{ session('status') }}", 'primary');
+                @endif
+            }
+        });
+
+        // Handle bfcache (back-forward cache) pageshow restoration
+        window.addEventListener('pageshow', (event) => {
+            if (event.persisted) {
+                const toastContainer = document.getElementById('toastContainer');
+                if (toastContainer) {
+                    toastContainer.innerHTML = '';
+                }
+            }
         });
 
         window.getFreshCsrfToken = async function () {
@@ -1544,30 +1570,30 @@
 
         /* ✅ SUCCESS – Soft Green Glow */
         .glass-toast-success {
-            background: linear-gradient(135deg, rgba(34, 197, 94, 0.25), rgba(16, 185, 129, 0.2)) !important;
-            border-color: rgba(34, 197, 94, 0.5) !important;
-            box-shadow: 0 0 25px rgba(34, 197, 94, 0.35) !important;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.95), rgba(6, 95, 70, 0.95)) !important;
+            border-color: rgba(52, 211, 153, 0.6) !important;
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.4) !important;
         }
 
         /* ❌ ERROR – Smooth Red Glow */
         .glass-toast-error {
-            background: linear-gradient(135deg, rgba(239, 68, 68, 0.25), rgba(220, 38, 38, 0.2)) !important;
-            border-color: rgba(239, 68, 68, 0.5) !important;
-            box-shadow: 0 0 25px rgba(239, 68, 68, 0.35) !important;
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.95), rgba(153, 27, 27, 0.95)) !important;
+            border-color: rgba(248, 113, 113, 0.6) !important;
+            box-shadow: 0 10px 30px rgba(239, 68, 68, 0.4) !important;
         }
 
         /* 🔵 PRIMARY – Elegant Blue Glow */
         .glass-toast-primary {
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.25), rgba(37, 99, 235, 0.2)) !important;
-            border-color: rgba(59, 130, 246, 0.5) !important;
-            box-shadow: 0 0 25px rgba(59, 130, 246, 0.35) !important;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.95), rgba(30, 64, 175, 0.95)) !important;
+            border-color: rgba(96, 165, 250, 0.6) !important;
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.4) !important;
         }
 
         /* 🟡 WARNING – Premium Amber Glow */
         .glass-toast-warning {
-            background: linear-gradient(135deg, rgba(251, 191, 36, 0.25), rgba(245, 158, 11, 0.2)) !important;
-            border-color: rgba(251, 191, 36, 0.5) !important;
-            box-shadow: 0 0 25px rgba(251, 191, 36, 0.35) !important;
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.95), rgba(146, 64, 14, 0.95)) !important;
+            border-color: rgba(251, 191, 36, 0.6) !important;
+            box-shadow: 0 10px 30px rgba(245, 158, 11, 0.4) !important;
         }
 
         .toast-progress-bar {
@@ -1604,6 +1630,7 @@
 
         .main-header {
             width: 100% !important;
+            z-index: 1090 !important;
         }
 
         /* Header Responsiveness & Premium Polish */
@@ -1824,6 +1851,12 @@
             border: 2px solid #fff;
         }
 
+        .bell-btn {
+            background-color: #f2701a;
+            border: 2px solid #fff;
+            color: #fff;
+        }
+
         .floating-btn:hover {
             transform: scale(1.1) translateY(-5px);
             color: #fff;
@@ -1847,6 +1880,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
+    <script src="{{ asset('js/web-push-client.js') }}" defer></script>
     @stack('modals')
     @stack('scripts')
     <!-- Floating Contact Icons -->

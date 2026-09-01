@@ -241,8 +241,7 @@
 
                         <!-- Promo Banner -->
                         <div class="promo-banner rounded-4 overflow-hidden shadow-premium position-relative border mt-2">
-                            <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=500&auto=format&fit=crop"
-                                class="img-fluid" alt="Promo">
+                            <img src="{{ asset('images/photo1.jpg') }}" class="img-fluid" alt="Promo">
                             <div
                                 class="position-absolute top-0 start-0 w-100 h-100 bg-dark bg-opacity-40 d-flex flex-column justify-content-end p-4 text-white">
                                 <h5 class="fw-bold mb-1">Weekly Deals</h5>
@@ -255,6 +254,58 @@
 
                 <!-- Main Shop Content -->
                 <div class="col-lg-9">
+
+                    @if(isset($categoryOffer) && $categoryOffer && $categoryOffer->isLive())
+                        <!-- Category Wise Live Offer Banner & Countdown -->
+                        <div class="category-offer-banner mb-4 p-3 p-md-4 rounded-4 position-relative overflow-hidden shadow-sm"
+                            style="background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 50%, #fef3c7 100%); border: 1.5px solid rgba(249, 115, 22, 0.25);">
+                            <div class="row align-items-center g-3">
+                                @if($categoryOffer->image)
+                                    <div class="col-12 col-md-4 col-lg-3 text-center">
+                                        <div class="offer-img-wrapper rounded-3 overflow-hidden shadow-sm border" style="aspect-ratio: 16 / 9; width: 100%;">
+                                            <img src="{{ asset($categoryOffer->image) }}" alt="{{ $categoryOffer->offer_name }}"
+                                                class="w-100 h-100 object-fit-cover">
+                                        </div>
+                                    </div>
+                                @endif
+
+                                <div class="col-12 {{ $categoryOffer->image ? 'col-md-5 col-lg-5' : 'col-md-7 col-lg-7' }} text-start">
+                                    <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
+                                        <span class="badge bg-danger text-white px-3 py-1.5 uppercase tracking-wider xx-small fw-bold rounded-pill shadow-sm">
+                                            <i class="bi bi-lightning-charge-fill me-1"></i> {{ $categoryOffer->offer_type ?: 'Flash Sale' }}
+                                        </span>
+                                        <span class="badge bg-warning text-dark px-3 py-1.5 fw-black xx-small rounded-pill shadow-sm">
+                                            <i class="bi bi-tag-fill me-1"></i>
+                                            @if($categoryOffer->discount_type === 'fixed')
+                                                ₹{{ (float)$categoryOffer->discount_value == (int)$categoryOffer->discount_value ? number_format($categoryOffer->discount_value) : number_format($categoryOffer->discount_value, 2) }} OFF
+                                            @else
+                                                {{ (float) $categoryOffer->discount_value }}% OFF
+                                            @endif
+                                        </span>
+                                    </div>
+                                    <h3 class="fw-black mb-1 text-dark fs-4 fs-lg-3">{{ $categoryOffer->offer_name }}</h3>
+                                    <p class="text-secondary small mb-0">Live offer automatically applied to all <strong class="text-dark">{{ $selectedCategory->name ?? 'Category' }}</strong> products!</p>
+                                </div>
+
+                                <div class="col-12 {{ $categoryOffer->image ? 'col-md-4 col-lg-4' : 'col-md-5 col-lg-5' }} d-flex justify-content-center justify-content-md-end">
+                                    <div class="bg-white p-3 rounded-4 border border-warning border-opacity-40 shadow-sm w-100" style="max-width: 320px;">
+                                        <div class="text-danger xx-small uppercase fw-black tracking-widest text-center mb-1">
+                                            <i class="bi bi-clock-history me-1 text-danger"></i> OFFER ENDS IN
+                                        </div>
+                                        <div class="d-flex align-items-center justify-content-center gap-2" id="categoryLiveCountdown" data-end="{{ $categoryOffer->end_date->timestamp * 1000 }}">
+                                            <div class="text-center px-1"><span class="h4 fw-black text-dark mb-0 d-block" id="timer-days">00</span><div class="xx-small text-muted fw-bold">Days</div></div>
+                                            <span class="h4 text-danger mb-3">:</span>
+                                            <div class="text-center px-1"><span class="h4 fw-black text-dark mb-0 d-block" id="timer-hours">00</span><div class="xx-small text-muted fw-bold">Hours</div></div>
+                                            <span class="h4 text-danger mb-3">:</span>
+                                            <div class="text-center px-1"><span class="h4 fw-black text-dark mb-0 d-block" id="timer-mins">00</span><div class="xx-small text-muted fw-bold">Mins</div></div>
+                                            <span class="h4 text-danger mb-3">:</span>
+                                            <div class="text-center px-1"><span class="h4 fw-black text-danger mb-0 d-block" id="timer-secs">00</span><div class="xx-small text-muted fw-bold">Secs</div></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
 
                     <!-- Sorting Bar -->
                     <div
@@ -294,116 +345,180 @@
                     <!-- Products Grid -->
                     <div class="row g-4">
                         @forelse ($products as $i => $prod)
+                            @php
+                                $catOffer = $prod->getActiveCategoryOffer();
+                                $effectivePrice = $prod->getEffectivePrice();
+                                $originalPrice = (float) $prod->selling_price;
+                                $hasCategoryOffer = ($catOffer && $catOffer->isLive() && $effectivePrice < $originalPrice);
+                            @endphp
                             <div class="col-md-6 col-xl-4 fade-in-up" style="animation-delay: {{ ($i % 12) * 0.05 }}s;">
-                                <div class="product-card h-100 p-2">
-                                    <div class="product-image-wrapper">
-                                        @if($prod->mrp > $prod->selling_price)
-                                            <span class="product-card-badge bg-primary text-white">SALE</span>
-                                        @else
-                                            <span class="product-card-badge bg-dark text-white">NEW</span>
-                                        @endif
+                                        <div class="product-card h-100 p-2">
+                                            <div class="product-image-wrapper">
+                                                @if($hasCategoryOffer)
+                                                    <span class="product-card-badge bg-danger text-white fw-bold">
+                                                        @if($catOffer->discount_type === 'fixed')
+                                                            ₹{{ (int) $catOffer->discount_value }} OFF
+                                                        @else
+                                                            {{ (int) $catOffer->discount_value }}% OFF
+                                                        @endif
+                                                    </span>
+                                                @elseif($prod->mrp > $prod->selling_price)
+                                                    <span class="product-card-badge bg-primary text-white">SALE</span>
+                                                @else
+                                                    <span class="product-card-badge bg-dark text-white">NEW</span>
+                                                @endif
 
-                                        <div class="product-actions-floating">
-                                            <form action="{{ route('wishlist.add', $prod->id) }}" method="POST"
-                                                class="d-inline">
-                                                @csrf
-                                                <button type="submit" class="action-btn border-0 shadow-sm" title="Wishlist"><i
-                                                        class="bi bi-heart"></i></button>
-                                            </form>
-                                            <button type="button" class="action-btn border-0 shadow-sm" title="Quick View"
-                                                onclick="openQuickView('{{ $prod->id }}')">
-                                                <i class="bi bi-eye"></i>
-                                            </button>
-                                        </div>
+                                                <div class="product-actions-floating">
+                                                    <form action="{{ route('wishlist.add', $prod->id) }}" method="POST"
+                                                        class="d-inline">
+                                                        @csrf
+                                                        <button type="submit" class="action-btn border-0 shadow-sm" title="Wishlist"><i
+                                                                class="bi bi-heart"></i></button>
+                                                    </form>
+                                                    <button type="button" class="action-btn border-0 shadow-sm" title="Quick View"
+                                                        onclick="openQuickView('{{ $prod->id }}')">
+                                                        <i class="bi bi-eye"></i>
+                                                    </button>
+                                                </div>
 
-                                        <a href="{{ url('/product-detail/' . $prod->slug) }}" class="w-100 h-100">
-                                            <img src="{{ asset($prod->image) }}" alt="{{ $prod->name }}"
-                                                onerror="this.src='https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=400'">
-                                        </a>
+                                                <a href="{{ url('/product-detail/' . $prod->slug) }}" class="w-100 h-100">
+                                                    <img src="{{ asset($prod->image) }}" alt="{{ $prod->name }}"
+                                                        onerror="this.src='{{ asset('images/placeholder.svg') }}'">
+                                                </a>
+                                            </div>
+                                            <div class="p-3">
+                                                <div class="mb-1 text-start">
+                                                    <span
+                                                        class="text-secondary xx-small fw-black uppercase tracking-widest">{{ $prod->subCategory->name ?? 'Category' }}</span>
+                                                </div>
+                                                <h6 class="fw-bold mb-2 text-truncate text-start">
+                                                    <a href="{{ url('/product-detail/' . $prod->slug) }}"
+                                                        class="text-dark text-decoration-none"
+                                                        style="font-size: 0.95rem;">{{ $prod->name }}</a>
+                                                </h6>
+                                                <div class="price-wrapper d-flex align-items-baseline flex-wrap gap-1 mb-3">
+                                                    @if($hasCategoryOffer)
+                                                        <span class="h5 fw-black text-danger mb-0">₹{{ (float)$effectivePrice == (int)$effectivePrice ? number_format($effectivePrice) : number_format($effectivePrice, 2) }}</span>
+                                                        <span class="text-secondary small text-decoration-line-through me-1">₹{{ (float)$originalPrice == (int)$originalPrice ? number_format($originalPrice) : number_format($originalPrice, 2) }}</span>
+                                                        @if($prod->mrp > $originalPrice)
+                                                            <span class="text-secondary xx-small text-decoration-line-through">(MRP ₹{{ number_format($prod->mrp) }})</span>
+                                                        @endif
+                                                    @else
+                                                        <span class="h5 fw-black text-primary mb-0">₹{{ (float)$prod->selling_price == (int)$prod->selling_price ? number_format($prod->selling_price) : number_format($prod->selling_price, 2) }}</span>
+                                                        @if($prod->mrp > $prod->selling_price)
+                                                            <span
+                                                                class="text-secondary small text-decoration-line-through">₹{{ number_format($prod->mrp) }}</span>
+                                                        @endif
+                                                    @endif
+                                                </div>
+                                                <div class="d-flex gap-2">
+                                                    <form action="{{ route('cart.add', $prod->id) }}" method="POST" class="flex-grow-1">
+                                                        @csrf
+                                                        <button type="submit"
+                                                            class="btn btn-dark w-100 py-2 fw-black uppercase xx-small tracking-widest rounded-3 shadow-sm hover-float">
+                                                            Cart
+                                                        </button>
+                                                    </form>
+                                                    <a href="{{ url('/product-detail/' . $prod->slug) }}"
+                                                        class="btn btn-primary bg-gradient-primary flex-grow-1 py-2 fw-black uppercase xx-small tracking-widest rounded-3 shadow-sm hover-float d-flex align-items-center justify-content-center text-white text-decoration-none">
+                                                        Buy Now
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="p-3">
-                                        <div class="mb-1 text-start">
-                                            <span
-                                                class="text-secondary xx-small fw-black uppercase tracking-widest">{{ $prod->subCategory->name ?? 'Category' }}</span>
-                                        </div>
-                                        <h6 class="fw-bold mb-2 text-truncate text-start">
-                                            <a href="{{ url('/product-detail/' . $prod->slug) }}"
-                                                class="text-dark text-decoration-none"
-                                                style="font-size: 0.95rem;">{{ $prod->name }}</a>
-                                        </h6>
-                                        <div class="price-wrapper d-flex align-items-center gap-2 mb-3">
-                                            <span
-                                                class="h5 fw-black text-primary mb-0">₹{{ number_format($prod->selling_price) }}</span>
-                                            @if($prod->mrp > $prod->selling_price)
-                                                <span
-                                                    class="text-secondary small text-decoration-line-through">₹{{ number_format($prod->mrp) }}</span>
-                                            @endif
-                                        </div>
-                                        <div class="d-flex gap-2">
-                                            <form action="{{ route('cart.add', $prod->id) }}" method="POST" class="flex-grow-1">
-                                                @csrf
-                                                <button type="submit"
-                                                    class="btn btn-dark w-100 py-2 fw-black uppercase xx-small tracking-widest rounded-3 shadow-sm hover-float">
-                                                    Cart
-                                                </button>
-                                            </form>
-                                            <a href="{{ url('/product-detail/' . $prod->slug) }}"
-                                                class="btn btn-primary bg-gradient-primary flex-grow-1 py-2 fw-black uppercase xx-small tracking-widest rounded-3 shadow-sm hover-float d-flex align-items-center justify-content-center text-white text-decoration-none">
-                                                Buy Now
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
                         @empty
-                            <div class="col-12 py-5 text-center">
-                                <i class="bi bi-box-seam fs-1 text-secondary mb-3 opacity-50"></i>
-                                <h4 class="fw-bold text-dark">No Products Found</h4>
-                                <p class="text-secondary small">Try adjusting your filters to find what you're looking for.</p>
-                            </div>
-                        @endforelse
-                    </div>
+                                <div class="col-12 py-5 text-center">
+                                    <i class="bi bi-box-seam fs-1 text-secondary mb-3 opacity-50"></i>
+                                    <h4 class="fw-bold text-dark">No Products Found</h4>
+                                    <p class="text-secondary small">Try adjusting your filters to find what you're looking for.</p>
+                                </div>
+                            @endforelse
+                        </div>
 
-                    <!-- Pagination -->
-                    <nav class="mt-5 d-flex justify-content-center">
-                        {{ $products->links('pagination::bootstrap-5') }}
-                    </nav>
+                        <!-- Pagination -->
+                        <nav class="mt-5 d-flex justify-content-center">
+                            {{ $products->links('pagination::bootstrap-5') }}
+                        </nav>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <script>
-        function updatePriceLabel(val) {
-            document.getElementById('priceLabel').innerHTML = '₹' + parseInt(val).toLocaleString() + '+';
-        }
+        <script>
+            // Live Category Offer Countdown Timer
+            document.addEventListener('DOMContentLoaded', function() {
+                const timerElem = document.getElementById('categoryLiveCountdown');
+                if (!timerElem) return;
 
-        // Sticky parent self-healing debugger & auto-fixer for Product Filters Sidebar
-        document.addEventListener('DOMContentLoaded', () => {
-            const stickyEl = document.querySelector('.sidebar-wrapper');
-            if (stickyEl) {
-                let parent = stickyEl.parentElement;
-                while (parent && parent !== document.documentElement) {
-                    const style = window.getComputedStyle(parent);
-                    const overflowX = style.getPropertyValue('overflow-x');
-                    const overflowY = style.getPropertyValue('overflow-y');
-                    const overflow = style.getPropertyValue('overflow');
-                    
-                    if (
-                        (overflowX !== 'visible' && overflowX !== 'clip') ||
-                        (overflowY !== 'visible' && overflowY !== 'clip') ||
-                        (overflow !== 'visible' && overflow !== 'clip')
-                    ) {
-                        console.log('Fixed sticky-breaking ancestor in products:', parent.tagName, parent.className);
-                        if (parent.tagName === 'BODY' || parent.tagName === 'HTML') {
-                            parent.style.overflowX = 'clip';
-                        } else {
-                            parent.style.overflow = 'visible';
-                        }
+                const endVal = timerElem.getAttribute('data-end');
+                if (!endVal) return;
+                const endDate = parseInt(endVal);
+                if (isNaN(endDate)) return;
+
+                function updateCountdown() {
+                    const now = new Date().getTime();
+                    const distance = endDate - now;
+
+                    const daysEl = document.getElementById('timer-days');
+                    const hoursEl = document.getElementById('timer-hours');
+                    const minsEl = document.getElementById('timer-mins');
+                    const secsEl = document.getElementById('timer-secs');
+
+                    if (distance <= 0) {
+                        if (daysEl) daysEl.innerText = '00';
+                        if (hoursEl) hoursEl.innerText = '00';
+                        if (minsEl) minsEl.innerText = '00';
+                        if (secsEl) secsEl.innerText = '00';
+                        timerElem.innerHTML = '<span class="badge bg-danger fs-6 py-2 px-3 fw-bold">OFFER EXPIRED</span>';
+                        return;
                     }
-                    parent = parent.parentElement;
+
+                    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                    if (daysEl) daysEl.innerText = String(days).padStart(2, '0');
+                    if (hoursEl) hoursEl.innerText = String(hours).padStart(2, '0');
+                    if (minsEl) minsEl.innerText = String(minutes).padStart(2, '0');
+                    if (secsEl) secsEl.innerText = String(seconds).padStart(2, '0');
                 }
+
+                updateCountdown();
+                setInterval(updateCountdown, 1000);
+            });
+
+            function updatePriceLabel(val) {
+                document.getElementById('priceLabel').innerHTML = '₹' + parseInt(val).toLocaleString() + '+';
             }
-        });
-    </script>
+
+            // Sticky parent self-healing debugger & auto-fixer for Product Filters Sidebar
+            document.addEventListener('DOMContentLoaded', () => {
+                const stickyEl = document.querySelector('.sidebar-wrapper');
+                if (stickyEl) {
+                    let parent = stickyEl.parentElement;
+                    while (parent && parent !== document.documentElement) {
+                        const style = window.getComputedStyle(parent);
+                        const overflowX = style.getPropertyValue('overflow-x');
+                        const overflowY = style.getPropertyValue('overflow-y');
+                        const overflow = style.getPropertyValue('overflow');
+
+                        if (
+                            (overflowX !== 'visible' && overflowX !== 'clip') ||
+                            (overflowY !== 'visible' && overflowY !== 'clip') ||
+                            (overflow !== 'visible' && overflow !== 'clip')
+                        ) {
+                            console.log('Fixed sticky-breaking ancestor in products:', parent.tagName, parent.className);
+                            if (parent.tagName === 'BODY' || parent.tagName === 'HTML') {
+                                parent.style.overflowX = 'clip';
+                            } else {
+                                parent.style.overflow = 'visible';
+                            }
+                        }
+                        parent = parent.parentElement;
+                    }
+                }
+            });
+        </script>
 @endsection

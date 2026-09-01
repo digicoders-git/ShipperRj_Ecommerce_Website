@@ -129,18 +129,26 @@
                     </a>
                 @endif
 
-                @if($isAdmin || ($subAdmin && $subAdmin->hasPermission('coupons_view')))
+                @if($isAdmin || ($subAdmin && ($subAdmin->hasPermission('offers_view') || $subAdmin->hasPermission('coupons_view'))))
+                    <a href="{{ route('admin.offers.index') }}"
+                        class="nav-link-admin {{ request()->routeIs('admin.offers.*') ? 'active' : '' }}">
+                        <i class="bi bi-lightning-charge"></i> <span>Live Selling Offers</span>
+                    </a>
                     <a href="{{ route('admin.coupons.index') }}"
                         class="nav-link-admin {{ request()->routeIs('admin.coupons.*') ? 'active' : '' }}">
-                        <i class="bi bi-ticket-perforated"></i> <span>Offers & Coupons</span>
+                        <i class="bi bi-ticket-perforated"></i> <span>Promo Coupons</span>
                     </a>
                 @endif
 
                 @if($isAdmin || ($subAdmin && $subAdmin->hasPermission('orders_view')))
                     <div class="sidebar-section-title">Orders & Logistics</div>
                     <a href="{{ route('admin.orders.index') }}"
-                        class="nav-link-admin {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}">
+                        class="nav-link-admin {{ request()->routeIs('admin.orders.index') || request()->routeIs('admin.orders.show') ? 'active' : '' }}">
                         <i class="bi bi-cart-check"></i> <span>Orders</span>
+                    </a>
+                    <a href="{{ route('admin.pending-payments.index') }}"
+                        class="nav-link-admin {{ request()->routeIs('admin.pending-payments.*') ? 'active' : '' }}">
+                        <i class="bi bi-clock-history"></i> <span>Pending Payments</span>
                     </a>
                     @if($isAdmin)
                         <a href="{{ route('admin.settings') }}"
@@ -173,6 +181,10 @@
                         class="nav-link-admin {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
                         <i class="bi bi-people"></i> <span>Users/Customers</span>
                     </a>
+                    <a href="{{ route('admin.user-carts.index') }}"
+                        class="nav-link-admin {{ request()->routeIs('admin.user-carts.*') ? 'active' : '' }}">
+                        <i class="bi bi-cart3"></i> <span>Customer Carts</span>
+                    </a>
                 @endif
 
                 @if($isAdmin || ($subAdmin && ($subAdmin->hasPermission('complaints_view') || $subAdmin->hasPermission('contacts_view') || $subAdmin->hasPermission('support_view') || $subAdmin->hasPermission('reviews_view') || $subAdmin->hasPermission('seller_inquiries_view') || $subAdmin->hasPermission('faqs_view'))))
@@ -189,7 +201,7 @@
                 @if($isAdmin || ($subAdmin && $subAdmin->hasPermission('complaints_view')))
                     <a href="{{ route('admin.complaints.index') }}"
                         class="nav-link-admin {{ request()->routeIs('admin.complaints.*') ? 'active' : '' }}">
-                        <i class="bi bi-chat-left-text"></i> <span>Complaints</span>
+                        <i class="bi bi-chat-left-text"></i> <span>Complaints & Support</span>
                     </a>
                 @endif
 
@@ -236,6 +248,11 @@
                 @endif
 
                 @if($isAdmin)
+                    <div class="sidebar-section-title">Engagement & Notifications</div>
+                    <a href="{{ route('admin.push.index') }}"
+                        class="nav-link-admin {{ request()->routeIs('admin.push.*') ? 'active' : '' }}">
+                        <i class="bi bi-bell-fill"></i> <span>Push Notifications</span>
+                    </a>
                     <div class="sidebar-section-title">System Administration</div>
                     <a href="{{ route('admin.subadmins.index') }}"
                         class="nav-link-admin {{ request()->routeIs('admin.subadmins.*') ? 'active' : '' }}">
@@ -487,20 +504,51 @@
                 });
             });
 
-            // Check for Laravel Sessions & Errors
-            @if(session('success'))
-                showToast("{{ session('success') }}", 'success');
-            @endif
+            // Global Glass Toast Notification Helper (Matches admin-dashboard.css design system)
+            window.showToast = function(message, type = 'success') {
+                const container = document.getElementById('glassToastContainer') || document.body;
+                const toast = document.createElement('div');
+                toast.className = `glass-toast ${type}`;
 
-            @if(session('error'))
-                showToast("{{ session('error') }}", 'error');
-            @endif
+                let iconClass = 'bi-check-circle-fill';
+                if (type === 'error' || type === 'danger') iconClass = 'bi-exclamation-triangle-fill';
+                else if (type === 'warning') iconClass = 'bi-exclamation-circle-fill';
+                else if (type === 'info') iconClass = 'bi-info-circle-fill';
 
-            @if($errors->any())
-                @foreach($errors->all() as $error)
-                    showToast("{{ $error }}", 'error');
-                @endforeach
-            @endif
+                toast.innerHTML = `
+                    <i class="bi ${iconClass}"></i>
+                    <div class="toast-content">${message}</div>
+                `;
+
+                container.appendChild(toast);
+
+                setTimeout(() => {
+                    toast.classList.add('fade-out');
+                    setTimeout(() => {
+                        toast.remove();
+                    }, 500);
+                }, 4000);
+            };
+
+            // Check for Laravel Sessions & Errors (Exclude back/forward browser navigation)
+            const navEntries = performance.getEntriesByType("navigation");
+            const isBackForward = navEntries.length > 0 && navEntries[0].type === "back_forward";
+
+            if (!isBackForward) {
+                @if(session('success'))
+                    showToast("{{ session('success') }}", 'success');
+                @endif
+
+                @if(session('error'))
+                    showToast("{{ session('error') }}", 'error');
+                @endif
+
+                @if($errors->any())
+                    @foreach($errors->all() as $error)
+                        showToast("{{ $error }}", 'error');
+                    @endforeach
+                @endif
+            }
 
             // --- Robust Sidebar Toggle Persistence ---
             if (localStorage.getItem('sidebar-collapsed') === 'true') {
@@ -573,6 +621,7 @@
         }
     </script>
 
+    <script src="{{ asset('js/web-push-client.js') }}" defer></script>
     @stack('scripts')
 </body>
 

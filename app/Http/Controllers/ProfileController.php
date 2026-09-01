@@ -2,10 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
+use App\Models\Refund;
+use App\Models\OrderTracking;
+use App\Models\WalletTransaction;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 class ProfileController extends Controller
 {
@@ -55,7 +60,7 @@ class ProfileController extends Controller
         // For simulation, just add the balance.
         $user->increment('wallet_balance', $amount);
 
-        \App\Models\WalletTransaction::create([
+        WalletTransaction::create([
             'user_id' => $user->id,
             'amount' => $amount,
             'type' => 'credit',
@@ -67,8 +72,8 @@ class ProfileController extends Controller
 
     public function update(Request $request)
     {
-        \Log::info('Profile update request hit.', $request->all());
-        $user = \App\Models\User::find(Auth::id());
+        Log::info('Profile update request hit.', $request->all());
+        $user = User::find(Auth::id());
 
         $request->validate([
             'name' => $request->hasFile('profile_photo') ? 'nullable|string|max:255' : 'required|string|max:255',
@@ -84,24 +89,24 @@ class ProfileController extends Controller
         $data = $request->only(['name', 'mobile', 'alt_mobile', 'address', 'city', 'state', 'pincode']);
 
         if ($request->hasFile('profile_photo')) {
-            \Log::info('Profile photo file detected.');
+            Log::info('Profile photo file detected.');
             // Delete old photo if exists
             if ($user->profile_photo && Storage::disk('public')->exists($user->profile_photo)) {
                 Storage::disk('public')->delete($user->profile_photo);
             }
 
             $path = $request->file('profile_photo')->store('profile_photos', 'public');
-            \Log::info('Profile photo stored at: ' . $path);
+            Log::info('Profile photo stored at: ' . $path);
             $data['profile_photo'] = $path;
         }
 
         $user->fill($data);
         if ($user->save()) {
-            \Log::info('User saved successfully. Photo in DB: ' . $user->profile_photo);
+            Log::info('User saved successfully. Photo in DB: ' . $user->profile_photo);
             return back()->with('success', 'Profile updated successfully!');
         }
 
-        \Log::error('User save failed.');
+        Log::error('User save failed.');
         return back()->with('error', 'Unable to update profile. Please try again.');
     }
 
@@ -117,7 +122,7 @@ class ProfileController extends Controller
             'new_password.confirmed' => 'New password and confirm password do not match.'
         ]);
 
-        $user = \App\Models\User::find(Auth::id());
+        $user = User::find(Auth::id());
 
         if (!Hash::check($request->current_password, $user->password)) {
             return back()->withErrors(['current_password' => 'Your old password is wrong. Please check again!']);
@@ -133,7 +138,7 @@ class ProfileController extends Controller
 
     public function destroy(Request $request)
     {
-        $user = \App\Models\User::find(Auth::id());
+        $user = User::find(Auth::id());
         Auth::logout();
 
         if ($user->delete()) {
@@ -163,9 +168,9 @@ class ProfileController extends Controller
             $refundAmount = $order->total_amount;
             $refundStatus = 'pending';
         } else {
-            // COD: advance is non-refundable, so refund is 0
-            $refundAmount = 0;
-            $refundStatus = 'processed';
+            // COD: refund the advance amount paid by user
+            $refundAmount = (float) ($order->advance_paid ?? 0);
+            $refundStatus = ($refundAmount > 0) ? 'pending' : 'processed';
         }
 
         $order->order_status = 'cancelled';
@@ -175,7 +180,7 @@ class ProfileController extends Controller
         $order->save();
 
         if ($refundStatus == 'pending') {
-            \App\Models\Refund::updateOrCreate(
+            Refund::updateOrCreate(
                 ['order_id' => $order->id],
                 [
                     'user_id' => $order->user_id,
@@ -187,7 +192,7 @@ class ProfileController extends Controller
         }
 
         // Track changes
-        \App\Models\OrderTracking::create([
+        OrderTracking::create([
             'order_id' => $order->id,
             'status' => 'cancelled',
             'message' => 'Order cancellation request submitted by User. Reason: ' . $request->cancel_reason
@@ -230,7 +235,7 @@ class ProfileController extends Controller
         $order->refund_status = 'pending';
         $order->save();
 
-        \App\Models\Refund::updateOrCreate(
+        Refund::updateOrCreate(
             ['order_id' => $order->id],
             [
                 'user_id' => $order->user_id,
@@ -241,7 +246,7 @@ class ProfileController extends Controller
         );
 
         // Track changes
-        \App\Models\OrderTracking::create([
+        OrderTracking::create([
             'order_id' => $order->id,
             'status' => 'return_requested',
             'message' => 'Return request submitted by User. Reason: ' . $request->return_reason

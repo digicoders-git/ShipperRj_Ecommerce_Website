@@ -21,6 +21,7 @@
                     <th class="small fw-bold py-3">Min Spend</th>
                     <th class="small fw-bold py-3">Expiry</th>
                     <th class="small fw-bold py-3">Status</th>
+                    <th class="small fw-bold py-3">Website Display</th>
                     <th class="small fw-bold py-3 text-end">Actions</th>
                 </tr>
             </thead>
@@ -44,6 +45,20 @@
                         @else
                             <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 px-2 py-1">Expired/Inactive</span>
                         @endif
+                    </td>
+                    <td>
+                        <form action="{{ route('admin.coupons.toggle-visibility', $coupon->id) }}" method="POST" style="display:inline;">
+                            @csrf
+                            @if($coupon->is_visible)
+                                <button type="submit" class="badge bg-success bg-opacity-20 border border-success text-light px-2 py-1 border-0 cursor-pointer" title="Click to Hide on Website">
+                                    <i class="bi bi-eye-fill me-1"></i> Visible
+                                </button>
+                            @else
+                                <button type="submit" class="badge bg-secondary bg-opacity-20 border border-secondary text-light px-2 py-1 border-0 cursor-pointer" title="Click to Show on Website">
+                                    <i class="bi bi-eye-slash-fill me-1"></i> Hidden
+                                </button>
+                            @endif
+                        </form>
                     </td>
                     <td class="text-end">
                         <div class="d-flex justify-content-end gap-2">
@@ -103,6 +118,13 @@
                                 <option value="0" {{ $coupon->status == 0 ? 'selected' : '' }}>Inactive</option>
                             </select>
                         </div>
+                        <div class="col-12 mb-3">
+                            <label class="form-label text-secondary small">Website Visibility (Exclusive Offers Listing)</label>
+                            <select name="is_visible" class="form-select glass-input">
+                                <option value="1" {{ $coupon->is_visible ? 'selected' : '' }}>Show on Website (Public Offer)</option>
+                                <option value="0" {{ !$coupon->is_visible ? 'selected' : '' }}>Hide from Website (Secret / Private Coupon)</option>
+                            </select>
+                        </div>
                     </div>
                     <div class='modal-footer-custom'>
                         <button type='button' class='btn btn-cancel' data-bs-dismiss='modal'>Cancel</button>
@@ -148,6 +170,13 @@
                             <select name="status" class="form-select glass-input">
                                 <option value="1">Active</option>
                                 <option value="0">Inactive</option>
+                            </select>
+                        </div>
+                        <div class="col-12 mb-3">
+                            <label class="form-label text-secondary small">Website Visibility (Exclusive Offers Listing)</label>
+                            <select name="is_visible" class="form-select glass-input">
+                                <option value="1">Show on Website (Public Offer)</option>
+                                <option value="0">Hide from Website (Secret / Private Coupon)</option>
                             </select>
                         </div>
                     </div>

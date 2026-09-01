@@ -20,21 +20,109 @@
                 <form action="{{ route('admin.settings.store') }}" method="POST">
                     @csrf
 
+                    @php
+                        $onlineTiers = isset($settings['shipping_tiers_online']) ? json_decode($settings['shipping_tiers_online'], true) : [];
+                        if (!is_array($onlineTiers) || empty($onlineTiers)) {
+                            $defaultOnline = $settings['global_online_shipping'] ?? 2;
+                            $onlineTiers = [
+                                ['min_price' => 0, 'max_price' => '', 'shipping_percent' => $defaultOnline]
+                            ];
+                        }
+
+                        $codTiers = isset($settings['shipping_tiers_cod']) ? json_decode($settings['shipping_tiers_cod'], true) : [];
+                        if (!is_array($codTiers) || empty($codTiers)) {
+                            $defaultCod = $settings['global_cod_shipping'] ?? 5;
+                            $codTiers = [
+                                ['min_price' => 0, 'max_price' => '', 'shipping_percent' => $defaultCod]
+                            ];
+                        }
+                    @endphp
+
                     <div class="mb-4 pt-3 border-top border-white border-opacity-10" id="logisticsConfiguration">
-                        <h6 class="text-white fw-bold mb-3"><i class="bi bi-truck me-2 text-warning"></i>Logistics &
-                            Shipping (Default Rates)</h6>
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label text-secondary small">Global Online Shipping (%)</label>
-                                <input type="number" name="global_online_shipping" class="form-control glass-input"
-                                    value="{{ $settings['global_online_shipping'] ?? 0 }}" required min="0" max="100"
-                                    step="0.01">
+                        <h6 class="text-white fw-bold mb-2"><i class="bi bi-truck me-2 text-warning"></i>Tier-Wise Shipping Rate Management</h6>
+                        <p class="x-small text-secondary mb-4">Set exact price range tiers (Min ₹ - Max ₹) and their shipping charge (%). Leave Max Price empty for "Above".</p>
+
+                        <!-- Online Shipping Tiers -->
+                        <div class="card bg-white bg-opacity-5 border border-white border-opacity-10 rounded-4 p-3 mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="fw-bold text-white small"><i class="bi bi-credit-card me-2 text-primary"></i>Online Payment Shipping Tiers</span>
+                                <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3 xx-small fw-bold" onclick="addShippingTier('online')">
+                                    <i class="bi bi-plus-circle me-1"></i>Add Online Tier
+                                </button>
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label text-secondary small">Global COD Shipping (%)</label>
-                                <input type="number" name="global_cod_shipping" class="form-control glass-input"
-                                    value="{{ $settings['global_cod_shipping'] ?? 0 }}" required min="0" max="100"
-                                    step="0.01">
+                            <div class="table-responsive">
+                                <table class="table table-borderless align-middle mb-0" id="table-online-tiers">
+                                    <thead>
+                                        <tr class="xx-small text-secondary text-uppercase border-bottom border-white border-opacity-10">
+                                            <th style="width: 30%;">Min Price (₹)</th>
+                                            <th style="width: 30%;">Max Price (₹)</th>
+                                            <th style="width: 25%;">Shipping (%)</th>
+                                            <th class="text-end" style="width: 15%;">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="container-online-tiers">
+                                        @foreach($onlineTiers as $idx => $tier)
+                                            <tr class="tier-row">
+                                                <td>
+                                                    <input type="number" step="0.01" min="0" name="shipping_tiers_online[{{ $idx }}][min_price]" class="form-control glass-input form-control-sm" value="{{ $tier['min_price'] ?? 0 }}" required placeholder="0">
+                                                </td>
+                                                <td>
+                                                    <input type="number" step="0.01" min="0" name="shipping_tiers_online[{{ $idx }}][max_price]" class="form-control glass-input form-control-sm" value="{{ $tier['max_price'] ?? '' }}" placeholder="Above">
+                                                </td>
+                                                <td>
+                                                    <input type="number" step="0.01" min="0" max="100" name="shipping_tiers_online[{{ $idx }}][shipping_percent]" class="form-control glass-input form-control-sm" value="{{ $tier['shipping_percent'] ?? 0 }}" required placeholder="%">
+                                                </td>
+                                                <td class="text-end">
+                                                    <button type="button" class="btn btn-sm btn-outline-danger border-0 rounded-circle" onclick="removeShippingTier(this, 'online')">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- COD Shipping Tiers -->
+                        <div class="card bg-white bg-opacity-5 border border-white border-opacity-10 rounded-4 p-3 mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="fw-bold text-white small"><i class="bi bi-cash-stack me-2 text-warning"></i>COD Payment Shipping Tiers</span>
+                                <button type="button" class="btn btn-sm btn-outline-warning rounded-pill px-3 xx-small fw-bold" onclick="addShippingTier('cod')">
+                                    <i class="bi bi-plus-circle me-1"></i>Add COD Tier
+                                </button>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-borderless align-middle mb-0" id="table-cod-tiers">
+                                    <thead>
+                                        <tr class="xx-small text-secondary text-uppercase border-bottom border-white border-opacity-10">
+                                            <th style="width: 30%;">Min Price (₹)</th>
+                                            <th style="width: 30%;">Max Price (₹)</th>
+                                            <th style="width: 25%;">Shipping (%)</th>
+                                            <th class="text-end" style="width: 15%;">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="container-cod-tiers">
+                                        @foreach($codTiers as $idx => $tier)
+                                            <tr class="tier-row">
+                                                <td>
+                                                    <input type="number" step="0.01" min="0" name="shipping_tiers_cod[{{ $idx }}][min_price]" class="form-control glass-input form-control-sm" value="{{ $tier['min_price'] ?? 0 }}" required placeholder="0">
+                                                </td>
+                                                <td>
+                                                    <input type="number" step="0.01" min="0" name="shipping_tiers_cod[{{ $idx }}][max_price]" class="form-control glass-input form-control-sm" value="{{ $tier['max_price'] ?? '' }}" placeholder="Above">
+                                                </td>
+                                                <td>
+                                                    <input type="number" step="0.01" min="0" max="100" name="shipping_tiers_cod[{{ $idx }}][shipping_percent]" class="form-control glass-input form-control-sm" value="{{ $tier['shipping_percent'] ?? 0 }}" required placeholder="%">
+                                                </td>
+                                                <td class="text-end">
+                                                    <button type="button" class="btn btn-sm btn-outline-danger border-0 rounded-circle" onclick="removeShippingTier(this, 'cod')">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>
@@ -178,3 +266,89 @@
         </div>
     </div>
 @endsection
+
+@push('scripts')
+<script>
+    let onlineTierIndex = {{ count($onlineTiers) }};
+    let codTierIndex = {{ count($codTiers) }};
+
+    function addShippingTier(type) {
+        let container = document.getElementById(type === 'cod' ? 'container-cod-tiers' : 'container-online-tiers');
+        let idx = (type === 'cod') ? codTierIndex++ : onlineTierIndex++;
+        let fieldPrefix = (type === 'cod') ? 'shipping_tiers_cod' : 'shipping_tiers_online';
+
+        let row = document.createElement('tr');
+        row.className = 'tier-row';
+        row.innerHTML = `
+            <td>
+                <input type="number" step="0.01" min="0" name="${fieldPrefix}[${idx}][min_price]" class="form-control glass-input form-control-sm" value="" required placeholder="Min">
+            </td>
+            <td>
+                <input type="number" step="0.01" min="0" name="${fieldPrefix}[${idx}][max_price]" class="form-control glass-input form-control-sm" value="" placeholder="Above">
+            </td>
+            <td>
+                <input type="number" step="0.01" min="0" max="100" name="${fieldPrefix}[${idx}][shipping_percent]" class="form-control glass-input form-control-sm" value="" required placeholder="%">
+            </td>
+            <td class="text-end">
+                <button type="button" class="btn btn-sm btn-outline-danger border-0 rounded-circle" onclick="removeShippingTier(this, '${type}')">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </td>
+        `;
+        container.appendChild(row);
+    }
+
+    function removeShippingTier(btn, type = 'online') {
+        let row = btn.closest('tr');
+        if (!row) return;
+
+        let inputs = row.querySelectorAll('input');
+        let minPrice = inputs[0] ? inputs[0].value : 0;
+        let maxPrice = inputs[1] ? inputs[1].value : '';
+
+        Swal.fire({
+            title: 'Delete Shipping Tier?',
+            text: "Do you want to delete this tier?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, Delete'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch("{{ route('admin.settings.deleteTier') }}", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                    },
+                    body: JSON.stringify({
+                        type: type,
+                        min_price: minPrice,
+                        max_price: maxPrice
+                    })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        row.style.transition = 'all 0.3s ease';
+                        row.style.opacity = '0';
+                        row.style.transform = 'scale(0.95)';
+                        setTimeout(() => row.remove(), 300);
+                        if (typeof showToast === 'function') {
+                            showToast(data.message, 'success');
+                        } else {
+                            Swal.fire('Deleted!', data.message, 'success');
+                        }
+                    } else {
+                        Swal.fire('Error', data.message || 'Failed to delete tier.', 'error');
+                    }
+                })
+                .catch(err => {
+                    Swal.fire('Error', 'Server error while deleting tier.', 'error');
+                });
+            }
+        });
+    }
+</script>
+@endpush

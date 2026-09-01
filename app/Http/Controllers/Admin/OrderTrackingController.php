@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\OrderTracking;
+use App\Models\Order;
 
 class OrderTrackingController extends Controller
 {
@@ -12,8 +14,8 @@ class OrderTrackingController extends Controller
      */
     public function index()
     {
-        $trackings = \App\Models\OrderTracking::with('order.user')->latest()->get();
-        $orders = \App\Models\Order::latest()->get();
+        $trackings = OrderTracking::with('order.user')->latest()->get();
+        $orders = Order::latest()->get();
         return view('admin.order-tracking', compact('trackings', 'orders'));
     }
 
@@ -36,7 +38,7 @@ class OrderTrackingController extends Controller
             'message' => 'required',
         ]);
 
-        \App\Models\OrderTracking::create([
+        OrderTracking::create([
             'order_id' => $request->order_id,
             'status' => $request->status,
             'message' => $request->message,

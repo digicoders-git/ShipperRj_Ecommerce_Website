@@ -1308,15 +1308,66 @@
                             <span class="sku-text">SKU: <strong>{{ $product->sku }}</strong></span>
                         </div>
 
-                        <div class="price-box">
-                            <div style="display:flex; align-items:baseline; flex-wrap:wrap; gap:4px;">
-                                <span class="sell-price">&#8377;{{ number_format($product->selling_price) }}</span>
-                                @if($product->mrp > $product->selling_price)
-                                    <span class="mrp-price">&#8377;{{ number_format($product->mrp) }}</span>
-                                    <span class="save-chip">
-                                        <i class="bi bi-arrow-down-short"></i>
-                                        {{ round((($product->mrp - $product->selling_price) / $product->mrp) * 100) }}% off
+                        @php
+                            $catOffer = $product->getActiveCategoryOffer();
+                            $effectivePrice = $product->getEffectivePrice();
+                            $originalSellingPrice = (float) $product->selling_price;
+                            $hasCategoryOffer = ($catOffer && $catOffer->isLive() && $effectivePrice < $originalSellingPrice);
+                        @endphp
+
+                        @if($hasCategoryOffer)
+                            <!-- Live Category Offer Card (Light Premium & Responsive) -->
+                            <div class="category-offer-card mb-3 p-3 rounded-4 position-relative overflow-hidden shadow-sm"
+                                style="background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 50%, #fef3c7 100%); border: 1.5px solid rgba(249, 115, 22, 0.25);">
+                                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
+                                    <div class="d-flex align-items-center gap-1 flex-wrap">
+                                        <span class="badge bg-danger text-white px-2.5 py-1 uppercase xx-small fw-bold rounded-pill shadow-sm">
+                                            <i class="bi bi-lightning-charge-fill me-1"></i> {{ $catOffer->offer_type ?: 'Special Offer' }}
+                                        </span>
+                                        <span class="fw-black text-dark small">{{ $catOffer->offer_name }}</span>
+                                    </div>
+                                    <span class="badge bg-warning text-dark fw-black px-3 py-1.5 rounded-pill shadow-sm ms-auto">
+                                        @if($catOffer->discount_type === 'fixed')
+                                            ₹{{ (float)$catOffer->discount_value == (int)$catOffer->discount_value ? number_format($catOffer->discount_value) : number_format($catOffer->discount_value, 2) }} OFF
+                                        @else
+                                            {{ (float) $catOffer->discount_value }}% OFF
+                                        @endif
                                     </span>
+                                </div>
+                                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 pt-2 border-top border-warning border-opacity-25">
+                                    <span class="xx-small text-danger uppercase fw-black tracking-widest text-nowrap"><i class="bi bi-clock-history me-1 text-danger"></i> OFFER ENDS IN</span>
+                                    <div class="d-inline-flex align-items-center justify-content-center gap-1 font-monospace text-danger fw-black bg-white px-3 py-1 rounded-pill border border-warning border-opacity-40 shadow-sm ms-auto" id="pdCategoryCountdown" data-end="{{ $catOffer->end_date->timestamp * 1000 }}" style="font-size: 0.88rem; line-height: 1.2;">
+                                        <span id="pd-timer-days">00</span><span class="text-muted fw-normal xx-small me-1">d</span>:<span id="pd-timer-hours">00</span><span class="text-muted fw-normal xx-small me-1">h</span>:<span id="pd-timer-mins">00</span><span class="text-muted fw-normal xx-small me-1">m</span>:<span id="pd-timer-secs">00</span><span class="text-muted fw-normal xx-small">s</span>
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
+
+                        <div class="price-box">
+                            <div style="display:flex; align-items:baseline; flex-wrap:wrap; gap:8px;">
+                                @if($hasCategoryOffer)
+                                    <span class="sell-price text-danger">&#8377;{{ (float)$effectivePrice == (int)$effectivePrice ? number_format($effectivePrice) : number_format($effectivePrice, 2) }}</span>
+                                    <span class="mrp-price">&#8377;{{ (float)$originalSellingPrice == (int)$originalSellingPrice ? number_format($originalSellingPrice) : number_format($originalSellingPrice, 2) }}</span>
+                                    @if($product->mrp > $originalSellingPrice)
+                                        <span class="text-muted small text-decoration-line-through">(MRP &#8377;{{ number_format($product->mrp) }})</span>
+                                    @endif
+                                    <span class="save-chip bg-danger text-white border-0">
+                                        <i class="bi bi-arrow-down-short"></i>
+                                        @if($catOffer->discount_type === 'fixed')
+                                            Save &#8377;{{ (float)$catOffer->discount_value == (int)$catOffer->discount_value ? number_format($catOffer->discount_value) : number_format($catOffer->discount_value, 2) }}
+                                        @else
+                                            {{ (float) $catOffer->discount_value }}% off
+                                        @endif
+                                    </span>
+                                @else
+                                    <span class="sell-price">&#8377;{{ number_format($product->selling_price) }}</span>
+                                    @if($product->mrp > $product->selling_price)
+                                        <span class="mrp-price">&#8377;{{ number_format($product->mrp) }}</span>
+                                        <span class="save-chip">
+                                            <i class="bi bi-arrow-down-short"></i>
+                                            {{ round((($product->mrp - $product->selling_price) / $product->mrp) * 100) }}% off
+                                        </span>
+                                    @endif
                                 @endif
                             </div>
                             <p class="tax-note">Inclusive of all taxes &amp; GST</p>
@@ -1383,14 +1434,14 @@
                             </div>
                             <form action="{{ url('/cart/add/' . $product->id) }}" method="POST" style="flex:1;">
                                 @csrf
-                                <input type="hidden" name="quantity" value="1" id="cartQtyInput">
+                                <input type="hidden" name="quantity" value="{{ $product->minimum_order_quantity ?? 1 }}" id="cartQtyInput">
                                 <button type="submit" class="btn-cart" style="width:100%;">
                                     <i class="bi bi-cart-plus"></i> Cart
                                 </button>
                             </form>
                             <form action="{{ url('/checkout') }}" method="GET" style="flex:1;">
                                 <input type="hidden" name="buy_now" value="{{ $product->id }}">
-                                <input type="hidden" name="qty" value="1" id="buyNowQtyInput">
+                                <input type="hidden" name="qty" value="{{ $product->minimum_order_quantity ?? 1 }}" id="buyNowQtyInput">
                                 <button type="submit" class="btn-buynow" style="width:100%;">
                                     Buy Now
                                 </button>
@@ -1403,7 +1454,6 @@
                             </form>
                         </div>
                         @php
-                            $settingsData = \App\Models\Setting::getAllCached();
                             $global_online = ($settingsData['global_online_shipping'] ?? '') !== '' ? (float) $settingsData['global_online_shipping'] : 0;
                             $global_cod = ($settingsData['global_cod_shipping'] ?? '') !== '' ? (float) $settingsData['global_cod_shipping'] : 0;
 
@@ -1627,7 +1677,7 @@
             </div>
             <div class="row g-3">
                 @php
-                    $related = \App\Models\Product::where('subcategory_id', $product->subcategory_id)
+                    $related = App\Models\Product::where('subcategory_id', $product->subcategory_id)
                         ->where('id', '!=', $product->id)->limit(4)->get();
                 @endphp
                 @forelse($related as $rel)
@@ -1850,6 +1900,26 @@
                         qtyInput.value = minLimit;
                         syncQty(minLimit);
                         qtyInput.focus();
+                        return;
+                    }
+
+                    const isBuyNow = (e.target && (e.target.classList.contains('btn-buynow') || e.target.classList.contains('mob-btn-buy')));
+                    const minOrderVal = parseFloat("{{ \App\Models\Setting::getAllCached()['min_order_price'] ?? 0 }}") || 0;
+                    if (isBuyNow && minOrderVal > 0) {
+                        const sellingPrice = parseFloat(document.getElementById('displaySellingPrice') ? document.getElementById('displaySellingPrice').dataset.price : "{{ $product->selling_price }}") || 0;
+                        const itemTotal = sellingPrice * val;
+                        if (itemTotal < minOrderVal) {
+                            e.preventDefault();
+                            let diff = minOrderVal - itemTotal;
+                            let extraQtyNeeded = Math.ceil(diff / (sellingPrice || 1));
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'MINIMUM ORDER VALUE REQUIRED',
+                                html: `<p class="mb-2">Order total is <b>₹${itemTotal.toLocaleString()}</b>. A minimum order amount of <b>₹${minOrderVal.toLocaleString()}</b> is required.</p><p class="text-secondary small mb-0">Please increase quantity by <b>${extraQtyNeeded}</b> more units (to ${val + extraQtyNeeded}) to place a direct order.</p>`,
+                                confirmButtonColor: '#f2701a'
+                            });
+                            return;
+                        }
                     }
                 };
 
@@ -1881,6 +1951,53 @@
             });
 
             // Auto-open review modal and switch to review tab if redirecting back after login
+            // Live Category Offer Countdown Timer for Product Detail
+            (function initPdCountdown() {
+                const pdTimer = document.getElementById('pdCategoryCountdown');
+                if (!pdTimer) return;
+
+                const endVal = pdTimer.getAttribute('data-end');
+                if (!endVal) return;
+                const endDate = parseInt(endVal);
+                if (isNaN(endDate)) return;
+
+                function updatePdCountdown() {
+                    const now = new Date().getTime();
+                    const dist = endDate - now;
+
+                    const daysEl = document.getElementById('pd-timer-days');
+                    const hoursEl = document.getElementById('pd-timer-hours');
+                    const minsEl = document.getElementById('pd-timer-mins');
+                    const secsEl = document.getElementById('pd-timer-secs');
+
+                    if (dist <= 0) {
+                        if (daysEl) daysEl.innerText = '00';
+                        if (hoursEl) hoursEl.innerText = '00';
+                        if (minsEl) minsEl.innerText = '00';
+                        if (secsEl) secsEl.innerText = '00';
+                        pdTimer.innerHTML = '<span class="text-danger fw-bold">EXPIRED</span>';
+                        const offerCard = pdTimer.closest('.category-offer-card');
+                        if (offerCard) {
+                            offerCard.style.display = 'none';
+                        }
+                        return;
+                    }
+
+                    const d = Math.floor(dist / (1000 * 60 * 60 * 24));
+                    const h = Math.floor((dist % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const m = Math.floor((dist % (1000 * 60 * 60)) / (1000 * 60));
+                    const s = Math.floor((dist % (1000 * 60)) / 1000);
+
+                    if (daysEl) daysEl.innerText = String(d).padStart(2, '0');
+                    if (hoursEl) hoursEl.innerText = String(h).padStart(2, '0');
+                    if (minsEl) minsEl.innerText = String(m).padStart(2, '0');
+                    if (secsEl) secsEl.innerText = String(s).padStart(2, '0');
+                }
+
+                updatePdCountdown();
+                setInterval(updatePdCountdown, 1000);
+            })();
+
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.has('write_review')) {
                 // Find review tab button and trigger click

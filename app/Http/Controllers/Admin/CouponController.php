@@ -40,7 +40,8 @@ class CouponController extends Controller implements HasMiddleware
             'discount_amount' => $request->discount_amount,
             'min_spend' => $request->min_spend,
             'expiry_date' => $request->expiry_date,
-            'status' => $request->status ?? 1
+            'status' => $request->status ?? 1,
+            'is_visible' => $request->has('is_visible') ? (int) $request->is_visible : 1
         ]);
 
         return redirect()->back()->with('success', 'Coupon created successfully.');
@@ -61,10 +62,20 @@ class CouponController extends Controller implements HasMiddleware
             'discount_amount' => $request->discount_amount,
             'min_spend' => $request->min_spend,
             'expiry_date' => $request->expiry_date,
-            'status' => $request->status ?? 1
+            'status' => $request->status ?? 1,
+            'is_visible' => $request->has('is_visible') ? (int) $request->is_visible : 0
         ]);
 
         return redirect()->back()->with('success', 'Coupon updated successfully.');
+    }
+
+    public function toggleVisibility($id)
+    {
+        $coupon = Coupon::findOrFail($id);
+        $coupon->is_visible = $coupon->is_visible ? 0 : 1;
+        $coupon->save();
+
+        return redirect()->back()->with('success', 'Coupon visibility updated successfully.');
     }
 
     public function destroy($id)

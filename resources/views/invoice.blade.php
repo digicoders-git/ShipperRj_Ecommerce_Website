@@ -220,9 +220,19 @@
                     </div>
                 </div>
                 <div class="col-5 text-end">
-                    <h1 class="outfit fw-black text-dark invoice-title mb-2">INVOICE</h1>
-                    <div class="d-flex flex-column align-items-end gap-1">
-                        <span class="badge-premium mb-2">Verified Transaction</span>
+                    @if($order->has_gst || $order->gst_number)
+                        <h1 class="outfit fw-black text-dark invoice-title mb-2" style="font-size: 2.2rem;">TAX INVOICE</h1>
+                        <div class="d-flex flex-column align-items-end gap-1">
+                            <span class="badge bg-warning text-dark px-3 py-1.5 rounded-pill fw-black xx-small uppercase mb-2 shadow-sm">
+                                <i class="bi bi-building me-1"></i> B2B GST INVOICE
+                            </span>
+                    @else
+                        <h1 class="outfit fw-black text-dark invoice-title mb-2" style="font-size: 2.2rem;">RETAIL INVOICE</h1>
+                        <div class="d-flex flex-column align-items-end gap-1">
+                            <span class="badge bg-secondary text-white px-3 py-1.5 rounded-pill fw-black xx-small uppercase mb-2 shadow-sm">
+                                <i class="bi bi-person me-1"></i> B2C RETAIL INVOICE
+                            </span>
+                    @endif
                         <p class="mb-0 text-secondary fw-bold small">ID: <span
                                 class="text-dark">#{{ $order->order_number }}</span></p>
                         <p class="mb-0 text-secondary small">DATE: <span
@@ -353,10 +363,17 @@
                                 <span class="fw-bold text-success">-₹{{ number_format($order->coupon_discount) }}</span>
                             </div>
                         @endif
-                        @if($order->has_gst && $order->gst_amount > 0)
+                        @if(($order->has_gst || $order->gst_number) && $order->gst_amount > 0)
+                            @php
+                                $halfGst = $order->gst_amount / 2;
+                            @endphp
+                            <div class="d-flex justify-content-between mb-2 align-items-center">
+                                <span class="text-secondary small fw-bold">CGST (9%)</span>
+                                <span class="fw-bold text-dark">+₹{{ number_format($halfGst, 2) }}</span>
+                            </div>
                             <div class="d-flex justify-content-between mb-3 align-items-center">
-                                <span class="text-secondary small fw-bold">GST (18%)</span>
-                                <span class="fw-bold text-dark">+₹{{ number_format($order->gst_amount, 2) }}</span>
+                                <span class="text-secondary small fw-bold">SGST (9%)</span>
+                                <span class="fw-bold text-dark">+₹{{ number_format($halfGst, 2) }}</span>
                             </div>
                         @endif
 

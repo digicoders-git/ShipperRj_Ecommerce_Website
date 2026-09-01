@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\Contact;
 
 class ContactController extends Controller
 {
@@ -12,13 +13,13 @@ class ContactController extends Controller
      */
     public function index()
     {
-        $contacts = \App\Models\Contact::latest()->paginate(20);
+        $contacts = Contact::latest()->paginate(20);
         return view('admin.contacts', compact('contacts'));
     }
 
     public function destroy(string $id)
     {
-        $contact = \App\Models\Contact::findOrFail($id);
+        $contact = Contact::findOrFail($id);
         $contact->delete();
         return redirect()->back()->with('success', 'Message deleted successfully');
     }

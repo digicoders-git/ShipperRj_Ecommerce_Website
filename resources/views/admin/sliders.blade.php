@@ -148,7 +148,7 @@
                                     </select>
                                 </div>
                                 <div class="col-md-12 mb-3">
-                                    <label class="form-label text-secondary small">Slider Image (Recommended size: 600x600 px)</label>
+                                    <label class="form-label text-secondary small">Slider Image (Recommended Aspect Ratio: <strong>16:9</strong>, e.g. <strong>1200x675 px</strong> or <strong>800x450 px</strong>)</label>
                                     <input type="file" name="image" class="form-control glass-input" accept="image/*">
                                     @if($slider->image)
                                         <div class="mt-2">
@@ -227,7 +227,7 @@
                                 </select>
                             </div>
                             <div class="col-md-12 mb-3">
-                                <label class="form-label text-secondary small">Slider Image (Recommended size: 600x600 px)</label>
+                                <label class="form-label text-secondary small">Slider Image (Recommended Aspect Ratio: <strong>16:9</strong>, e.g. <strong>1200x675 px</strong> or <strong>800x450 px</strong>)</label>
                                 <input type="file" name="image" class="form-control glass-input" accept="image/*">
                             </div>
                         </div>
